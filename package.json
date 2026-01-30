@@ -9,7 +9,8 @@
     "lint": "eslint",
     "migrate": "ts-node --project database/tsconfig.json database/migrate.ts",
     "seed": "ts-node --project database/tsconfig.json database/seed.ts",
-    "seed:unseed": "ts-node --project database/tsconfig.json database/seed.ts unseed"
+    "seed:unseed": "ts-node --project database/tsconfig.json database/seed.ts unseed",
+    "seed:medical-billing": "ts-node seed-medical-billing.ts"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",

@@ -14,6 +14,7 @@ export default function CreateBlogPage() {
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [cloudinaryUrl, setCloudinaryUrl] = useState<string>('');
+  const [categories, setCategories] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -21,7 +22,8 @@ export default function CreateBlogPage() {
     content: '',
     file: '',
     seoTitle: '',
-    seoContent: ''
+    seoContent: '',
+    categoryId: ''
   });
 
   useEffect(() => {
@@ -34,8 +36,29 @@ export default function CreateBlogPage() {
         return;
       }
       
+      fetchCategories();
     }
   }, [router]);
+
+  const fetchCategories = async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
+      if (!token) return;
+
+      const response = await fetch('/api/admin/blog-categories?limit=100', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success && data.categories) {
+        setCategories(data.categories);
+      }
+    } catch (err) {
+      console.error('Failed to fetch categories:', err);
+    }
+  };
 
   // Auto-generate slug from title
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -179,7 +202,7 @@ export default function CreateBlogPage() {
             )}
 
             <form onSubmit={handleSubmit}>
-              {/* Row 1: Title, Slug, SEO Title (3 fields) */}
+              {/* Row 1: Title, Slug, Category (3 fields) */}
               <div className="row mb-3">
                 <div className="col-md-4">
                   <label className="form-label">Title *</label>
@@ -209,6 +232,25 @@ export default function CreateBlogPage() {
                 </div>
 
                 <div className="col-md-4">
+                  <label className="form-label">Category</label>
+                  <select
+                    className="form-select"
+                    value={formData.categoryId}
+                    onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((cat: any) => (
+                      <option key={cat._id} value={cat._id}>
+                        {cat.parent ? `${cat.parent.name} > ` : ''}{cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 2: SEO Title (full width) */}
+              <div className="row mb-3">
+                <div className="col-md-12">
                   <label className="form-label">SEO Title</label>
                   <input
                     type="text"
@@ -224,7 +266,7 @@ export default function CreateBlogPage() {
                 </div>
               </div>
 
-              {/* Row 2: File (full width) */}
+              {/* Row 3: File (full width) */}
               <div className="row mb-3">
                 <div className="col-md-12">
 
@@ -259,7 +301,7 @@ export default function CreateBlogPage() {
                 </div>
               </div>
 
-              {/* Row 3: SEO Content (full width) */}
+              {/* Row 4: SEO Content (full width) */}
               <div className="row mb-3">
                 <div className="col-md-12">
                   <label className="form-label">SEO Content</label>
@@ -277,7 +319,7 @@ export default function CreateBlogPage() {
                 </div>
               </div>
 
-              {/* Row 4: Description, Content (2 fields - description last) */}
+              {/* Row 5: Description, Content (2 fields - description last) */}
               <div className="row mb-3">
                 <div className="col-md-6">
                   <label className="form-label">Content</label>

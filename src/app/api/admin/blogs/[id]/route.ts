@@ -43,6 +43,7 @@ export async function GET(
       file: blog.file,
       seoTitle: blog.seo_title,
       seoContent: blog.seo_content,
+      categoryId: blog.category_id || null,
       created_at: blog.created_at,
       updated_at: blog.updated_at
     };
@@ -83,7 +84,8 @@ export async function PUT(
       content,
       file,
       seoTitle,
-      seoContent
+      seoContent,
+      categoryId
     } = body;
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
@@ -119,6 +121,7 @@ export async function PUT(
       file: file.trim(),
       seo_title: seoTitle?.trim() || null,
       seo_content: seoContent?.trim() || null,
+      category_id: categoryId || null,
       updated_at: new Date().toISOString()
     };
 

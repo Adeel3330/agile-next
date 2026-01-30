@@ -98,7 +98,8 @@ export async function POST(req: NextRequest) {
       content,
       file,
       seoTitle,
-      seoContent
+      seoContent,
+      categoryId
     } = body;
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
@@ -136,6 +137,7 @@ export async function POST(req: NextRequest) {
         file: file.trim(),
         seo_title: seoTitle?.trim() || null,
         seo_content: seoContent?.trim() || null,
+        category_id: categoryId || null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         deleted_at: null
