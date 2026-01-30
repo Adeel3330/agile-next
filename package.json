@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "migrate": "ts-node --project database/tsconfig.json database/migrate.ts",
+    "seed": "ts-node --project database/tsconfig.json database/seed.ts",
+    "seed:unseed": "ts-node --project database/tsconfig.json database/seed.ts unseed"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",
