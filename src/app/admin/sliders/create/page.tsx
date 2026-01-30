@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+// Dynamically import RichTextEditor to avoid SSR issues
+const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
 
 export default function CreateSliderPage() {
   const router = useRouter();
@@ -257,12 +261,11 @@ export default function CreateSliderPage() {
               <div className="row mb-3">
                 <div className="col-md-6">
                   <label className="form-label">Description</label>
-                  <textarea
-                    className="form-control"
+                  <RichTextEditor
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={4}
+                    onChange={(value) => setFormData({ ...formData, description: value })}
                     placeholder="Enter slider description"
+                    height="250px"
                   />
                 </div>
                 <div className="col-md-6">

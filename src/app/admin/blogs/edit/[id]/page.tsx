@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+// Dynamically import RichTextEditor to avoid SSR issues
+const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
 
 interface Blog {
   _id: string;
@@ -406,22 +410,20 @@ export default function EditBlogPage() {
               <div className="row mb-3">
                 <div className="col-md-6">
                   <label className="form-label">Content</label>
-                  <textarea
-                    className="form-control"
+                  <RichTextEditor
                     value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows={6}
+                    onChange={(value) => setFormData({ ...formData, content: value })}
                     placeholder="Enter blog content"
+                    height="300px"
                   />
                 </div>
                 <div className="col-md-6">
                   <label className="form-label">Description</label>
-                  <textarea
-                    className="form-control"
+                  <RichTextEditor
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={6}
+                    onChange={(value) => setFormData({ ...formData, description: value })}
                     placeholder="Enter blog description"
+                    height="300px"
                   />
                 </div>
               </div>

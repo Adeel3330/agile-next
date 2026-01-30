@@ -3,6 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+// Dynamically import RichTextEditor to avoid SSR issues
+const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { 
+  ssr: false,
+  loading: () => <div style={{ height: '300px', border: '1px solid #ddd', borderRadius: '4px', padding: '10px', backgroundColor: '#f9f9f9' }}>Loading editor...</div>
+});
 
 export default function CreateBlogPage() {
   const router = useRouter();
@@ -320,28 +327,28 @@ export default function CreateBlogPage() {
               </div>
 
               {/* Row 5: Description, Content (2 fields - description last) */}
-              <div className="row mb-3">
-                <div className="col-md-6">
-                  <label className="form-label">Content</label>
-                  <textarea
-                    className="form-control"
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows={6}
-                    placeholder="Enter blog content"
-                  />
+              {mounted && (
+                <div className="row mb-3">
+                  <div className="col-md-6">
+                    <label className="form-label">Content</label>
+                    <RichTextEditor
+                      value={formData.content}
+                      onChange={(value) => setFormData({ ...formData, content: value })}
+                      placeholder="Enter blog content"
+                      height="300px"
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Description</label>
+                    <RichTextEditor
+                      value={formData.description}
+                      onChange={(value) => setFormData({ ...formData, description: value })}
+                      placeholder="Enter blog description"
+                      height="300px"
+                    />
+                  </div>
                 </div>
-                <div className="col-md-6">
-                  <label className="form-label">Description</label>
-                  <textarea
-                    className="form-control"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={6}
-                    placeholder="Enter blog description"
-                  />
-                </div>
-              </div>
+              )}
 
               <div className="d-flex justify-content-end gap-2 pt-3 border-top">
                 <Link href="/admin/blogs" className="theme-btn btn-two rounded-1 px-3 py-2">

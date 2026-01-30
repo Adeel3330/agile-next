@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+// Dynamically import RichTextEditor to avoid SSR issues
+const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
 
 interface Career {
   _id: string;
@@ -260,25 +264,21 @@ export default function EditCareerPage() {
               <div className="row mb-3">
                 <div className="col-md-6">
                   <label className="form-label">Description *</label>
-                  <textarea
-                    className="form-control"
+                  <RichTextEditor
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={4}
-                    required
+                    onChange={(value) => setFormData({ ...formData, description: value })}
                     placeholder="Enter job description"
+                    height="250px"
                   />
                 </div>
 
                 <div className="col-md-6">
                   <label className="form-label">Requirements *</label>
-                  <textarea
-                    className="form-control"
+                  <RichTextEditor
                     value={formData.requirements}
-                    onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
-                    rows={4}
-                    required
+                    onChange={(value) => setFormData({ ...formData, requirements: value })}
                     placeholder="Enter job requirements"
+                    height="250px"
                   />
                 </div>
               </div>
