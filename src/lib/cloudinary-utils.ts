@@ -105,12 +105,24 @@ export function getCloudinaryImageUrl(
       transformations.push('c_fill');
     }
     
-    const transformString = transformations.length > 0 ? transformations.join(',') + '/' : '';
+    if (transformations.length === 0) {
+      return url;
+    }
+    
+    const transformString = transformations.join(',');
     
     // Insert transformation after 'upload'
-    pathParts.splice(uploadIndex + 1, 0, transformString);
+    // Cloudinary format: /upload/{transformations}/{version}/{public_id}
+    // We need to insert transformations right after 'upload'
+    const afterUpload = pathParts.slice(uploadIndex + 1);
+    const newPathParts = [
+      ...pathParts.slice(0, uploadIndex + 1),
+      transformString,
+      ...afterUpload
+    ];
     
-    urlObj.pathname = pathParts.join('/');
+    // Remove empty strings and join
+    urlObj.pathname = newPathParts.filter(part => part !== '').join('/');
     return urlObj.toString();
   } catch (error) {
     console.error('Error generating Cloudinary transformation URL:', error);
