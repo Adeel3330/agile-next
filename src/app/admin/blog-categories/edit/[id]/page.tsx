@@ -65,9 +65,12 @@ export default function EditBlogCategoryPage() {
 
       const data = await response.json();
       if (data.success && data.categories) {
-        // Exclude current category from parent options to prevent circular references
+        // Only show parent categories (categories without a parent) and exclude current category
         setCategories(data.categories
-          .filter((cat: any) => (cat._id || cat.id) !== id)
+          .filter((cat: any) => 
+            (cat._id || cat.id) !== id && // Exclude current category to prevent circular references
+            !cat.parentId && !cat.parent_id // Only show parent categories
+          )
           .map((cat: any) => ({
             id: cat._id || cat.id,
             name: cat.name,

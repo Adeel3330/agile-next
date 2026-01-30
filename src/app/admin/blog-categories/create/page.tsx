@@ -46,11 +46,14 @@ export default function CreateBlogCategoryPage() {
 
       const data = await response.json();
       if (data.success && data.categories) {
-        setCategories(data.categories.map((cat: any) => ({
-          id: cat._id || cat.id,
-          name: cat.name,
-          slug: cat.slug
-        })));
+        // Only show parent categories (categories without a parent)
+        setCategories(data.categories
+          .filter((cat: any) => !cat.parentId && !cat.parent_id) // Only parents
+          .map((cat: any) => ({
+            id: cat._id || cat.id,
+            name: cat.name,
+            slug: cat.slug
+          })));
       }
     } catch (err) {
       console.error('Fetch categories error:', err);
