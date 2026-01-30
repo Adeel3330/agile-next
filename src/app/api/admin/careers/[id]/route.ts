@@ -1,0 +1,186 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyToken } from '@/lib/auth';
+import { supabaseAdmin } from '@/lib/supabase';
+
+// GET /api/admin/careers/[id]
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const auth = await verifyToken(req);
+    if (!auth) {
+      return NextResponse.json(
+        { success: false, message: 'Access denied. Invalid or missing token.' },
+        { status: 401 }
+      );
+    }
+
+    const { id } = params;
+
+    const { data: career, error } = await supabaseAdmin
+      .from('careers')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !career) {
+      return NextResponse.json(
+        { success: false, message: 'Career not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: career
+    });
+  } catch (error) {
+    console.error('Get career error:', error);
+    return NextResponse.json(
+      { success: false, message: 'Failed to fetch career' },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT /api/admin/careers/[id]
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const auth = await verifyToken(req);
+    if (!auth) {
+      return NextResponse.json(
+        { success: false, message: 'Access denied. Invalid or missing token.' },
+        { status: 401 }
+      );
+    }
+
+    const { id } = params;
+    const body = await req.json();
+    const {
+      title,
+      department,
+      location,
+      type,
+      status,
+      description,
+      requirements
+    } = body;
+
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
+      return NextResponse.json(
+        { success: false, message: 'Please provide a job title' },
+        { status: 400 }
+      );
+    }
+
+    // Map 'active' to 'open' for backward compatibility
+    let careerStatus: 'open' | 'closed' | 'draft' | undefined = undefined;
+    if (status !== undefined) {
+      if (status === 'active') {
+        careerStatus = 'open';
+      } else if (status === 'closed') {
+        careerStatus = 'closed';
+      } else if (status === 'draft') {
+        careerStatus = 'draft';
+      } else {
+        careerStatus = status as 'open' | 'closed' | 'draft';
+      }
+    }
+
+    const updates: any = {
+      title: title.trim(),
+      updated_at: new Date().toISOString()
+    };
+
+    if (department !== undefined) {
+      updates.department = department?.trim() || null;
+    }
+    if (location !== undefined) {
+      updates.location = location?.trim() || null;
+    }
+    if (type !== undefined) {
+      updates.type = type?.trim() || null;
+    }
+    if (careerStatus !== undefined) {
+      updates.status = careerStatus;
+    }
+    if (description !== undefined) {
+      updates.description = description?.trim() || null;
+    }
+    if (requirements !== undefined) {
+      updates.requirements = requirements?.trim() || null;
+    }
+
+    const { data: career, error } = await supabaseAdmin
+      .from('careers')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error || !career) {
+      return NextResponse.json(
+        { success: false, message: 'Career not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Career updated successfully',
+      data: career
+    });
+  } catch (error) {
+    console.error('Update career error:', error);
+    return NextResponse.json(
+      { success: false, message: 'Failed to update career' },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/admin/careers/[id]
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const auth = await verifyToken(req);
+    if (!auth) {
+      return NextResponse.json(
+        { success: false, message: 'Access denied. Invalid or missing token.' },
+        { status: 401 }
+      );
+    }
+
+    const { id } = params;
+
+    const { error } = await supabaseAdmin
+      .from('careers')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      return NextResponse.json(
+        { success: false, message: 'Career not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Career deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete career error:', error);
+    return NextResponse.json(
+      { success: false, message: 'Failed to delete career' },
+      { status: 500 }
+    );
+  }
+}
+

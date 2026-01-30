@@ -1,0 +1,284 @@
+/* Slider Form Page Styles */
+.formPage {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 30px 0;
+}
+
+.formContainer {
+  /* max-width: 900px; */
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+  padding: 30px;
+}
+
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.formTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+}
+
+.btnBack {
+  padding: 10px 20px;
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btnBack:hover {
+  background: #5a6268;
+  color: #fff;
+}
+
+.alertError {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 12px 15px;
+  border-radius: 5px;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.formRowDescription {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 15px;
+}
+
+.descriptionField {
+  grid-column: 1 / 2;
+}
+
+.formGroup label {
+  font-weight: 500;
+  color: #444;
+  font-size: 14px;
+}
+
+.formControl {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: all 0.3s;
+  font-family: inherit;
+}
+
+.formControl:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+  outline: none;
+}
+
+textarea.formControl {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.helpText {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.previewContainer {
+  margin-top: 10px;
+}
+
+.previewContainer label {
+  display: block;
+  font-weight: 500;
+  color: #444;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.preview {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  object-fit: contain;
+}
+
+.previewContainer img {
+  display: block;
+  margin-top: 10px;
+}
+
+.previewContainer video {
+  display: block;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.formFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.btnSecondary {
+  padding: 12px 24px;
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnSecondary:hover {
+  background: #5a6268;
+  color: #fff;
+}
+
+.btnPrimary {
+  padding: 12px 24px;
+  background: #0066cc;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: #0052a3;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 20px;
+}
+
+.loadingSpinner {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 3px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 3px solid #0066cc;
+  animation: spin 1s linear infinite;
+}
+
+.loadingContainer p {
+  color: #666;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .formContainer {
+    margin: 15px;
+    padding: 20px;
+  }
+
+  .formHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .formRowDescription {
+    grid-template-columns: 1fr;
+  }
+
+  .descriptionField {
+    grid-column: 1;
+  }
+
+  .formFooter {
+    flex-direction: column-reverse;
+  }
+
+  .btnSecondary,
+  .btnPrimary {
+    width: 100%;
+    justify-content: center;
+  }
+}

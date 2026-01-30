@@ -106,8 +106,10 @@
 
 
 :root{
-  --theme-color: #F3A952;
-  --secondary-color: #064ACB;
+  /* --theme-color: #F3A952; */
+  --theme-color: #F46700;
+  --secondary-color: #0A3366;
+  /* --secondary-color: #064ACB; */
   --pink-color: #FFC0CB;
   --violet-color: #7F00FF;
   --crimson-color: #DC143C;
@@ -2628,7 +2630,9 @@ button.ltr {
 }
 
 
-
+.bg-theme-one{
+  background: var(--theme-color);
+}
 
 
 

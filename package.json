@@ -10,8 +10,14 @@
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",
+    "@supabase/supabase-js": "^2.93.3",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.9.0",
     "isotope-layout": "^3.0.6",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.22.0",
     "next": "15.5.0",
+    "next-cloudinary": "^6.17.5",
     "react": "19.1.0",
     "react-countup": "^6.5.3",
     "react-dom": "19.1.0",
@@ -21,12 +27,16 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/bcryptjs": "^2.4.6",
     "@types/isotope-layout": "^3.0.15",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "15.5.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
