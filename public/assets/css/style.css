@@ -431,6 +431,7 @@ img {
   text-transform: uppercase;
   z-index: 1;
   transition: all 500ms ease;
+  cursor: pointer;
 }
 
 .theme-btn span{

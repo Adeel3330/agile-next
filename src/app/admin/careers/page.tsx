@@ -241,14 +241,14 @@ export default function CareersPage() {
                     </td>
                     <td>
                       <Link
-                        href={`/admin/careers/edit/${career._id}`}
+                        href={`/admin/careers/edit/${career.id}`}
                         className={`${styles.btnAction} ${styles.btnEdit}`}
                       >
                         <i className="fa fa-edit"></i> Edit
                       </Link>
                       <button
                         className={`${styles.btnAction} ${styles.btnDelete}`}
-                        onClick={() => handleDelete(career._id)}
+                        onClick={() => handleDelete(career.id)}
                       >
                         <i className="fa fa-trash"></i> Delete
                       </button>

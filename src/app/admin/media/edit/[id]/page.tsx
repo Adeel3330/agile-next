@@ -355,7 +355,7 @@ export default function EditMediaPage() {
                 <div className="col-md-4">
                   <label className="form-label">Link URL</label>
                   <input
-                    type="url"
+                    type="text"
                     className="form-control"
                     value={formData.linkUrl}
                     onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}

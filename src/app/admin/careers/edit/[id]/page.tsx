@@ -10,7 +10,9 @@ const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor')
 
 interface Career {
   _id: string;
+  id?: string;
   title: string;
+  slug?: string;
   department: string;
   location: string;
   type: string;
@@ -33,6 +35,7 @@ export default function EditCareerPage() {
 
   const [formData, setFormData] = useState({
     title: '',
+    slug: '',
     department: '',
     location: '',
     type: '',
@@ -85,16 +88,17 @@ export default function EditCareerPage() {
         return;
       }
 
-      const career: Career = data.career;
+      const career: Career = data.data || data.career;
       // Map backend 'open' to frontend 'active' for form
       const displayStatus = career.status === 'open' ? 'active' : career.status;
       setFormData({
         title: career.title,
-        department: career.department,
-        location: career.location,
-        type: career.type,
-        description: career.description,
-        requirements: career.requirements,
+        slug: career.slug || '',
+        department: career.department || '',
+        location: career.location || '',
+        type: career.type || '',
+        description: career.description || '',
+        requirements: career.requirements || '',
         status: displayStatus as 'active' | 'closed'
       });
       setLoading(false);
@@ -120,6 +124,7 @@ export default function EditCareerPage() {
       // Map frontend 'active' to backend 'open' before sending
       const submitData = {
         ...formData,
+        slug: formData.slug.trim(),
         status: formData.status === 'active' ? 'open' : formData.status
       };
 
@@ -188,7 +193,7 @@ export default function EditCareerPage() {
             )}
 
             <form onSubmit={handleSubmit}>
-              {/* Row 1: Title, Department, Location (3 fields) */}
+              {/* Row 1: Title, Slug, Department (3 fields) */}
               <div className="row mb-3">
                 <div className="col-md-4">
                   <label className="form-label">Title *</label>
@@ -196,10 +201,32 @@ export default function EditCareerPage() {
                     type="text"
                     className="form-control"
                     value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    onChange={(e) => {
+                      const title = e.target.value;
+                      setFormData({
+                        ...formData,
+                        title: title,
+                        slug: title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+                      });
+                    }}
                     required
                     placeholder="Enter career title"
                   />
+                </div>
+
+                <div className="col-md-4">
+                  <label className="form-label">Slug *</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    required
+                    placeholder="career-slug"
+                  />
+                  <small className="form-text text-muted">
+                    URL-friendly version (auto-generated from title)
+                  </small>
                 </div>
 
                 <div className="col-md-4">
@@ -227,9 +254,21 @@ export default function EditCareerPage() {
                 </div>
               </div>
 
-              {/* Row 2: Type, Status (2 fields) */}
+              {/* Row 2: Location, Type, Status (3 fields) */}
               <div className="row mb-3">
-                <div className="col-md-6">
+                <div className="col-md-4">
+                  <label className="form-label">Location *</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    required
+                    placeholder="Enter location"
+                  />
+                </div>
+
+                <div className="col-md-4">
                   <label className="form-label">Type *</label>
                   <select
                     className="form-select"
@@ -246,7 +285,7 @@ export default function EditCareerPage() {
                   </select>
                 </div>
 
-                <div className="col-md-6">
+                <div className="col-md-4">
                   <label className="form-label">Status *</label>
                   <select
                     className="form-select"

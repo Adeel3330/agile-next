@@ -1,23 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 
 // Increase timeout for file uploads
 export const maxDuration = 60; // 60 seconds
 export const dynamic = 'force-dynamic';
 
-// POST /api/admin/media/upload
-// Upload file to Cloudinary
+// POST /api/resumes/upload
+// Public API - Upload resume file (no authentication required)
 export async function POST(req: NextRequest) {
   try {
-    const auth = await verifyToken(req);
-    if (!auth) {
-      return NextResponse.json(
-        { success: false, message: 'Access denied. Invalid or missing token.' },
-        { status: 401 }
-      );
-    }
-
     const formData = await req.formData();
     const file = formData.get('file') as File;
 
@@ -28,19 +19,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate file type (only images)
-    if (!file.type.startsWith('image/')) {
+    // Validate file type (only PDF and DOC/DOCX)
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const allowedExtensions = ['.pdf', '.doc', '.docx'];
+    const fileName = file.name.toLowerCase();
+    const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+    
+    if (!allowedTypes.includes(file.type) && !hasValidExtension) {
       return NextResponse.json(
-        { success: false, message: 'Only image files are allowed' },
+        { success: false, message: 'Only PDF and DOC/DOCX files are allowed' },
         { status: 400 }
       );
     }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    // Validate file size (max 5MB for resumes)
+    const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { success: false, message: 'File size must be less than 10MB' },
+        { success: false, message: 'File size must be less than 5MB' },
         { status: 400 }
       );
     }
@@ -55,10 +51,10 @@ export async function POST(req: NextRequest) {
     
     const buffer = Buffer.from(bytes);
 
-    // Upload to Cloudinary in 'media' folder
+    // Upload to Cloudinary in 'resumes' folder
     try {
       const uploadResult = await Promise.race([
-        uploadToCloudinary(buffer, 'media', 'image'),
+        uploadToCloudinary(buffer, 'resumes', 'auto'),
         new Promise<never>((_, reject) => 
           setTimeout(() => reject(new Error('Upload timeout')), 50000)
         )
@@ -67,11 +63,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         url: uploadResult.url,
-        publicId: uploadResult.public_id,
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type,
-        originalName: file.name
+        publicId: uploadResult.public_id
       });
     } catch (uploadError: any) {
       console.error('Cloudinary upload error:', uploadError);
@@ -81,25 +73,10 @@ export async function POST(req: NextRequest) {
           { status: 408 }
         );
       }
-      
-      let message = 'Failed to upload file to Cloudinary';
-      if (uploadError.message) {
-        message = uploadError.message;
-      } else if (uploadError.http_code) {
-        message = `Cloudinary error: ${uploadError.message || 'Upload failed'}`;
-      }
-      
-      return NextResponse.json(
-        { 
-          success: false, 
-          message,
-          error: process.env.NODE_ENV === 'development' ? uploadError.message : undefined
-        },
-        { status: 500 }
-      );
+      throw uploadError;
     }
   } catch (error: any) {
-    console.error('Upload error:', error);
+    console.error('Resume upload error:', error);
     
     if (error.message === 'File read timeout') {
       return NextResponse.json(
@@ -109,11 +86,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
-        success: false, 
-        message: 'Failed to upload file',
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
+      { success: false, message: 'Failed to upload resume. Please try again.' },
       { status: 500 }
     );
   }

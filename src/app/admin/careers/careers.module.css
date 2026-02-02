@@ -37,6 +37,7 @@
 }
 
 .btnPrimary:hover {
+color:white;
   background: #0052a3;
 }
 
@@ -167,6 +168,7 @@
   cursor: pointer;
   transition: all 0.3s;
   margin-right: 5px;
+  display: inline-block;
 }
 
 .btnEdit {
@@ -176,6 +178,7 @@
 
 .btnEdit:hover {
   background: #e55a2b;
+  color: white;
 }
 
 .btnDelete {

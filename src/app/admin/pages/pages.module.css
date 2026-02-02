@@ -38,6 +38,7 @@
 }
 
 .btnPrimary:hover {
+color:white;
   background: #0052a3;
 }
 
@@ -219,6 +220,7 @@
 
 .btnEdit:hover {
   background: #e55a2b;
+  color: white;
 }
 
 .btnVersions {
@@ -228,6 +230,7 @@
 
 .btnVersions:hover {
   background: #5a6268;
+  color: white;
 }
 
 .btnDelete {

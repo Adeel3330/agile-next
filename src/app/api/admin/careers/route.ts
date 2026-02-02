@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       title,
+      slug,
       department,
       location,
       type,
@@ -102,10 +103,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Use provided slug or generate from title
+    const careerSlug = slug?.trim() || title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    
+    // Check if slug already exists, append number if needed
+    let finalSlug = careerSlug;
+    let slugCounter = 1;
+    while (true) {
+      const { data: existing } = await supabaseAdmin
+        .from('careers')
+        .select('id')
+        .eq('slug', finalSlug)
+        .maybeSingle();
+      
+      if (!existing) break;
+      finalSlug = `${careerSlug}-${slugCounter}`;
+      slugCounter++;
+    }
+
     const { data: career, error } = await supabaseAdmin
       .from('careers')
       .insert({
         title: title.trim(),
+        slug: finalSlug,
         department: department?.trim() || null,
         location: location?.trim() || null,
         type: type?.trim() || null,

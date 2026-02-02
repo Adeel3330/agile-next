@@ -27,6 +27,7 @@ export default function AdminLayout({
   const sidebarItems = [
     { href: '/admin', label: 'Dashboard', icon: 'fa-tachometer-alt' },
     { href: '/admin/careers', label: 'Careers Development', icon: 'fa-briefcase' },
+    { href: '/admin/resumes', label: 'Resumes', icon: 'fa-file-alt' },
     { href: '/admin/sliders', label: 'Sliders', icon: 'fa-images' },
     { href: '/admin/blog-categories', label: 'Categories', icon: 'fa-folder' },
     { href: '/admin/blogs', label: 'Blogs', icon: 'fa-newspaper' },

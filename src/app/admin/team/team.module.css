@@ -38,6 +38,7 @@
 }
 
 .btnPrimary:hover {
+color:white;
   background: #0052a3;
 }
 
@@ -222,6 +223,7 @@
 
 .btnEdit:hover {
   background: #e55a2b;
+  color: white;
 }
 
 .btnDelete {

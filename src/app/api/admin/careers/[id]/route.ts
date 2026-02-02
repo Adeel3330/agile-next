@@ -62,6 +62,7 @@ export async function PUT(
     const body = await req.json();
     const {
       title,
+      slug,
       department,
       location,
       type,
@@ -91,8 +92,28 @@ export async function PUT(
       }
     }
 
+    // Use provided slug or generate from title
+    const careerSlug = slug?.trim() || title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    
+    // Check if slug already exists (excluding current career), append number if needed
+    let finalSlug = careerSlug;
+    let slugCounter = 1;
+    while (true) {
+      const { data: existing } = await supabaseAdmin
+        .from('careers')
+        .select('id')
+        .eq('slug', finalSlug)
+        .neq('id', id)
+        .maybeSingle();
+      
+      if (!existing) break;
+      finalSlug = `${careerSlug}-${slugCounter}`;
+      slugCounter++;
+    }
+
     const updates: any = {
       title: title.trim(),
+      slug: finalSlug,
       updated_at: new Date().toISOString()
     };
 

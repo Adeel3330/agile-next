@@ -38,6 +38,7 @@
 }
 
 .btnPrimary:hover {
+color:white;
   background: #0052a3;
   color: #fff;
 }
