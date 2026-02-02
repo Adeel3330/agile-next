@@ -163,8 +163,8 @@ export default function SettingsPage() {
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
-      // Use media upload endpoint (or create a dedicated one)
-      const uploadResponse = await fetch('/api/admin/media/upload', {
+      // Use Cloudinary upload endpoint (consistent with other modules)
+      const uploadResponse = await fetch('/api/admin/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
