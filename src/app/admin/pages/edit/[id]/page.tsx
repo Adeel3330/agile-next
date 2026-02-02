@@ -456,7 +456,7 @@ export default function EditPagePage() {
                 >
                   {saving ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <p className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></p>
                       Saving...
                     </>
                   ) : (

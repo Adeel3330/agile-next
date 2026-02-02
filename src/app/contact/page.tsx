@@ -7,7 +7,7 @@ export default function ContactPage() {
 
     return (
         <div className="boxed_wrapper">
-            <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Contact Us">
+            <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Contact Us">
                 <section className="contact-info-two centred">
                     <div className="pattern-layer" style={{ backgroundImage: "url(assets/images/shape/shape-43.png)" }}></div>
                     <div className="auto-container">

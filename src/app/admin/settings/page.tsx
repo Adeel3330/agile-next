@@ -160,8 +160,21 @@ export default function SettingsPage() {
         return;
       }
 
+      // Validate file size (max 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        setError('File size must be less than 10MB');
+        setUploading(false);
+        setPreviewUrl(uploadedLogoUrl || '');
+        return;
+      }
+
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
+
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      let timeoutId: NodeJS.Timeout | null = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
       // Use Cloudinary upload endpoint (consistent with other modules)
       const uploadResponse = await fetch('/api/admin/upload', {
@@ -169,8 +182,19 @@ export default function SettingsPage() {
         headers: {
           'Authorization': `Bearer ${token}`
         },
-        body: uploadFormData
+        body: uploadFormData,
+        signal: controller.signal
       });
+
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json().catch(() => ({ message: 'Upload failed' }));
+        throw new Error(errorData.message || 'Upload failed');
+      }
 
       const uploadData = await uploadResponse.json();
 
@@ -184,9 +208,22 @@ export default function SettingsPage() {
       setUploadedLogoUrl(uploadData.url);
       setFormData(prev => ({ ...prev, logoUrl: uploadData.url }));
       setUploading(false);
-    } catch (err) {
+    } catch (err: any) {
+      // Clear timeout if it exists
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      
       console.error('Upload error:', err);
-      setError('Failed to upload logo. Please try again.');
+      
+      if (err.name === 'AbortError') {
+        setError('Upload timeout. Please try again with a smaller file.');
+      } else if (err.message) {
+        setError(err.message);
+      } else {
+        setError('Failed to upload logo. Please try again.');
+      }
+      
       setUploading(false);
       setPreviewUrl(uploadedLogoUrl || '');
     }
@@ -590,7 +627,7 @@ export default function SettingsPage() {
                 >
                   {saving ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <p className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></p>
                       Saving...
                     </>
                   ) : (
