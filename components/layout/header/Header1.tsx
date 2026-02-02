@@ -137,7 +137,16 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
               <div className="logo-box">
                 <figure className="logo">
                   <Link href="/">
-                    <Image src="/assets/images/logo.png" alt="Logo Image" width={203} height={40} priority />
+                  <Image 
+                        src={settings?.logoUrl || '/assets/images/logo.png'} 
+                        alt="Logo Image" 
+                        width={203} 
+                        height={40} 
+                        priority 
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/assets/images/logo.png';
+                        }}
+                      />
                   </Link>
                 </figure>
               </div>
