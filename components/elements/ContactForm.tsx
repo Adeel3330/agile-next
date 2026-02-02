@@ -6,18 +6,23 @@ export default function ContactForm() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
+    subject: "",
     message: "",
   });
 
   const [status, setStatus] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrorMessage(""); // Clear error when user types
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
+    setErrorMessage("");
 
     try {
       const res = await fetch("/api/contact", {
@@ -26,15 +31,19 @@ export default function ContactForm() {
         body: JSON.stringify(formData),
       });
 
-      if (res.ok) {
+      const data = await res.json();
+
+      if (data.success) {
         setStatus("success");
-        setFormData({ name: "", email: "", message: "" });
+        setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
       } else {
         setStatus("error");
+        setErrorMessage(data.message || "Something went wrong");
       }
     } catch (err) {
       console.error(err);
       setStatus("error");
+      setErrorMessage("Failed to send message. Please try again.");
     }
   };
 
@@ -62,10 +71,22 @@ export default function ContactForm() {
                 />
             </div>
             <div className="col-lg-6 col-md-6 col-sm-12 form-group">
-                <input type="text" name="phone" placeholder="Phone" />
+                <input 
+                  type="text" 
+                  name="phone" 
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Phone" 
+                />
             </div>
             <div className="col-lg-6 col-md-6 col-sm-12 form-group">
-                <input type="text" name="subject" placeholder="Subject" />
+                <input 
+                  type="text" 
+                  name="subject" 
+                  value={formData.subject}
+                  onChange={handleChange}
+                  placeholder="Subject" 
+                />
             </div>
             <div className="col-lg-12 col-md-12 col-sm-12 form-group">
                 <textarea
@@ -89,7 +110,7 @@ export default function ContactForm() {
 
       {status === "loading" && <p className="text-gray-600">Sending...</p>}
       {status === "success" && <p className="text-green-600">Message sent successfully ✅</p>}
-      {status === "error" && <p className="text-red-600">Something went wrong ❌</p>}
+      {status === "error" && <p className="text-red-600">{errorMessage || "Something went wrong ❌"}</p>}
     </form>
   );
 }

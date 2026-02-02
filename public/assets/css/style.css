@@ -2763,3 +2763,9 @@ button.ltr {
 .google-map-section .map-inner{
   height: 570px;
 }
+
+
+.sidebar-menu{
+  max-height: 70%;
+  overflow-y: scroll;
+}

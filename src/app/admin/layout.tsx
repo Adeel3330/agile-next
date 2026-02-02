@@ -22,12 +22,12 @@ export default function AdminLayout({
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
 
   // Define sidebar items outside conditional logic
   const sidebarItems = [
     { href: '/admin', label: 'Dashboard', icon: 'fa-tachometer-alt' },
     { href: '/admin/careers', label: 'Careers Development', icon: 'fa-briefcase' },
-    { href: '/admin/resumes', label: 'Resumes', icon: 'fa-file-alt' },
     { href: '/admin/sliders', label: 'Sliders', icon: 'fa-images' },
     { href: '/admin/blog-categories', label: 'Categories', icon: 'fa-folder' },
     { href: '/admin/blogs', label: 'Blogs', icon: 'fa-newspaper' },
@@ -35,9 +35,25 @@ export default function AdminLayout({
     { href: '/admin/media', label: 'Media Management', icon: 'fa-image' },
     { href: '/admin/team', label: 'Team Management', icon: 'fa-users' },
     { href: '/admin/affiliates', label: 'Affiliates', icon: 'fa-handshake' },
+  ];
+
+  // Settings submenu items
+  const settingsSubmenu = [
+    { href: '/admin/resumes', label: 'Resumes', icon: 'fa-file-alt' },
+    { href: '/admin/contacts', label: 'Contact Submissions', icon: 'fa-envelope' },
     { href: '/admin/settings', label: 'System Settings', icon: 'fa-cog' },
     { href: '/admin/profile', label: 'Profile', icon: 'fa-user' },
   ];
+
+  // Check if current path is in settings submenu
+  const isSettingsActive = settingsSubmenu.some(item => pathname === item.href || pathname.startsWith(item.href + '/'));
+
+  // Auto-open settings menu if on a settings page
+  useEffect(() => {
+    if (isSettingsActive) {
+      setSettingsMenuOpen(true);
+    }
+  }, [isSettingsActive]);
 
   useEffect(() => {
     setMounted(true);
@@ -173,7 +189,7 @@ export default function AdminLayout({
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 12px 20px;
+          padding: 7px 15px;
           color: #555;
           text-decoration: none;
           font-size: 14px;
@@ -193,6 +209,68 @@ export default function AdminLayout({
         .sidebar-link i {
           font-size: 16px;
           width: 20px;
+          text-align: center;
+        }
+        .sidebar-item.has-submenu {
+          position: relative;
+        }
+        .sidebar-item.has-submenu > .sidebar-link {
+          cursor: pointer;
+        }
+        .sidebar-item.has-submenu > .sidebar-link::after {
+          content: '';
+          height:10px;
+          width:10px;
+          border-top:2px solid black;
+          border-right:2px solid black;
+          transform: translate3d(0,-50%,0) rotate(134deg);
+
+
+          font-weight: 900;
+          margin-left: auto;
+          transition: transform 0.3s;
+        }
+        .sidebar-item.has-submenu.open > .sidebar-link::after {
+          transform: rotate(-43deg);
+        }
+        .sidebar-submenu {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.3s ease;
+        }
+        .sidebar-item.has-submenu.open > .sidebar-submenu {
+          max-height: 500px;
+        }
+        .sidebar-submenu-item {
+          margin: 0;
+        }
+        .sidebar-submenu-link {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 20px 10px 50px;
+          color: #666;
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 500;
+          transition: all 0.3s;
+          border-left: 3px solid transparent;
+        }
+        .sidebar-submenu-link:hover {
+          background: #f0f0f0;
+          color: #0066cc;
+        }
+        .sidebar-submenu-link.active {
+          background: #e6f0ff;
+          color: #0066cc;
+          border-left-color: #0066cc;
+        }
+        .sidebar-submenu-link i {
+          font-size: 14px;
+          width: 18px;
           text-align: center;
         }
         .sidebar-footer {
@@ -310,6 +388,34 @@ export default function AdminLayout({
               </Link>
             </li>
           ))}
+          
+          {/* Settings Menu with Submenu */}
+          <li className={`sidebar-item has-submenu ${settingsMenuOpen ? 'open' : ''}`}>
+            <div
+              className={`sidebar-link ${isSettingsActive ? 'active' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                setSettingsMenuOpen(!settingsMenuOpen);
+              }}
+            >
+              <i className="fa fa-cog"></i>
+              <span>Settings</span>
+            </div>
+            <ul className="sidebar-submenu">
+              {settingsSubmenu.map((item) => (
+                <li key={item.href} className="sidebar-submenu-item">
+                  <Link
+                    href={item.href}
+                    className={`sidebar-submenu-link ${pathname === item.href || pathname.startsWith(item.href + '/') ? 'active' : ''}`}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <i className={`fa ${item.icon}`}></i>
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </li>
         </ul>
 
         <div className="sidebar-footer">
