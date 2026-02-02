@@ -74,6 +74,9 @@ export default function CareerDetailsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setSubmitError('');
+    setSubmitSuccess(false);
+
     // Validate file type
     const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     const allowedExtensions = ['.pdf', '.doc', '.docx'];
@@ -82,6 +85,8 @@ export default function CareerDetailsPage() {
     
     if (!allowedTypes.includes(file.type) && !hasValidExtension) {
       setSubmitError('Only PDF and DOC/DOCX files are allowed');
+      // Reset file input
+      e.target.value = '';
       return;
     }
 
@@ -89,11 +94,12 @@ export default function CareerDetailsPage() {
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
       setSubmitError('File size must be less than 5MB');
+      // Reset file input
+      e.target.value = '';
       return;
     }
 
     setFormData(prev => ({ ...prev, resumeFile: file }));
-    setSubmitError('');
 
     // Upload file
     setUploading(true);
@@ -108,15 +114,22 @@ export default function CareerDetailsPage() {
 
       const uploadData = await uploadResponse.json();
 
-      if (!uploadData.success) {
-        throw new Error(uploadData.message || 'Upload failed');
+      if (!uploadResponse.ok || !uploadData.success) {
+        const errorMessage = uploadData.message || `Upload failed (${uploadResponse.status})`;
+        throw new Error(errorMessage);
+      }
+
+      if (!uploadData.url) {
+        throw new Error('Upload succeeded but no URL returned');
       }
 
       setFormData(prev => ({ ...prev, resumeFileUrl: uploadData.url }));
     } catch (err: any) {
       console.error('Upload error:', err);
-      setSubmitError(err.message || 'Failed to upload resume');
-      setFormData(prev => ({ ...prev, resumeFile: null }));
+      setSubmitError(err.message || 'Failed to upload resume. Please try again.');
+      setFormData(prev => ({ ...prev, resumeFile: null, resumeFileUrl: '' }));
+      // Reset file input
+      e.target.value = '';
     } finally {
       setUploading(false);
     }
@@ -167,13 +180,15 @@ export default function CareerDetailsPage() {
 
       const data = await response.json();
 
-      if (!data.success) {
-        setSubmitError(data.message || 'Failed to submit resume');
+      if (!response.ok || !data.success) {
+        const errorMessage = data.message || `Failed to submit resume (${response.status})`;
+        setSubmitError(errorMessage);
         setSubmitting(false);
         return;
       }
 
       setSubmitSuccess(true);
+      setSubmitError('');
       setFormData({
         fullName: '',
         email: '',
@@ -186,9 +201,9 @@ export default function CareerDetailsPage() {
       // Reset file input
       const fileInput = document.getElementById('resume-file') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
-    } catch (err) {
+    } catch (err: any) {
       console.error('Submit error:', err);
-      setSubmitError('Failed to submit resume. Please try again.');
+      setSubmitError(err.message || 'Failed to submit resume. Please check your connection and try again.');
     } finally {
       setSubmitting(false);
     }
@@ -238,6 +253,12 @@ export default function CareerDetailsPage() {
 
   return (
     <div className="boxed_wrapper">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes spin {
+          0% { transform: translateY(-50%) rotate(0deg); }
+          100% { transform: translateY(-50%) rotate(360deg); }
+        }
+      `}} />
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={career.title}>
         <section className="sidebar-page-container pt_120 pb_120">
           <div className="auto-container">
@@ -344,10 +365,29 @@ export default function CareerDetailsPage() {
                             required
                           />
                           {uploading && (
-                            <p className="text-muted small mt-2">Uploading resume...</p>
+                            <p className="text-primary small mt-2" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span 
+                                style={{ 
+                                  display: 'inline-block',
+                                  width: '14px',
+                                  height: '14px',
+                                  border: '2px solid #0066cc',
+                                  borderTop: '2px solid transparent',
+                                  borderRadius: '50%',
+                                  animation: 'spin 0.8s linear infinite'
+                                }}
+                              />
+                              Uploading resume... Please wait
+                            </p>
                           )}
-                          {formData.resumeFile && !uploading && (
-                            <p className="text-success small mt-2">✓ {formData.resumeFile.name}</p>
+                          {formData.resumeFile && !uploading && formData.resumeFileUrl && (
+                            <p className="text-success small mt-2" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span>✓</span>
+                              <span>{formData.resumeFile.name}</span>
+                            </p>
+                          )}
+                          {formData.resumeFile && !uploading && !formData.resumeFileUrl && (
+                            <p className="text-danger small mt-2">⚠ Upload failed. Please try again.</p>
                           )}
                         </div>
                         <div className="col-lg-12 col-md-12 col-sm-12 form-group">
@@ -366,9 +406,28 @@ export default function CareerDetailsPage() {
                             type="submit"
                             className="theme-btn btn-one cursor-pointer"
                             disabled={submitting || uploading || !formData.resumeFileUrl}
+                            style={{ position: 'relative', minWidth: '200px' }}
                           >
-                            <span>{submitting ? 'Submitting...' : uploading ? 'Uploading...' : 'Submit Application'}</span>
-                            
+                            {(submitting || uploading) && (
+                              <p 
+                                style={{ 
+                                  position: 'absolute', 
+                                  left: '20px', 
+                                  top: '50%', 
+                                  transform: 'translateY(-50%)',
+                                  display: 'inline-block',
+                                  width: '16px',
+                                  height: '16px',
+                                  border: '2px solid #fff',
+                                  borderTop: '2px solid transparent',
+                                  borderRadius: '50%',
+                                  animation: 'spin 0.8s linear infinite'
+                                }}
+                              />
+                            )}
+                            <span style={{ marginLeft: submitting || uploading ? '30px' : '0' }}>
+                              {submitting ? 'Submitting...' : uploading ? 'Uploading Resume...' : 'Submit Application'}
+                            </span>
                           </button>
                         </div>
                       </div>
@@ -379,7 +438,7 @@ export default function CareerDetailsPage() {
               <div className="col-lg-4 col-md-12 col-sm-12 sidebar-side">
                 <div className="blog-sidebar">
                   <div className="consulting-widget">
-                    <div className="bg-layer" style={{ backgroundImage: "url(assets/images/resource/sidebar-1.jpg)" }}></div>
+                    <div className="bg-layer" style={{ backgroundImage: "url(/assets/images/resource/sidebar-1.jpg)" }}></div>
                     <h3>Join Our <br />Team Today!</h3>
                     <p>We're always looking for talented individuals to join our team. Explore our open positions and find your next career opportunity.</p>
                     <Link href="/careers" className="theme-btn btn-two"><span>View All Careers</span></Link>
