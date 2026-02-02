@@ -336,7 +336,7 @@ export default function ContactsPage() {
                               className="btn btn-sm btn-danger"
                               onClick={() => handleDelete(contact.id)}
                             >
-                              <i className="bi bi-trash"></i>
+                              <i className="fa fa-trash"></i>
                             </button>
                           </td>
                         </tr>

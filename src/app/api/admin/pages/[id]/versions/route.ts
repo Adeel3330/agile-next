@@ -6,7 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 // Get all versions of a page
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -17,7 +17,8 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
 
     const { data: versions, error } = await supabaseAdmin
       .from('page_versions')
@@ -26,9 +27,10 @@ export async function GET(
       .order('version_number', { ascending: false });
 
     if (error) {
-      console.error('Supabase error:', error);
+      console.error('Supabase error fetching versions:', error);
+      console.error('Page ID:', id);
       return NextResponse.json(
-        { success: false, message: 'Failed to fetch versions' },
+        { success: false, message: `Failed to fetch versions: ${error.message || 'Unknown error'}` },
         { status: 500 }
       );
     }
@@ -69,7 +71,7 @@ export async function GET(
 // Restore a specific version
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -80,7 +82,8 @@ export async function POST(
       );
     }
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
     const body = await req.json();
     const { versionId } = body;
 
@@ -97,9 +100,18 @@ export async function POST(
       .select('*')
       .eq('id', versionId)
       .eq('page_id', id)
-      .single();
+      .maybeSingle();
 
-    if (versionError || !version) {
+    if (versionError) {
+      console.error('Supabase error fetching version:', versionError);
+      console.error('Version ID:', versionId, 'Page ID:', id);
+      return NextResponse.json(
+        { success: false, message: `Failed to fetch version: ${versionError.message || 'Unknown error'}` },
+        { status: 500 }
+      );
+    }
+
+    if (!version) {
       return NextResponse.json(
         { success: false, message: 'Version not found' },
         { status: 404 }

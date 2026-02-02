@@ -89,15 +89,15 @@ export async function PUT(
       template 
     } = body;
 
-    // Check if page exists
-    const { data: existing } = await supabaseAdmin
+    // Check if page exists and get current data for versioning
+    const { data: existing, error: existingError } = await supabaseAdmin
       .from('pages')
-      .select('id, slug')
+      .select('*')
       .eq('id', id)
       .is('deleted_at', null)
       .single();
 
-    if (!existing) {
+    if (existingError || !existing) {
       return NextResponse.json(
         { success: false, message: 'Page not found' },
         { status: 404 }
@@ -143,6 +143,63 @@ export async function PUT(
       }
     }
     if (template !== undefined) updateData.template = template?.trim() || null;
+
+    // Check if there are actual changes (not just updated_at)
+    const hasChanges = Object.keys(updateData).some(key => {
+      if (key === 'updated_at') return false;
+      const newValue = updateData[key];
+      const oldValue = existing[key as keyof typeof existing];
+      
+      // Handle JSONB fields
+      if (key === 'sections') {
+        return JSON.stringify(newValue) !== JSON.stringify(oldValue);
+      }
+      
+      return newValue !== oldValue;
+    });
+
+    // Create a version before updating if there are actual changes
+    if (hasChanges) {
+      try {
+        // Get the next version number
+        const { data: maxVersion } = await supabaseAdmin
+          .from('page_versions')
+          .select('version_number')
+          .eq('page_id', id)
+          .order('version_number', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        const nextVersion = (maxVersion?.version_number || 0) + 1;
+
+        // Create version with current (OLD) data
+        const { error: versionError } = await supabaseAdmin
+          .from('page_versions')
+          .insert({
+            page_id: id,
+            version_number: nextVersion,
+            title: existing.title,
+            slug: existing.slug,
+            content: existing.content,
+            sections: existing.sections || [],
+            seo_title: existing.seo_title,
+            seo_description: existing.seo_description,
+            seo_keywords: existing.seo_keywords,
+            seo_image: existing.seo_image,
+            status: existing.status,
+            template: existing.template,
+            change_note: 'Auto-saved version before update'
+          });
+
+        if (versionError) {
+          console.error('Failed to create version:', versionError);
+          // Don't fail the update if versioning fails, but log it
+        }
+      } catch (versionError) {
+        // Log but don't fail the update if versioning fails
+        console.warn('Failed to create version:', versionError);
+      }
+    }
 
     const { data: page, error } = await supabaseAdmin
       .from('pages')
