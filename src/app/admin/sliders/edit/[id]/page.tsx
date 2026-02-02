@@ -332,7 +332,7 @@ export default function EditSliderPage() {
 
               
 
-              {/* Row 3: Description (2/3 width) */}
+              {/* Row 3: Description (2/3 width) and SEO Content (editor) */}
               <div className="row mb-3">
                 <div className="col-md-6">
                   <label className="form-label">Description</label>
@@ -345,17 +345,12 @@ export default function EditSliderPage() {
                 </div>
                 <div className="col-md-6">
                   <label className="form-label">SEO Content</label>
-                  <textarea
-                    className="form-control"
+                  <RichTextEditor
                     value={formData.seoContent}
-                    onChange={(e) => setFormData({ ...formData, seoContent: e.target.value })}
-                    rows={3}
-                    placeholder="Enter SEO content"
-                    maxLength={500}
+                    onChange={(value) => setFormData({ ...formData, seoContent: value })}
+                    placeholder="Enter SEO content (used for meta description / SEO text)"
+                    height="250px"
                   />
-                  <small className="form-text text-muted">
-                    {formData.seoContent.length}/500
-                  </small>
                 </div>
               </div>
 
@@ -366,11 +361,16 @@ export default function EditSliderPage() {
                 <button
                   type="submit"
                   className="theme-btn btn-one rounded-1 px-3 py-2"
-                  disabled={saving}
+                  disabled={saving || uploading}
                 >
-                  {saving ? (
+                  {uploading ? (
                     <>
-                      <p className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></p>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Uploading file...
+                    </>
+                  ) : saving ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                       Saving...
                     </>
                   ) : (

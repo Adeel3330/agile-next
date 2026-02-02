@@ -35,9 +35,26 @@ function generateSlug(title: string): string {
     .replace(/^-|-$/g, '');
 }
 
-// Helper function to get Cloudinary placeholder URL
+// Helper function to get medical billing related Cloudinary images
+// Replace these with actual medical billing images from Cloudinary
 function getPlaceholderImage(): string {
+  // Using medical billing related placeholder - replace with actual medical billing images
+  // Example: medical billing office, healthcare revenue cycle, medical coding, etc.
   return 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg';
+}
+
+// Helper function to get medical billing blog images
+function getMedicalBillingBlogImage(index: number = 0): string {
+  // Medical billing related images for blogs
+  const images = [
+    'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill/v1312461204/sample.jpg', // Medical billing services
+    'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill/v1312461204/sample.jpg', // Revenue cycle management
+    'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill/v1312461204/sample.jpg', // Medical coding
+    'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill/v1312461204/sample.jpg', // Insurance claims
+    'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill/v1312461204/sample.jpg', // HIPAA compliance
+    'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill/v1312461204/sample.jpg', // Outsourcing billing
+  ];
+  return images[index % images.length];
 }
 
 async function seedMedicalBillingCategories() {
@@ -250,7 +267,7 @@ When selecting a medical billing service provider, consider:
 
 Effective medical billing is essential for healthcare practice success. Partnering with a professional billing service can significantly improve revenue cycle performance and allow healthcare providers to focus on patient care.
       `.trim(),
-      file: getPlaceholderImage(),
+      file: getMedicalBillingBlogImage(0),
       seo_title: 'Complete Guide to Medical Billing Services | Healthcare Revenue Management',
       seo_content: 'Learn everything about medical billing services, revenue cycle management, and how to optimize your healthcare practice billing processes.',
       created_at: new Date().toISOString(),
@@ -326,7 +343,7 @@ Modern RCM relies on:
 
 Effective revenue cycle management is crucial for healthcare practice sustainability. By understanding and optimizing each stage of the revenue cycle, practices can improve financial performance and patient satisfaction.
       `.trim(),
-      file: getPlaceholderImage(),
+      file: getMedicalBillingBlogImage(1),
       seo_title: 'Revenue Cycle Management Guide | Healthcare Financial Management',
       seo_content: 'Comprehensive guide to revenue cycle management in healthcare, including best practices, KPIs, and optimization strategies.',
       created_at: new Date().toISOString(),
@@ -423,7 +440,7 @@ Modern coding tools include:
 
 Accurate medical coding is fundamental to successful healthcare billing. By following best practices and staying current with coding standards, practices can improve reimbursement rates and maintain compliance.
       `.trim(),
-      file: getPlaceholderImage(),
+      file: getMedicalBillingBlogImage(2),
       seo_title: 'Medical Coding Best Practices | Accurate Healthcare Billing',
       seo_content: 'Learn essential medical coding best practices to ensure accurate billing, maximize reimbursement, and maintain compliance.',
       created_at: new Date().toISOString(),
@@ -545,7 +562,7 @@ Modern denial management tools:
 
 Effective denial management requires a proactive approach focusing on prevention, quick resolution, and continuous improvement. By implementing these strategies, practices can significantly reduce denial rates and improve revenue.
       `.trim(),
-      file: getPlaceholderImage(),
+      file: getMedicalBillingBlogImage(3),
       seo_title: 'Insurance Claim Denial Management | Healthcare Billing Solutions',
       seo_content: 'Learn effective strategies for handling insurance claim denials, reducing denial rates, and improving healthcare practice revenue.',
       created_at: new Date().toISOString(),
@@ -670,7 +687,7 @@ HIPAA violations can result in:
 
 HIPAA compliance is not optional—it's a legal requirement. Medical billing operations must implement comprehensive safeguards to protect patient information and avoid costly violations.
       `.trim(),
-      file: getPlaceholderImage(),
+      file: getMedicalBillingBlogImage(4),
       seo_title: 'HIPAA Compliance Medical Billing | Healthcare Privacy Guidelines',
       seo_content: 'Essential HIPAA compliance guidelines for medical billing operations, including security safeguards and best practices.',
       created_at: new Date().toISOString(),
@@ -842,7 +859,7 @@ Outsourcing may be beneficial when:
 
 Outsourcing medical billing can be an effective strategy for many practices, but it requires careful consideration and management. By following best practices and choosing the right partner, practices can achieve improved efficiency and financial performance.
       `.trim(),
-      file: getPlaceholderImage(),
+      file: getMedicalBillingBlogImage(5),
       seo_title: 'Outsourcing Medical Billing | Healthcare Revenue Management',
       seo_content: 'Complete guide to outsourcing medical billing services, including benefits, challenges, selection criteria, and best practices.',
       created_at: new Date().toISOString(),

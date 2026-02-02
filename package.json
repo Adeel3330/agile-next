@@ -11,7 +11,8 @@
     "seed": "ts-node --project database/tsconfig.json database/seed.ts",
     "seed:unseed": "ts-node --project database/tsconfig.json database/seed.ts unseed",
     "seed:medical-billing": "ts-node seed-medical-billing.ts",
-    "seed:cms-modules": "ts-node seed-cms-modules.ts"
+    "seed:cms-modules": "ts-node seed-cms-modules.ts",
+    "seed:sliders-careers": "ts-node seed-sliders-careers.ts"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",
