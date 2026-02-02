@@ -30,6 +30,8 @@ export default function AdminLayout({
     { href: '/admin/sliders', label: 'Sliders', icon: 'fa-images' },
     { href: '/admin/blog-categories', label: 'Categories', icon: 'fa-folder' },
     { href: '/admin/blogs', label: 'Blogs', icon: 'fa-newspaper' },
+    { href: '/admin/pages', label: 'Pages CMS', icon: 'fa-file-alt' },
+    { href: '/admin/affiliates', label: 'Affiliates', icon: 'fa-handshake' },
     { href: '/admin/profile', label: 'Profile', icon: 'fa-user' },
   ];
 
