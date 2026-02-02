@@ -215,6 +215,11 @@ color:white;
   color: #3d4161;
 }
 
+.badgeCta {
+  background: #ffe5cc;
+  color: #cc6600;
+}
+
 .badgeOther {
   background: #e2e3e5;
   color: #41464b;

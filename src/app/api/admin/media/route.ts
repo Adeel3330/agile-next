@@ -132,9 +132,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!position || !['home', 'services', 'about', 'contact', 'other'].includes(position)) {
+    if (!position || !['home', 'services', 'about', 'contact', 'cta', 'other'].includes(position)) {
       return NextResponse.json(
-        { success: false, message: 'Please provide a valid position (home, services, about, contact, other)' },
+        { success: false, message: 'Please provide a valid position (home, services, about, contact, cta, other)' },
         { status: 400 }
       );
     }

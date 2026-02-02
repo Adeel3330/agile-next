@@ -111,14 +111,16 @@ export async function PUT(
 
     if (title !== undefined) updateData.title = title.trim();
     if (description !== undefined) updateData.description = description?.trim() || null;
-    if (fileUrl !== undefined) updateData.file_url = fileUrl.trim();
+    if (fileUrl !== undefined && fileUrl !== null && fileUrl.trim().length > 0) {
+      updateData.file_url = fileUrl.trim();
+    }
     if (fileName !== undefined) updateData.file_name = fileName?.trim() || null;
     if (fileSize !== undefined) updateData.file_size = fileSize || null;
     if (fileType !== undefined) updateData.file_type = fileType?.trim() || null;
     if (position !== undefined) {
-      if (!['home', 'services', 'about', 'contact', 'other'].includes(position)) {
+      if (!['home', 'services', 'about', 'contact', 'cta', 'other'].includes(position)) {
         return NextResponse.json(
-          { success: false, message: 'Invalid position. Must be: home, services, about, contact, or other' },
+          { success: false, message: 'Invalid position. Must be: home, services, about, contact, cta, or other' },
           { status: 400 }
         );
       }

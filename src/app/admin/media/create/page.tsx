@@ -17,7 +17,7 @@ export default function CreateMediaPage() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    position: 'home' as 'home' | 'services' | 'about' | 'contact' | 'other',
+    position: 'home' as 'home' | 'services' | 'about' | 'contact' | 'other' | 'cta',
     status: 'active' as 'active' | 'inactive',
     displayOrder: 0,
     altText: '',
@@ -210,6 +210,7 @@ export default function CreateMediaPage() {
                     <option value="services">Services</option>
                     <option value="about">About</option>
                     <option value="contact">Contact</option>
+                    <option value="cta">CTA</option>
                     <option value="other">Other</option>
                   </select>
                 </div>

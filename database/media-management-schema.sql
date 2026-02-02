@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS media (
   file_name VARCHAR(255) NOT NULL,
   file_size BIGINT, -- File size in bytes
   file_type VARCHAR(100), -- MIME type (e.g., image/jpeg, image/png)
-  position VARCHAR(50) NOT NULL CHECK (position IN ('home', 'services', 'about', 'contact', 'other')),
+  position VARCHAR(50) NOT NULL CHECK (position IN ('home', 'services', 'about', 'contact', 'cta', 'other')),
   status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
   display_order INTEGER DEFAULT 0, -- For ordering within position
   alt_text VARCHAR(255), -- For accessibility

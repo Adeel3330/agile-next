@@ -12,7 +12,7 @@ interface Media {
   fileName?: string;
   fileSize?: number;
   fileType?: string;
-  position: 'home' | 'services' | 'about' | 'contact' | 'other';
+  position: 'home' | 'services' | 'about' | 'contact' | 'other' | 'cta';
   status: 'active' | 'inactive';
   displayOrder: number;
   altText?: string;
@@ -33,16 +33,19 @@ export default function EditMediaPage() {
   const [error, setError] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [uploadedFileData, setUploadedFileData] = useState<any>(null);
+  const [hasNewFile, setHasNewFile] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    position: 'home' as 'home' | 'services' | 'about' | 'contact' | 'other',
+    position: 'home' as 'home' | 'services' | 'about' | 'contact' | 'cta' | 'other',
     status: 'active' as 'active' | 'inactive',
     displayOrder: 0,
     altText: '',
     linkUrl: ''
   });
+  
+  const [existingFileUrl, setExistingFileUrl] = useState<string>('');
 
   useEffect(() => {
     setMounted(true);
@@ -102,12 +105,9 @@ export default function EditMediaPage() {
       // Set existing image as preview
       if (media.fileUrl) {
         setPreviewUrl(media.fileUrl);
-        setUploadedFileData({
-          url: media.fileUrl,
-          fileName: media.fileName,
-          fileSize: media.fileSize,
-          fileType: media.fileType
-        });
+        setExistingFileUrl(media.fileUrl);
+        // Don't set uploadedFileData here - only set it when a new file is uploaded
+        setHasNewFile(false);
       }
       
       setLoading(false);
@@ -177,6 +177,7 @@ export default function EditMediaPage() {
         fileSize: uploadData.fileSize,
         fileType: uploadData.fileType
       });
+      setHasNewFile(true);
       setUploading(false);
     } catch (err) {
       console.error('Upload error:', err);
@@ -202,14 +203,15 @@ export default function EditMediaPage() {
         ...formData
       };
 
-      // Update file data if a new file was uploaded, otherwise keep existing
-      if (uploadedFileData && uploadedFileData.url) {
+      // Only include file data if a new file was uploaded
+      // If no new file, don't include fileUrl in update - existing file will be preserved
+      if (hasNewFile && uploadedFileData && uploadedFileData.url) {
         submitData.fileUrl = uploadedFileData.url;
         submitData.fileName = uploadedFileData.fileName;
         submitData.fileSize = uploadedFileData.fileSize;
         submitData.fileType = uploadedFileData.fileType;
       }
-      // If no new file uploaded, existing file data is preserved (not included in update)
+      // If hasNewFile is false, we don't include fileUrl, so the API won't update it
 
       const response = await fetch(`/api/admin/media/${id}`, {
         method: 'PUT',
@@ -308,6 +310,7 @@ export default function EditMediaPage() {
                     <option value="services">Services</option>
                     <option value="about">About</option>
                     <option value="contact">Contact</option>
+                    <option value="cta">CTA</option>
                     <option value="other">Other</option>
                   </select>
                 </div>

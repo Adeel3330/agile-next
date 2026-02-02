@@ -16,10 +16,10 @@ export async function GET(req: NextRequest) {
     }
 
     // Validate position
-    const validPositions = ['home', 'services', 'about', 'contact', 'other'];
+    const validPositions = ['home', 'services', 'about', 'contact', 'cta', 'other'];
     if (!validPositions.includes(position)) {
       return NextResponse.json(
-        { success: false, message: 'Invalid position. Must be: home, services, about, contact, or other' },
+        { success: false, message: 'Invalid position. Must be: home, services, about, contact, cta, or other' },
         { status: 400 }
       );
     }
