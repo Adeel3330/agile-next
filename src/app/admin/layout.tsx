@@ -33,6 +33,7 @@ export default function AdminLayout({
     { href: '/admin/pages', label: 'Pages CMS', icon: 'fa-file-alt' },
     { href: '/admin/media', label: 'Media Management', icon: 'fa-photo-video' },
     { href: '/admin/affiliates', label: 'Affiliates', icon: 'fa-handshake' },
+    { href: '/admin/settings', label: 'System Settings', icon: 'fa-cog' },
     { href: '/admin/profile', label: 'Profile', icon: 'fa-user' },
   ];
 

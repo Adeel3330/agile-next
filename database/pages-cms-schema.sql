@@ -51,6 +51,10 @@ CREATE INDEX IF NOT EXISTS idx_pages_deleted_at ON pages(deleted_at);
 CREATE INDEX IF NOT EXISTS idx_page_versions_page_id ON page_versions(page_id);
 CREATE INDEX IF NOT EXISTS idx_page_versions_version_number ON page_versions(version_number);
 
+ALTER TABLE pages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pages_versions ENABLE ROW LEVEL SECURITY;
+
+
 -- Function to generate slug from title
 CREATE OR REPLACE FUNCTION generate_page_slug(title_param VARCHAR)
 RETURNS VARCHAR AS $$
