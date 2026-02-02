@@ -37,7 +37,7 @@ export default function Footer1() {
         setLoading(false);
       })
       .catch(err => {
-        console.error('Failed to fetch settings:', err);
+        console.error('Failed to fetch settings footer:', err);
         setLoading(false);
       });
   }, []);
