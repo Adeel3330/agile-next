@@ -49,8 +49,8 @@ function getPlaceholderImage(): string {
 
 // Helper function to get Supabase Storage placeholder URL
 function getStoragePlaceholderImage(): string {
-  // This should be replaced with actual Supabase Storage URL after uploading
-  return 'https://via.placeholder.com/800x600';
+  // Using Cloudinary placeholder instead of via.placeholder.com to avoid timeouts
+  return 'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill/v1312461204/sample.jpg';
 }
 
 /**
