@@ -69,6 +69,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
       .then(data => {
         if (data.success && data.categories) {
           setCategories(data.categories);
+          console.log('Categories loaded:', data.categories.length);
         }
       })
       .catch(err => {
@@ -81,12 +82,37 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
       .then(data => {
         if (data.success && data.services) {
           setServices(data.services);
+          console.log('Services loaded:', data.services.length);
+          console.log('Sample service:', data.services[0]);
         }
       })
       .catch(err => {
         console.error('Failed to fetch services:', err);
       });
   }, []);
+
+  // Debug: Log when both categories and services are loaded (simplified to prevent crashes)
+  useEffect(() => {
+    if (categories.length > 0 && services.length > 0) {
+      // Only log summary, not full arrays
+      console.log('Menu Data:', {
+        categoriesCount: categories.length,
+        servicesCount: services.length
+      });
+      
+      // Quick check for matching (limit to prevent performance issues)
+      const categoryIds = new Set(categories.map(c => c.id));
+      const servicesWithCategories = services.filter(s => s.categoryId && categoryIds.has(s.categoryId));
+      console.log('Services matched to categories:', servicesWithCategories.length);
+      
+      // Log first category match as sample
+      if (categories.length > 0) {
+        const firstCategory = categories[0];
+        const matched = services.filter(s => s.categoryId === firstCategory.id || s.category?.id === firstCategory.id);
+        console.log(`Sample: "${firstCategory.name}" has ${matched.length} services`);
+      }
+    }
+  }, [categories.length, services.length]); // Only depend on lengths to prevent infinite loops
 
   const formatWorkingHours = () => {
     if (!settings?.workingHours) return 'Mon - Fri: 9:00am to 6:00pm';
@@ -237,33 +263,86 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                         <Link href="/services">Services</Link>
                         <ul>
                           {categories.length > 0 ? (
-                            categories.map((category) => {
-                              const categoryServices = services.filter(
-                                (s) => s.categoryId === category.id
-                              );
-                              return categoryServices.length > 0 ? (
-                                <li key={category.id} className="dropdown">
-                                  <Link href={`/services?category=${category.slug}`}>
-                                    {category.name}
-                                  </Link>
-                                  <ul>
-                                    {categoryServices.map((service) => (
-                                      <li key={service.id}>
-                                        <Link href={`/services/${service.slug}`}>
-                                          {service.title}
-                                        </Link>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </li>
-                              ) : (
-                                <li key={category.id}>
-                                  <Link href={`/services?category=${category.slug}`}>
-                                    {category.name}
-                                  </Link>
-                                </li>
-                              );
-                            })
+                            <>
+                              {categories.map((category) => {
+                                // Filter services for this category
+                                // Check both categoryId and category.id (in case service has nested category object)
+                                const categoryServices = services.filter(
+                                  (s) => {
+                                    const match1 = s.categoryId === category.id;
+                                    const match2 = s.category?.id === category.id;
+                                    return match1 || match2;
+                                  }
+                                );
+                                
+                                // Always show category, with dropdown if it has services
+                                return (
+                                  <li key={category.id} className={categoryServices.length > 0 ? "dropdown" : ""}>
+                                    <Link href={`/services?category=${category.slug}`}>
+                                      {category.name}
+                                      
+                                    </Link>
+                                    {categoryServices.length > 0 && (
+                                      <ul className="submenu">
+                                        {categoryServices.map((service) => (
+                                          <li key={service.id}>
+                                            <Link href={`/services/${service.slug}`}>
+                                              {service.title}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </li>
+                                );
+                              })}
+                              {/* Show services without categories at the end */}
+                              {(() => {
+                                const uncategorizedServices = services.filter(
+                                  (s) => !s.categoryId && !s.category?.id
+                                );
+                                const categorizedServiceIds = new Set(
+                                  services
+                                    .filter(s => s.categoryId || s.category?.id)
+                                    .map(s => s.id)
+                                );
+                                const allCategoryIds = new Set(categories.map(c => c.id));
+                                const servicesNotInCategories = services.filter(
+                                  (s) => {
+                                    const serviceCategoryId = s.categoryId || s.category?.id;
+                                    return serviceCategoryId && !allCategoryIds.has(serviceCategoryId);
+                                  }
+                                );
+                                
+                                if (uncategorizedServices.length > 0 || servicesNotInCategories.length > 0) {
+                                  return (
+                                    <li className="dropdown">
+                                      <Link href="/services">
+                                        Other Services
+                                        <span className="fa fa-angle-right" style={{ float: 'right', marginTop: '3px' }}></span>
+                                      </Link>
+                                      <ul className="submenu">
+                                        {uncategorizedServices.map((service) => (
+                                          <li key={service.id}>
+                                            <Link href={`/services/${service.slug}`}>
+                                              {service.title}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                        {servicesNotInCategories.map((service) => (
+                                          <li key={service.id}>
+                                            <Link href={`/services/${service.slug}`}>
+                                              {service.title}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </li>
+                                  );
+                                }
+                                return null;
+                              })()}
+                            </>
                           ) : (
                             <li>
                               <Link href="/services">All Services</Link>
@@ -380,33 +459,88 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                         <Link href="/services">Services</Link>
                         <ul>
                           {categories.length > 0 ? (
-                            categories.map((category) => {
-                              const categoryServices = services.filter(
-                                (s) => s.categoryId === category.id
-                              );
-                              return categoryServices.length > 0 ? (
-                                <li key={category.id} className="dropdown">
-                                  <Link href={`/services?category=${category.slug}`}>
-                                    {category.name}
-                                  </Link>
-                                  <ul>
-                                    {categoryServices.map((service) => (
-                                      <li key={service.id}>
-                                        <Link href={`/services/${service.slug}`}>
-                                          {service.title}
-                                        </Link>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </li>
-                              ) : (
-                                <li key={category.id}>
-                                  <Link href={`/services?category=${category.slug}`}>
-                                    {category.name}
-                                  </Link>
-                                </li>
-                              );
-                            })
+                            <>
+                              {categories.map((category) => {
+                                // Filter services for this category
+                                // Check both categoryId and category.id (in case service has nested category object)
+                                const categoryServices = services.filter(
+                                  (s) => {
+                                    const match1 = s.categoryId === category.id;
+                                    const match2 = s.category?.id === category.id;
+                                    return match1 || match2;
+                                  }
+                                );
+                                
+                                // Always show category, with dropdown if it has services
+                                return (
+                                  <li key={category.id} className={categoryServices.length > 0 ? "dropdown" : ""}>
+                                    <Link href={`/services?category=${category.slug}`}>
+                                      {category.name}
+                                      {categoryServices.length > 0 && (
+                                        <span className="fa fa-angle-right" style={{ float: 'right', marginTop: '3px' }}></span>
+                                      )}
+                                    </Link>
+                                    {categoryServices.length > 0 && (
+                                      <ul className="submenu">
+                                        {categoryServices.map((service) => (
+                                          <li key={service.id}>
+                                            <Link href={`/services/${service.slug}`}>
+                                              {service.title}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </li>
+                                );
+                              })}
+                              {/* Show services without categories at the end */}
+                              {(() => {
+                                const uncategorizedServices = services.filter(
+                                  (s) => !s.categoryId && !s.category?.id
+                                );
+                                const categorizedServiceIds = new Set(
+                                  services
+                                    .filter(s => s.categoryId || s.category?.id)
+                                    .map(s => s.id)
+                                );
+                                const allCategoryIds = new Set(categories.map(c => c.id));
+                                const servicesNotInCategories = services.filter(
+                                  (s) => {
+                                    const serviceCategoryId = s.categoryId || s.category?.id;
+                                    return serviceCategoryId && !allCategoryIds.has(serviceCategoryId);
+                                  }
+                                );
+                                
+                                if (uncategorizedServices.length > 0 || servicesNotInCategories.length > 0) {
+                                  return (
+                                    <li className="dropdown">
+                                      <Link href="/services">
+                                        Other Services
+                                        <span className="fa fa-angle-right" style={{ float: 'right', marginTop: '3px' }}></span>
+                                      </Link>
+                                      <ul className="submenu">
+                                        {uncategorizedServices.map((service) => (
+                                          <li key={service.id}>
+                                            <Link href={`/services/${service.slug}`}>
+                                              {service.title}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                        {servicesNotInCategories.map((service) => (
+                                          <li key={service.id}>
+                                            <Link href={`/services/${service.slug}`}>
+                                              {service.title}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </li>
+                                  );
+                                }
+                                return null;
+                              })()}
+                            </>
                           ) : (
                             <li>
                               <Link href="/services">All Services</Link>

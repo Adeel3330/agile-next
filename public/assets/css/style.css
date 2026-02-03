@@ -1048,7 +1048,7 @@ img {
   letter-spacing: 0.05em;
   opacity:1;
   color: #111111;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
   z-index:1;
   -webkit-transition:all 500ms ease;
@@ -1060,7 +1060,7 @@ img {
 
 .main-menu .navigation > li.current > a,
 .main-menu .navigation > li:hover > a{
-  
+  color: var(--theme-color);
 }
 
 .main-menu .navigation > li > ul,
