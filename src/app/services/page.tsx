@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import Layout from '../../../components/layout/Layout';
@@ -23,66 +24,180 @@ interface Service {
   icon?: string;
 }
 
+interface PageData {
+  id: string;
+  title: string;
+  slug: string;
+  content?: string;
+  sections?: any[];
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+  seoImage?: string;
+  template?: string;
+}
+
+interface TabSection {
+  id: number;
+  title: string;
+  videoImg?: string;
+  heading?: string;
+  text?: string;
+  list?: string[];
+}
+
 export default function ServicesPage() {
+  const searchParams = useSearchParams();
+  const categorySlug = searchParams.get('category');
+  
   const [mounted, setMounted] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pageData, setPageData] = useState<PageData | null>(null);
+  const [pageLoading, setPageLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
-
-  const tabs = [
-    { id: 1, title: 'Modern Technology' },
-    { id: 2, title: 'Success of Treatments' },
-    { id: 3, title: 'Certified Doctors' },
-  ];
-
-  const tabContent = [
-    {
-      id: 1,
-      videoImg: '/assets/images/resource/video-1.jpg',
-      heading: 'Modern Technology',
-      text: 'The phrase emphasizes the importance of healthcare providers, researchers, and innovators working together to create positive change in healthcare.',
-      list: [
-        'Your Health is Our Top Priority',
-        'Compassionate Care, Innovative Treatments',
-        'We Treat You Like Family',
-        'Leading the Way in Medical Excellence',
-      ],
-    },
-    {
-      id: 2,
-      videoImg: '/assets/images/resource/video-1.jpg',
-      heading: 'Success of Treatments',
-      text: 'The phrase emphasizes the importance of healthcare providers, researchers, and innovators working together to create positive change in healthcare.',
-      list: [
-        'Your Health is Our Top Priority',
-        'Compassionate Care, Innovative Treatments',
-        'We Treat You Like Family',
-        'Leading the Way in Medical Excellence',
-      ],
-    },
-    {
-      id: 3,
-      videoImg: '/assets/images/resource/video-1.jpg',
-      heading: 'Certified Doctors',
-      text: 'The phrase emphasizes the importance of healthcare providers, researchers, and innovators working together to create positive change in healthcare.',
-      list: [
-        'Your Health is Our Top Priority',
-        'Compassionate Care, Innovative Treatments',
-        'We Treat You Like Family',
-        'Leading the Way in Medical Excellence',
-      ],
-    },
-  ];
+  const [tabs, setTabs] = useState<TabSection[]>([]);
+  const [tabContent, setTabContent] = useState<TabSection[]>([]);
 
   useEffect(() => {
     setMounted(true);
-    fetchServices();
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      fetchServices();
+      fetchPageData();
+    }
+  }, [mounted, categorySlug]);
+
+  const fetchPageData = useCallback(async () => {
+    setPageLoading(true);
+    try {
+      const response = await fetch('/api/pages?template=services');
+      const data = await response.json();
+
+      if (data.success && data.page) {
+        setPageData(data.page);
+        
+        // Parse sections - handle both string and array formats
+        let sections: any[] = [];
+        if (data.page.sections) {
+          if (typeof data.page.sections === 'string') {
+            try {
+              sections = JSON.parse(data.page.sections);
+            } catch (e) {
+              console.error('Failed to parse sections JSON:', e);
+              sections = [];
+            }
+          } else if (Array.isArray(data.page.sections)) {
+            sections = data.page.sections;
+          }
+        }
+        
+        const tabsData: TabSection[] = [];
+        const contentData: TabSection[] = [];
+        
+        // Process sections to extract tabs and content
+        sections.forEach((section: any, index: number) => {
+          // Handle tabs or chooseus type
+          if (section.type === 'tabs' || section.type === 'chooseus') {
+            if (section.tabs && Array.isArray(section.tabs)) {
+              section.tabs.forEach((tab: any, tabIndex: number) => {
+                tabsData.push({
+                  id: tabIndex + 1,
+                  title: tab.title || tab.heading || `Tab ${tabIndex + 1}`
+                });
+                
+                contentData.push({
+                  id: tabIndex + 1,
+                  title: tab.title || tab.heading || `Tab ${tabIndex + 1}`,
+                  videoImg: tab.videoImg || tab.image || '/assets/images/resource/video-1.jpg',
+                  heading: tab.heading || tab.title,
+                  text: tab.text || tab.description || tab.content,
+                  list: tab.list || tab.items || []
+                });
+              });
+            }
+          }
+          // Handle features type - convert features items to tabs (limit to first 3)
+          else if (section.type === 'features' && section.items && Array.isArray(section.items)) {
+            section.items.slice(0, 3).forEach((item: any, itemIndex: number) => {
+              tabsData.push({
+                id: itemIndex + 1,
+                title: item.title || `Feature ${itemIndex + 1}`
+              });
+              
+              contentData.push({
+                id: itemIndex + 1,
+                title: item.title || `Feature ${itemIndex + 1}`,
+                videoImg: item.image || item.videoImg || '/assets/images/resource/video-1.jpg',
+                heading: item.title,
+                text: item.description || item.text || item.content,
+                list: item.list || item.items || []
+              });
+            });
+          }
+          // Handle content array - multiple content items as tabs
+          else if (section.type === 'content' && Array.isArray(section.content)) {
+            section.content.forEach((contentItem: any, contentIndex: number) => {
+              tabsData.push({
+                id: contentIndex + 1,
+                title: contentItem.title || contentItem.heading || `Content ${contentIndex + 1}`
+              });
+              
+              contentData.push({
+                id: contentIndex + 1,
+                title: contentItem.title || contentItem.heading || `Content ${contentIndex + 1}`,
+                videoImg: contentItem.videoImg || contentItem.image || '/assets/images/resource/video-1.jpg',
+                heading: contentItem.heading || contentItem.title,
+                text: contentItem.text || contentItem.description || contentItem.content,
+                list: contentItem.list || contentItem.items || []
+              });
+            });
+          }
+          // Handle direct array of content items (if section is an array of content)
+          else if (Array.isArray(section) && section.length > 0 && typeof section[0] === 'object' && section[0].title) {
+            section.forEach((contentItem: any, contentIndex: number) => {
+              tabsData.push({
+                id: contentIndex + 1,
+                title: contentItem.title || contentItem.heading || `Content ${contentIndex + 1}`
+              });
+              
+              contentData.push({
+                id: contentIndex + 1,
+                title: contentItem.title || contentItem.heading || `Content ${contentIndex + 1}`,
+                videoImg: contentItem.videoImg || contentItem.image || '/assets/images/resource/video-1.jpg',
+                heading: contentItem.heading || contentItem.title,
+                text: contentItem.text || contentItem.description || contentItem.content,
+                list: contentItem.list || contentItem.items || []
+              });
+            });
+          }
+        });
+        
+        if (tabsData.length > 0) {
+          setTabs(tabsData);
+          setTabContent(contentData);
+          setActiveTab(1);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch page data:', err);
+    } finally {
+      setPageLoading(false);
+    }
   }, []);
 
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/services?limit=50');
+      // Build API URL with category filter if present
+      let apiUrl = '/api/services?limit=50';
+      if (categorySlug) {
+        apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
+      }
+      
+      const response = await fetch(apiUrl);
       const data = await response.json();
 
       if (data.success && data.services) {
@@ -93,7 +208,7 @@ export default function ServicesPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [categorySlug]);
 
   if (!mounted) {
     return null;
@@ -165,11 +280,11 @@ export default function ServicesPage() {
                         </figure>
                         <div className="lower-content">
                           <div className="inner">
-                            {service.icon && (
+                            {/* {service.icon && (
                               <div className="icon-box">
                                 <i className={service.icon}></i>
                               </div>
-                            )}
+                            )} */}
                             <h3>
                               <Link href={`/services/${service.slug}`}>{service.title}</Link>
                             </h3>
@@ -184,125 +299,35 @@ export default function ServicesPage() {
             )}
           </div>
         </section>
-        <Video />
+        {/* <Video /> */}
 
-        <section className="chooseus-section service-page sec-pad p_relative">
-          <div className="auto-container">
-            <div className="sec-title centred mb_55">
-              <span className="sub-title mb_5">Why Choose Us</span>
-              <h2>What&apos;s Our Speciality</h2>
-              <p>
-                Medical care is the practice of providing diagnosis, treatment, and
-                preventive care for various <br /> illnesses, injuries, and diseases. It
-              </p>
-            </div>
-
-            {/* Tabs Buttons */}
-            <div className="tabs-box">
-              <div className="tab-btns tab-buttons clearfix centred mb_40">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    className={`tab-btn ${activeTab === tab.id ? 'active-btn' : ''}`}
-                    onClick={() => setActiveTab(tab.id)}
-                  >
-                    <h3>{tab.title}</h3>
-                  </button>
-                ))}
-              </div>
-
-              {/* Tabs Content */}
-              <div className="tabs-content">
-                {tabContent.map((content) => (
-                  <div
-                    key={content.id}
-                    className={`tab ${activeTab === content.id ? 'active-tab' : ''}`}
-                  >
-                    <div className="inner-box">
-                      <div
-                        className="shape"
-                        style={{ backgroundImage: 'url(/assets/images/shape/shape-14.png)' }}
-                      ></div>
-                      <div className="row clearfix">
-                        <div className="col-lg-6 col-md-12 col-sm-12 video-column">
-                          <div
-                            className="video-inner"
-                            style={{ backgroundImage: `url(${content.videoImg})` }}
-                          >
-                            <div className="video-btn">
-                              <ModalVideo />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="col-lg-6 col-md-12 col-sm-12 content-column">
-                          <div className="content-block-two">
-                            <div className="content-box ml_40">
-                              <div className="text-box">
-                                <h3>{content.heading}</h3>
-                                <p>{content.text}</p>
-                              </div>
-                              <ul className="list-style-one clearfix">
-                                {content.list.map((item, index) => (
-                                  <li key={index}>{item}</li>
-                                ))}
-                              </ul>
-                              <div className="btn-box">
-                                <Link href="/services" className="theme-btn btn-two">
-                                  <span>See All Services</span>
-                                </Link>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="appointment-style-two p_relative">
-          <div className="auto-container">
-            <div className="inner-box">
-              <h2>Make an Appointment</h2>
-              <form method="post" action="service.html" className="default-form">
-                <div className="row clearfix">
-                  <div className="col-lg-6 col-md-6 col-sm-12 single-column">
-                    <div className="form-group">
-                      <div className="icon"><i className="icon-45"></i></div>
-                      <input type="text" name="name" placeholder="Name" required />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-md-6 col-sm-12 single-column">
-                    <div className="form-group">
-                      <div className="icon"><i className="icon-46"></i></div>
-                      <input type="email" name="email" placeholder="Email" required />
-                    </div>
-                  </div>
-                  <div className="col-lg-12 col-md-12 col-sm-12 single-column">
-                    <div className="form-group">
-                      <div className="icon"><Image src="/assets/images/icons/icon-18.svg" alt="Image" width={14} height={15} priority /></div>
-                      <input type="text" name="phone" placeholder="Phone" required />
-                    </div>
-                  </div>
-                  <div className="col-lg-12 col-md-12 col-sm-12 single-column">
-                    <div className="form-group">
-                      <div className="icon"><i className="icon-48"></i></div>
-                      <textarea name="message" placeholder="Message"></textarea>
-                    </div>
-                  </div>
-                  <div className="col-lg-12 col-md-12 col-sm-12 single-column">
-                    <div className="form-group message-btn">
-                      <button type="submit" className="theme-btn btn-two"><span>Send your message</span></button>
-                    </div>
-                  </div>
+        {pageLoading ? (
+          <section className="chooseus-section service-page sec-pad p_relative">
+            <div className="auto-container">
+              <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
                 </div>
-              </form>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        ) : pageData && tabs.length > 0 ? (
+          <section className="chooseus-section service-page sec-pad p_relative">
+            <div className="auto-container">
+              <div className="sec-title centred mb_55">
+                <span className="sub-title mb_5">Why Choose Us</span>
+                <h2>{pageData.title || 'What\'s Our Speciality'}</h2>
+                {pageData.content && (
+                  <p dangerouslySetInnerHTML={{ __html: pageData.content }}></p>
+                )}
+              </div>
+
+              
+            </div>
+          </section>
+        ) : null}
+
+       
         <Cta />
       </Layout>
       <style dangerouslySetInnerHTML={{ __html: `
