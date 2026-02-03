@@ -6,7 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 // Get a single contact submission (admin only)
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -17,7 +17,8 @@ export async function GET(
       );
     }
 
-    const id = params.id;
+    const resolvedParams = await Promise.resolve(params);
+    const id = resolvedParams.id;
 
     const { data: contact, error } = await supabaseAdmin
       .from('contact_submissions')
@@ -68,7 +69,7 @@ export async function GET(
 // Update contact status (admin only)
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -79,7 +80,8 @@ export async function PUT(
       );
     }
 
-    const id = params.id;
+    const resolvedParams = await Promise.resolve(params);
+    const id = resolvedParams.id;
     const body = await req.json();
     const { status } = body;
 
@@ -135,7 +137,7 @@ export async function PUT(
 // DELETE /api/admin/contacts/[id] (Soft Delete)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -146,7 +148,8 @@ export async function DELETE(
       );
     }
 
-    const id = params.id;
+    const resolvedParams = await Promise.resolve(params);
+    const id = resolvedParams.id;
 
     const { error } = await supabaseAdmin
       .from('contact_submissions')

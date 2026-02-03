@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 // GET /api/admin/blog-categories/[id]
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -16,7 +16,8 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
 
     const { data: category, error } = await supabaseAdmin
       .from('blog_categories')
@@ -79,7 +80,7 @@ export async function GET(
 // PUT /api/admin/blog-categories/[id]
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -90,7 +91,8 @@ export async function PUT(
       );
     }
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
     const body = await req.json();
     const { name, slug, description, parentId } = body;
 
@@ -233,7 +235,7 @@ export async function PUT(
 // DELETE /api/admin/blog-categories/[id] (Soft Delete)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -244,7 +246,8 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
 
     const { data: category, error } = await supabaseAdmin
       .from('blog_categories')

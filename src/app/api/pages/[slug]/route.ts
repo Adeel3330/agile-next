@@ -6,10 +6,11 @@ import { supabaseAdmin } from '@/lib/supabase';
 // Fetch published page by slug
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> | { slug: string } }
 ) {
   try {
-    const { slug } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { slug } = resolvedParams;
 
     const { data: page, error } = await supabaseAdmin
       .from('pages')

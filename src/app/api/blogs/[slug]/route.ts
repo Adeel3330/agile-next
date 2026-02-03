@@ -5,10 +5,11 @@ import { supabaseAdmin } from '@/lib/supabase';
 // Public API - no authentication required
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> | { slug: string } }
 ) {
   try {
-    const { slug } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { slug } = resolvedParams;
 
     const { data: blog, error } = await supabaseAdmin
       .from('blogs')

@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 // GET /api/admin/affiliate-applications/[id]
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -16,7 +16,8 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
 
     const { data: application, error } = await supabaseAdmin
       .from('affiliate_applications')
@@ -66,7 +67,7 @@ export async function GET(
 // PUT /api/admin/affiliate-applications/[id]
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -77,7 +78,8 @@ export async function PUT(
       );
     }
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
     const body = await req.json();
     const { name, email, phone, providerType, status, notes } = body;
 
@@ -160,7 +162,7 @@ export async function PUT(
 // DELETE /api/admin/affiliate-applications/[id] (soft delete)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -171,7 +173,8 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
 
     const { data: application, error } = await supabaseAdmin
       .from('affiliate_applications')

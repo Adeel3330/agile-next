@@ -7,7 +7,7 @@ import { isCloudinaryUrl } from '@/lib/cloudinary-utils';
 // GET /api/admin/sliders/[id]
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -18,7 +18,8 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
 
     const { data: slider, error } = await supabaseAdmin
       .from('sliders')
@@ -63,7 +64,7 @@ export async function GET(
 // PUT /api/admin/sliders/[id]
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -74,7 +75,8 @@ export async function PUT(
       );
     }
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
     const body = await req.json();
     const {
       title,
@@ -186,7 +188,7 @@ export async function PUT(
 // DELETE /api/admin/sliders/[id] (Soft Delete)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -197,7 +199,8 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
 
     const { data: slider, error } = await supabaseAdmin
       .from('sliders')

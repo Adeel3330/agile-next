@@ -57,8 +57,15 @@ export default function News() {
   };
 
   // Default blogs for skeleton/fallback
-  const displayBlogs = loading 
-    ? Array.from({ length: 3 }).map((_, i) => ({ id: `skeleton-${i}`, title: '', slug: '', file: '', created_at: '' }))
+  const displayBlogs: Blog[] = loading 
+    ? Array.from({ length: 3 }).map((_, i) => ({ 
+        id: `skeleton-${i}`, 
+        title: '', 
+        slug: '', 
+        file: '', 
+        created_at: '',
+        category: null
+      }))
     : blogs.length > 0 
       ? blogs 
       : [];
