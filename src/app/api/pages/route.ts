@@ -63,6 +63,21 @@ export async function GET(req: NextRequest) {
 
     const page = pages[0];
 
+    // Parse sections if it's a JSON string
+    let sections = null;
+    if (page.sections) {
+      if (typeof page.sections === 'string') {
+        try {
+          sections = JSON.parse(page.sections);
+        } catch (e) {
+          console.error('Failed to parse sections JSON:', e);
+          sections = null;
+        }
+      } else if (Array.isArray(page.sections)) {
+        sections = page.sections;
+      }
+    }
+
     return NextResponse.json({
       success: true,
       page: {
@@ -72,6 +87,7 @@ export async function GET(req: NextRequest) {
         content: page.content,
         description: page.content ? (page.content.replace(/<[^>]*>/g, '').substring(0, 500)) : null, // Extract plain text from content for description
         fileUrl: page.file_url,
+        sections: sections,
         seoTitle: page.seo_title,
         seoDescription: page.seo_description,
         seoKeywords: page.seo_keywords,
