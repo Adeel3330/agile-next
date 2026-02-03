@@ -42,6 +42,7 @@ export default function AdminLayout({
   const settingsSubmenu = [
     { href: '/admin/resumes', label: 'Resumes', icon: 'fa-file-alt' },
     { href: '/admin/contacts', label: 'Contact Submissions', icon: 'fa-envelope' },
+    { href: '/admin/bookings', label: 'Bookings', icon: 'fa-calendar-check' },
     { href: '/admin/settings', label: 'System Settings', icon: 'fa-cog' },
     { href: '/admin/profile', label: 'Profile', icon: 'fa-user' },
   ];

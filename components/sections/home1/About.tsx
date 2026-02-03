@@ -10,16 +10,31 @@ interface AboutData {
   fileUrl?: string;
 }
 
+interface Service {
+  id: string;
+  title: string;
+  slug: string;
+}
+
 export default function About() {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
     const [date, setDate] = useState("");
+    const [phone, setPhone] = useState("");
+    const [selectedService, setSelectedService] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [mounted, setMounted] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [servicesLoading, setServicesLoading] = useState(true);
     const [aboutData, setAboutData] = useState<AboutData | null>(null);
     const [aboutImage, setAboutImage] = useState<string | null>(null);
+    const [services, setServices] = useState<Service[]>([]);
 
     useEffect(() => {
         setMounted(true);
         fetchAboutData();
+        fetchServices();
     }, []);
 
     const fetchAboutData = async () => {
@@ -52,6 +67,68 @@ export default function About() {
             console.error('Failed to fetch about data:', err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchServices = async () => {
+        setServicesLoading(true);
+        try {
+            const response = await fetch('/api/services?limit=50');
+            const data = await response.json();
+
+            if (data.success && data.services) {
+                setServices(data.services);
+            }
+        } catch (err) {
+            console.error('Failed to fetch services:', err);
+        } finally {
+            setServicesLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSubmitting(true);
+        setSubmitMessage(null);
+
+        try {
+            const selectedServiceObj = services.find(s => s.id === selectedService);
+            
+            const response = await fetch('/api/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    serviceId: selectedService || null,
+                    serviceName: selectedServiceObj?.title || selectedService || null,
+                    name: name.trim(),
+                    email: email.trim(),
+                    phone: phone.trim(),
+                    appointmentDate: date,
+                    appointmentTime: null,
+                    message: null
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setSubmitMessage({ type: 'success', text: data.message || 'Booking submitted successfully!' });
+                // Reset form
+                setName('');
+                setEmail('');
+                setDate('');
+                setPhone('');
+                setSelectedService('');
+            } else {
+                setSubmitMessage({ type: 'error', text: data.message || 'Failed to submit booking. Please try again.' });
+            }
+        } catch (err) {
+            console.error('Submit booking error:', err);
+            setSubmitMessage({ type: 'error', text: 'Failed to submit booking. Please try again.' });
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -186,40 +263,130 @@ export default function About() {
                 <div className="appointment-box">
                     <h4>Book an Appointment</h4>
                     <div className="form-inner">
-                        <form method="post" action="index.html" className="clearfix">
-                            <div className="form-group">
+                        <form onSubmit={handleSubmit} className="clearfix">
+                            <div className="form-group mt-5">
                                 <div className="icon-box"><i className="icon-15"></i></div>
-                                <span>Chose services</span>
+                                <span>Choose services</span>
                                 <div className="select-box">
-                                    <select className="selectmenu">
-                                        <option>Heart Health</option>
-                                        <option>Cardiology</option>
-                                        <option>Dental</option>
-                                        <option>Gastroenterology</option>
+                                    <select 
+                                        className="selectmenu"
+                                        value={selectedService}
+                                        onChange={(e) => setSelectedService(e.target.value)}
+                                        required
+                                        disabled={servicesLoading || submitting}
+                                    >
+                                        <option value="">Select a service</option>
+                                        {services.map((service) => (
+                                            <option key={service.id} value={service.id}>
+                                                {service.title}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                             </div>
-                            <div className="form-group">
+                            <div className="form-group mt-5">
                                 <div className="icon-box"><i className="icon-16"></i></div>
                                 <span>Date</span>
                                 <input
-                                type="date"
-                                id="date"
-                                placeholder="MM / DD / YYYY"
-                                value={date}
-                                onChange={(e) => setDate(e.target.value)}/>
+                                    type="date"
+                                    id="date"
+                                    placeholder="MM / DD / YYYY"
+                                    value={date}
+                                    onChange={(e) => setDate(e.target.value)}
+                                    min={new Date().toISOString().split('T')[0]}
+                                    required
+                                    disabled={submitting}
+                                />
                             </div>
-                            <div className="form-group">
+                            <div className="form-group mt-5">
                                 <div className="icon-box"><i className="icon-17"></i></div>
                                 <span>Phone</span>
-                                <input type="text" name="phone" placeholder="+ 1 (XXX) XXX XXX"/>
+                                <input 
+                                    type="tel" 
+                                    name="phone" 
+                                    placeholder="+ 1 (XXX) XXX XXX"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    required
+                                    disabled={submitting}
+                                />
                             </div>
-                            <div className="message-btn">
-                                <button type="submit" className="theme-btn btn-one"><span>Book Now</span></button>
+                            <div className="form-group mt-5">
+                                <div className="icon-box"><i className="fa fa-user"></i></div>
+                                <span>Name</span>
+                                <input 
+                                    type="text" 
+                                    name="name" 
+                                    placeholder="Your Name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    required
+                                    disabled={submitting}
+                                />
+                            </div>
+                            <div className="form-group mt-5">
+                                <div className="icon-box"><i className="fa fa-envelope"></i></div>
+                                <span>Email</span>
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    placeholder="your.email@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    disabled={submitting}
+                                />
+                            </div>
+                            {submitMessage && (
+                                <div className={`alert ${submitMessage.type === 'success' ? 'alert-success' : 'alert-danger'}`} style={{
+                                    padding: '10px 15px',
+                                    marginBottom: '15px',
+                                    position: 'absolute',
+                                    width: '100%',
+                                    borderRadius: '4px',
+                                    backgroundColor: submitMessage.type === 'success' ? '#d4edda' : '#f8d7da',
+                                    color: submitMessage.type === 'success' ? '#155724' : '#721c24',
+                                    border: `1px solid ${submitMessage.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
+                                }}>
+                                    {submitMessage.text}
+                                </div>
+                            )}
+                            <div className="message-btn mt-5">
+                                <button 
+                                    type="submit" 
+                                    className="theme-btn btn-one"
+                                    disabled={submitting || !date || !phone || !selectedService || !name || !email}
+                                    style={{ position: 'relative', opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
+                                >
+                                    {submitting && (
+                                        <p style={{ 
+                                            position: 'absolute', 
+                                            left: '15px', 
+                                            top: '50%', 
+                                            transform: 'translateY(-50%)',
+                                            display: 'inline-block',
+                                            width: '14px',
+                                            height: '14px',
+                                            border: '2px solid #fff',
+                                            borderTop: '2px solid transparent',
+                                            borderRadius: '50%',
+                                            animation: 'spin 0.8s linear infinite'
+                                        }}></p>
+                                    )}
+                                    <span style={{ marginLeft: submitting ? '25px' : '0' }}>
+                                        {submitting ? 'Submitting...' : 'Book Now'}
+                                    </span>
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
+                <style dangerouslySetInnerHTML={{ __html: `
+                    @keyframes spin {
+                        0% { transform: translateY(-50%) rotate(0deg); }
+                        100% { transform: translateY(-50%) rotate(360deg); }
+                    }
+                `}} />
             </div>
         </section>
   );
