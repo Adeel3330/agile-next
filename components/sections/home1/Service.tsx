@@ -94,7 +94,7 @@ export default function Service() {
         className="pattern-layer"
         style={{ backgroundImage: "url(/assets/images/shape/shape-13.png)" }}
       ></div>
-      <span className="big-text">Central Hospital Central Hospital</span>
+      <span className="big-text">AGILLE NESUS SOLUTIONS</span>
       <div className="auto-container">
         <div className="sec-title mb_60">
           <span className="sub-title mb_5">What we do for our patients</span>
