@@ -102,11 +102,11 @@ export default function ServiceDetailsPage() {
 
   const fetchServices = useCallback(async () => {
     try {
-      const response = await fetch('/api/services?limit=20');
+      const response = await fetch('/api/services?limit=5');
       const data = await response.json();
 
       if (data.success && data.services) {
-        setServices(data.services.map((s: Service) => ({
+        setServices(data.services.slice(0, 5).map((s: Service) => ({
           id: s.id,
           title: s.title,
           slug: s.slug
@@ -197,43 +197,6 @@ export default function ServiceDetailsPage() {
                           </li>
                         ))}
                       </ul>
-                    </div>
-                  </div>
-                  <div className="sidebar-widget appointment-widget mb_40">
-                    <div className="widget-title">
-                      <h2>Appointment</h2>
-                    </div>
-                    <div className="form-inner">
-                      <form method="post" action="/contact" className="default-form">
-                        <div className="form-group">
-                          <div className="icon"><i className="icon-45"></i></div>
-                          <input type="text" name="name" placeholder="Name" required />
-                        </div>
-                        <div className="form-group">
-                          <div className="icon"><i className="icon-46"></i></div>
-                          <input type="email" name="email" placeholder="Email" required />
-                        </div>
-                        <div className="form-group">
-                          <div className="icon"><Image src="/assets/images/icons/icon-15.svg" alt="Image" width={15} height={15} priority /></div>
-                          <div className="select-box">
-                            <select className="selectmenu" name="service" defaultValue={service.title}>
-                              <option>I&apos;m interested in *</option>
-                              {services.map((s) => (
-                                <option key={s.id} value={s.title}>
-                                  {s.title}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="form-group">
-                          <div className="icon"><i className="icon-48"></i></div>
-                          <textarea name="message" placeholder="Message"></textarea>
-                        </div>
-                        <div className="form-group message-btn">
-                          <button type="submit" className="theme-btn btn-two"><span>Send your message</span></button>
-                        </div>
-                      </form>
                     </div>
                   </div>
                   <div className="sidebar-widget schedule-widget">
