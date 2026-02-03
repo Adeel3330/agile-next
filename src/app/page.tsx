@@ -11,7 +11,7 @@ import News from "../../components/sections/home1/News";
 import Portfolio from "../../components/sections/home1/Portfolio";
 import Service from "../../components/sections/home1/Service";
 import Team from "../../components/sections/home1/Team";
-import Working from "../../components/sections/home1/Working";
+// import Working from "../../components/sections/home1/Working";
 import GoogleMapSection from "../../components/sections/home1/GoogleMap";
 export default function Home() {
 
@@ -24,7 +24,7 @@ export default function Home() {
                 <Service/>
                 <Chooseus/>
                 <Appointment/>
-                <Working/>
+                {/* <Working/> */}
                 <About_Two/>
                 <Team/>
                 {/* <Portfolio/> */}
