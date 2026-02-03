@@ -129,6 +129,30 @@ export async function PUT(
       }
     }
 
+    // Check if slug already exists for this parent_id (excluding current category)
+    // Slug uniqueness per parent
+    let existingCategoryQuery = supabaseAdmin
+      .from('blog_categories')
+      .select('id, name, slug, parent_id')
+      .eq('slug', categorySlug)
+      .neq('id', id)
+      .is('deleted_at', null);
+
+    if (parentId) {
+      existingCategoryQuery = existingCategoryQuery.eq('parent_id', parentId);
+    } else {
+      existingCategoryQuery = existingCategoryQuery.is('parent_id', null);
+    }
+
+    const { data: existingCategory } = await existingCategoryQuery.maybeSingle();
+
+    if (existingCategory) {
+      return NextResponse.json(
+        { success: false, message: `Category slug "${categorySlug}" already exists for this parent category` },
+        { status: 409 }
+      );
+    }
+
     const updates: any = {
       name: name.trim(),
       slug: categorySlug,

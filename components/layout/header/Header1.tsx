@@ -22,8 +22,28 @@ interface Settings {
   logoUrl?: string;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface Service {
+  id: string;
+  title: string;
+  slug: string;
+  categoryId?: string;
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+}
+
 export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
   const [settings, setSettings] = useState<Settings | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -41,6 +61,30 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
       .catch(err => {
         console.error('Failed to fetch settings:', err);
         setLoading(false);
+      });
+
+    // Fetch service categories
+    fetch('/api/categories/service-categories')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.categories) {
+          setCategories(data.categories);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch categories:', err);
+      });
+
+    // Fetch all services
+    fetch('/api/services?limit=100')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.services) {
+          setServices(data.services);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch services:', err);
       });
   }, []);
 
@@ -192,32 +236,39 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                       <li className="dropdown">
                         <Link href="/services">Services</Link>
                         <ul>
-                          <li>
-                            <Link href="/services#physicians">Physicians/Medical Groups</Link>
-                          </li>
-                          <li>
-                            <Link href="/services#billing-companies">Medical Billing Companies</Link>
-                          </li>
-                          <li className="dropdown">
-                            <Link href="/services#rcm">Revenue Cycle Management</Link>
-                            <ul>
-                              <li><Link href="/services#eligibility">Eligibility & Benefits Verification</Link></li>
-                              <li><Link href="/services#demographics">Patients Demographics Entry</Link></li>
-                              <li><Link href="/services#authorizations">Authorizations</Link></li>
-                              <li><Link href="/services#coding">Coding – ICD 10</Link></li>
-                              <li><Link href="/services#charge-capture">Charge Capture</Link></li>
-                              <li><Link href="/services#claims-submission">Claims Submission</Link></li>
-                              <li><Link href="/services#claims-audit">Claims Audit (Fix Rejections)</Link></li>
-                              <li><Link href="/services#payment-posting">Payment Posting</Link></li>
-                              <li><Link href="/services#denial-management">Denial Management</Link></li>
-                              <li><Link href="/services#ar-follow-up">AR Follow Up</Link></li>
-                              <li><Link href="/services#patient-statements">Patient Statements & Follow Up</Link></li>
-                              <li><Link href="/services#credit-balance">Credit Balance Solution</Link></li>
-                              <li><Link href="/services#credentialing">Credentialing & Enrollment</Link></li>
-                              <li><Link href="/services#ipa-contracting">IPA Contracting</Link></li>
-                              <li><Link href="/services#virtual-assistance">Virtual Assistance</Link></li>
-                            </ul>
-                          </li>
+                          {categories.length > 0 ? (
+                            categories.map((category) => {
+                              const categoryServices = services.filter(
+                                (s) => s.categoryId === category.id
+                              );
+                              return categoryServices.length > 0 ? (
+                                <li key={category.id} className="dropdown">
+                                  <Link href={`/services?category=${category.slug}`}>
+                                    {category.name}
+                                  </Link>
+                                  <ul>
+                                    {categoryServices.map((service) => (
+                                      <li key={service.id}>
+                                        <Link href={`/services/${service.slug}`}>
+                                          {service.title}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </li>
+                              ) : (
+                                <li key={category.id}>
+                                  <Link href={`/services?category=${category.slug}`}>
+                                    {category.name}
+                                  </Link>
+                                </li>
+                              );
+                            })
+                          ) : (
+                            <li>
+                              <Link href="/services">All Services</Link>
+                            </li>
+                          )}
                         </ul>
                       </li>
                       <li className="dropdown">
@@ -328,32 +379,39 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                       <li className="dropdown">
                         <Link href="/services">Services</Link>
                         <ul>
-                          <li>
-                            <Link href="/services#physicians">Physicians/Medical Groups</Link>
-                          </li>
-                          <li>
-                            <Link href="/services#billing-companies">Medical Billing Companies</Link>
-                          </li>
-                          <li className="dropdown">
-                            <Link href="/services#rcm">Revenue Cycle Management</Link>
-                            <ul>
-                              <li><Link href="/services#eligibility">Eligibility & Benefits Verification</Link></li>
-                              <li><Link href="/services#demographics">Patients Demographics Entry</Link></li>
-                              <li><Link href="/services#authorizations">Authorizations</Link></li>
-                              <li><Link href="/services#coding">Coding – ICD 10</Link></li>
-                              <li><Link href="/services#charge-capture">Charge Capture</Link></li>
-                              <li><Link href="/services#claims-submission">Claims Submission</Link></li>
-                              <li><Link href="/services#claims-audit">Claims Audit (Fix Rejections)</Link></li>
-                              <li><Link href="/services#payment-posting">Payment Posting</Link></li>
-                              <li><Link href="/services#denial-management">Denial Management</Link></li>
-                              <li><Link href="/services#ar-follow-up">AR Follow Up</Link></li>
-                              <li><Link href="/services#patient-statements">Patient Statements & Follow Up</Link></li>
-                              <li><Link href="/services#credit-balance">Credit Balance Solution</Link></li>
-                              <li><Link href="/services#credentialing">Credentialing & Enrollment</Link></li>
-                              <li><Link href="/services#ipa-contracting">IPA Contracting</Link></li>
-                              <li><Link href="/services#virtual-assistance">Virtual Assistance</Link></li>
-                            </ul>
-                          </li>
+                          {categories.length > 0 ? (
+                            categories.map((category) => {
+                              const categoryServices = services.filter(
+                                (s) => s.categoryId === category.id
+                              );
+                              return categoryServices.length > 0 ? (
+                                <li key={category.id} className="dropdown">
+                                  <Link href={`/services?category=${category.slug}`}>
+                                    {category.name}
+                                  </Link>
+                                  <ul>
+                                    {categoryServices.map((service) => (
+                                      <li key={service.id}>
+                                        <Link href={`/services/${service.slug}`}>
+                                          {service.title}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </li>
+                              ) : (
+                                <li key={category.id}>
+                                  <Link href={`/services?category=${category.slug}`}>
+                                    {category.name}
+                                  </Link>
+                                </li>
+                              );
+                            })
+                          ) : (
+                            <li>
+                              <Link href="/services">All Services</Link>
+                            </li>
+                          )}
                         </ul>
                       </li>
                       <li className="dropdown">
