@@ -13,7 +13,7 @@ interface Page {
   title: string;
   slug: string;
   content?: string;
-  sections?: any[];
+  fileUrl?: string;
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string;
@@ -42,7 +42,7 @@ export default function EditPagePage() {
     title: '',
     slug: '',
     content: '',
-    sections: '[]',
+    fileUrl: '',
     seoTitle: '',
     seoDescription: '',
     seoKeywords: '',
@@ -50,6 +50,8 @@ export default function EditPagePage() {
     status: 'draft' as 'draft' | 'published' | 'archived',
     template: ''
   });
+  const [fileUrlPreview, setFileUrlPreview] = useState<string>('');
+  const [uploadingFile, setUploadingFile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -100,7 +102,7 @@ export default function EditPagePage() {
         title: page.title,
         slug: page.slug,
         content: page.content || '',
-        sections: JSON.stringify(page.sections || [], null, 2),
+        fileUrl: page.fileUrl || '',
         seoTitle: page.seoTitle || '',
         seoDescription: page.seoDescription || '',
         seoKeywords: page.seoKeywords || '',
@@ -108,6 +110,10 @@ export default function EditPagePage() {
         status: page.status,
         template: page.template || ''
       });
+      // Set existing fileUrl as preview if available
+      if (page.fileUrl) {
+        setFileUrlPreview(page.fileUrl);
+      }
       // Set existing image as preview if available
       if (page.seoImage) {
         setPreviewUrl(page.seoImage);
@@ -118,6 +124,51 @@ export default function EditPagePage() {
       console.error('Fetch error:', err);
       setError('Failed to fetch page');
       setLoading(false);
+    }
+  };
+
+  const handleFileUrlChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingFile(true);
+    setError('');
+
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
+      if (!token) {
+        setError('Authentication required');
+        setUploadingFile(false);
+        return;
+      }
+
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const uploadResponse = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: uploadFormData
+      });
+
+      const uploadData = await uploadResponse.json();
+
+      if (!uploadData.success) {
+        setError(uploadData.message || 'Failed to upload file to Cloudinary');
+        setUploadingFile(false);
+        return;
+      }
+
+      // Store Cloudinary URL
+      setFormData(prev => ({ ...prev, fileUrl: uploadData.url }));
+      setFileUrlPreview(uploadData.url);
+      setUploadingFile(false);
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError('Failed to upload file. Please try again.');
+      setUploadingFile(false);
     }
   };
 
@@ -190,20 +241,17 @@ export default function EditPagePage() {
         return;
       }
 
-      // Parse sections JSON
-      let sections = [];
-      try {
-        sections = JSON.parse(formData.sections || '[]');
-      } catch (err) {
-        setError('Invalid sections JSON format');
-        setSaving(false);
-        return;
-      }
-
       const submitData = {
-        ...formData,
-        sections,
-        seoImage: cloudinaryUrl || formData.seoImage // Use Cloudinary URL if available
+        title: formData.title,
+        slug: formData.slug,
+        content: formData.content,
+        fileUrl: formData.fileUrl,
+        seoTitle: formData.seoTitle,
+        seoDescription: formData.seoDescription,
+        seoKeywords: formData.seoKeywords,
+        seoImage: cloudinaryUrl || formData.seoImage, // Use Cloudinary URL if available
+        status: formData.status,
+        template: formData.template
       };
 
       const response = await fetch(`/api/admin/pages/${id}`, {
@@ -285,7 +333,15 @@ export default function EditPagePage() {
                     type="text"
                     className="form-control"
                     value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    onChange={(e) => {
+                      const title = e.target.value;
+                      const generatedSlug = title
+                        .toLowerCase()
+                        .trim()
+                        .replace(/[^a-z0-9]+/g, '-')
+                        .replace(/^-|-$/g, '');
+                      setFormData({ ...formData, title: title, slug: generatedSlug });
+                    }}
                     required
                     placeholder="Enter page title"
                   />
@@ -427,20 +483,39 @@ export default function EditPagePage() {
                 </div>
               </div>
 
-              {/* Row 6: Sections JSON (spans 2 columns) */}
+              {/* Row 6: File URL Upload (spans 2 columns) */}
               <div className="row mb-3">
                 <div className="col-md-8">
-                  <label className="form-label">Sections (JSON)</label>
-                  <textarea
+                  <label className="form-label">Page Image/File</label>
+                  <input
+                    type="file"
                     className="form-control"
-                    value={formData.sections}
-                    onChange={(e) => setFormData({ ...formData, sections: e.target.value })}
-                    rows={6}
-                    placeholder='[{"type": "hero", "title": "Welcome"}, {"type": "content", "content": "..."}]'
-                    style={{ fontFamily: 'monospace', fontSize: '12px' }}
+                    accept="image/*"
+                    onChange={handleFileUrlChange}
+                    disabled={uploadingFile}
                   />
+                  {uploadingFile && (
+                    <small className="text-muted d-block mt-1">
+                      <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                      Uploading to Cloudinary...
+                    </small>
+                  )}
+                  {fileUrlPreview && !uploadingFile && (
+                    <div className="mt-2">
+                      <img 
+                        src={fileUrlPreview} 
+                        alt="Preview" 
+                        style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '4px' }}
+                      />
+                    </div>
+                  )}
+                  {formData.fileUrl && (
+                    <div className="mt-2">
+                      <small className="text-muted">Current file: {formData.fileUrl.substring(0, 50)}...</small>
+                    </div>
+                  )}
                   <small className="text-muted">
-                    JSON array of section objects. See documentation for structure.
+                    Upload an image or file for this page (optional)
                   </small>
                 </div>
               </div>

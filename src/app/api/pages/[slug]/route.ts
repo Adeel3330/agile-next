@@ -33,7 +33,7 @@ export async function GET(
         title: page.title,
         slug: page.slug,
         content: page.content,
-        sections: page.sections || [],
+        fileUrl: page.file_url,
         seoTitle: page.seo_title,
         seoDescription: page.seo_description,
         seoKeywords: page.seo_keywords,

@@ -22,7 +22,7 @@ export default function CreatePagePage() {
     title: '',
     slug: '',
     content: '',
-    sections: '[]',
+    fileUrl: '',
     seoTitle: '',
     seoDescription: '',
     seoKeywords: '',
@@ -30,6 +30,8 @@ export default function CreatePagePage() {
     status: 'draft' as 'draft' | 'published' | 'archived',
     template: ''
   });
+  const [fileUrlPreview, setFileUrlPreview] = useState<string>('');
+  const [uploadingFile, setUploadingFile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -43,9 +45,9 @@ export default function CreatePagePage() {
     }
   }, [router]);
 
-  // Auto-generate slug from title
+  // Auto-generate slug from title whenever title changes
   useEffect(() => {
-    if (formData.title && !formData.slug) {
+    if (formData.title) {
       const generatedSlug = formData.title
         .toLowerCase()
         .trim()
@@ -54,6 +56,51 @@ export default function CreatePagePage() {
       setFormData(prev => ({ ...prev, slug: generatedSlug }));
     }
   }, [formData.title]);
+
+  const handleFileUrlChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingFile(true);
+    setError('');
+
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
+      if (!token) {
+        setError('Authentication required');
+        setUploadingFile(false);
+        return;
+      }
+
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const uploadResponse = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: uploadFormData
+      });
+
+      const uploadData = await uploadResponse.json();
+
+      if (!uploadData.success) {
+        setError(uploadData.message || 'Failed to upload file to Cloudinary');
+        setUploadingFile(false);
+        return;
+      }
+
+      // Store Cloudinary URL
+      setFormData(prev => ({ ...prev, fileUrl: uploadData.url }));
+      setFileUrlPreview(uploadData.url);
+      setUploadingFile(false);
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError('Failed to upload file. Please try again.');
+      setUploadingFile(false);
+    }
+  };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -124,20 +171,17 @@ export default function CreatePagePage() {
         return;
       }
 
-      // Parse sections JSON
-      let sections = [];
-      try {
-        sections = JSON.parse(formData.sections || '[]');
-      } catch (err) {
-        setError('Invalid sections JSON format');
-        setLoading(false);
-        return;
-      }
-
       const submitData = {
-        ...formData,
-        sections,
-        seoImage: cloudinaryUrl || formData.seoImage // Use Cloudinary URL if available
+        title: formData.title,
+        slug: formData.slug,
+        content: formData.content,
+        fileUrl: formData.fileUrl,
+        seoTitle: formData.seoTitle,
+        seoDescription: formData.seoDescription,
+        seoKeywords: formData.seoKeywords,
+        seoImage: cloudinaryUrl || formData.seoImage, // Use Cloudinary URL if available
+        status: formData.status,
+        template: formData.template
       };
 
       const response = await fetch('/api/admin/pages', {
@@ -344,20 +388,39 @@ export default function CreatePagePage() {
                 </div>
               </div>
 
-              {/* Row 6: Sections JSON (spans 2 columns) */}
+              {/* Row 6: File URL Upload (spans 2 columns) */}
               <div className="row mb-3">
                 <div className="col-md-8">
-                  <label className="form-label">Sections (JSON)</label>
-                  <textarea
+                  <label className="form-label">Page Image/File</label>
+                  <input
+                    type="file"
                     className="form-control"
-                    value={formData.sections}
-                    onChange={(e) => setFormData({ ...formData, sections: e.target.value })}
-                    rows={6}
-                    placeholder='[{"type": "hero", "title": "Welcome"}, {"type": "content", "content": "..."}]'
-                    style={{ fontFamily: 'monospace', fontSize: '12px' }}
+                    accept="image/*"
+                    onChange={handleFileUrlChange}
+                    disabled={uploadingFile}
                   />
+                  {uploadingFile && (
+                    <small className="text-muted d-block mt-1">
+                      <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                      Uploading to Cloudinary...
+                    </small>
+                  )}
+                  {fileUrlPreview && !uploadingFile && (
+                    <div className="mt-2">
+                      <img 
+                        src={fileUrlPreview} 
+                        alt="Preview" 
+                        style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '4px' }}
+                      />
+                    </div>
+                  )}
+                  {formData.fileUrl && (
+                    <div className="mt-2">
+                      <small className="text-muted">Current file: {formData.fileUrl.substring(0, 50)}...</small>
+                    </div>
+                  )}
                   <small className="text-muted">
-                    JSON array of section objects. See documentation for structure.
+                    Upload an image or file for this page (optional)
                   </small>
                 </div>
               </div>

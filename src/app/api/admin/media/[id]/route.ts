@@ -118,9 +118,9 @@ export async function PUT(
     if (fileSize !== undefined) updateData.file_size = fileSize || null;
     if (fileType !== undefined) updateData.file_type = fileType?.trim() || null;
     if (position !== undefined) {
-      if (!['home', 'services', 'about', 'contact', 'cta', 'other'].includes(position)) {
+      if (!['home', 'services', 'about', 'contact', 'cta', 'compliance', 'other'].includes(position)) {
         return NextResponse.json(
-          { success: false, message: 'Invalid position. Must be: home, services, about, contact, cta, or other' },
+          { success: false, message: 'Invalid position. Must be: home, services, about, contact, cta, compliance, or other' },
           { status: 400 }
         );
       }

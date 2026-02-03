@@ -39,7 +39,7 @@ export async function GET(
         title: page.title,
         slug: page.slug,
         content: page.content,
-        sections: page.sections || [],
+        fileUrl: page.file_url,
         seoTitle: page.seo_title,
         seoDescription: page.seo_description,
         seoKeywords: page.seo_keywords,
@@ -80,7 +80,7 @@ export async function PUT(
       title, 
       slug, 
       content, 
-      sections, 
+      fileUrl,
       seoTitle, 
       seoDescription, 
       seoKeywords, 
@@ -104,23 +104,32 @@ export async function PUT(
       );
     }
 
-    // Check if slug is being changed and if new slug already exists
-    const pageSlug = slug?.trim() || existing.slug;
-    if (pageSlug !== existing.slug) {
-      const { data: slugExists } = await supabaseAdmin
-        .from('pages')
-        .select('id')
-        .eq('slug', pageSlug)
-        .neq('id', id)
-        .is('deleted_at', null)
-        .single();
+    // Generate slug from title if title changed and slug not provided, or use provided slug
+    let pageSlug = slug?.trim() || existing.slug;
+    if (title && title !== existing.title && !slug) {
+      // Auto-generate slug from new title
+      pageSlug = title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
 
-      if (slugExists) {
-        return NextResponse.json(
-          { success: false, message: 'A page with this slug already exists' },
-          { status: 400 }
-        );
+    // Check if slug is being changed and if new slug already exists
+    if (pageSlug !== existing.slug) {
+      // If slug exists, append number
+      let finalSlug = pageSlug;
+      let slugCounter = 1;
+      while (true) {
+        const { data: slugExists } = await supabaseAdmin
+          .from('pages')
+          .select('id')
+          .eq('slug', finalSlug)
+          .neq('id', id)
+          .is('deleted_at', null)
+          .maybeSingle();
+
+        if (!slugExists) break;
+        finalSlug = `${pageSlug}-${slugCounter}`;
+        slugCounter++;
       }
+      pageSlug = finalSlug;
     }
 
     const updateData: any = {
@@ -128,9 +137,9 @@ export async function PUT(
     };
 
     if (title !== undefined) updateData.title = title.trim();
-    if (slug !== undefined) updateData.slug = pageSlug;
+    if (slug !== undefined || (title && title !== existing.title)) updateData.slug = pageSlug;
     if (content !== undefined) updateData.content = content?.trim() || null;
-    if (sections !== undefined) updateData.sections = sections || [];
+    if (fileUrl !== undefined) updateData.file_url = fileUrl?.trim() || null;
     if (seoTitle !== undefined) updateData.seo_title = seoTitle?.trim() || null;
     if (seoDescription !== undefined) updateData.seo_description = seoDescription?.trim() || null;
     if (seoKeywords !== undefined) updateData.seo_keywords = seoKeywords?.trim() || null;
@@ -149,11 +158,6 @@ export async function PUT(
       if (key === 'updated_at') return false;
       const newValue = updateData[key];
       const oldValue = existing[key as keyof typeof existing];
-      
-      // Handle JSONB fields
-      if (key === 'sections') {
-        return JSON.stringify(newValue) !== JSON.stringify(oldValue);
-      }
       
       return newValue !== oldValue;
     });
@@ -181,7 +185,7 @@ export async function PUT(
             title: existing.title,
             slug: existing.slug,
             content: existing.content,
-            sections: existing.sections || [],
+            file_url: existing.file_url,
             seo_title: existing.seo_title,
             seo_description: existing.seo_description,
             seo_keywords: existing.seo_keywords,
@@ -223,7 +227,7 @@ export async function PUT(
         title: page.title,
         slug: page.slug,
         content: page.content,
-        sections: page.sections || [],
+        fileUrl: page.file_url,
         seoTitle: page.seo_title,
         seoDescription: page.seo_description,
         seoKeywords: page.seo_keywords,

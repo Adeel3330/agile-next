@@ -311,6 +311,7 @@ export default function EditMediaPage() {
                     <option value="about">About</option>
                     <option value="contact">Contact</option>
                     <option value="cta">CTA</option>
+                    <option value="compliance">Compliance</option>
                     <option value="other">Other</option>
                   </select>
                 </div>

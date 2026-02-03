@@ -278,14 +278,14 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                       </li>
                       <li className={`dropdown ${isActive('/about') ? "current" : ""}`}>
                         <Link href="/about">About Us</Link>
-                        <ul>
+                        {/* <ul>
                           <li>
                             <Link href="/about">About Agile Nexus Solutions</Link>
                           </li>
                           <li>
                             <Link href="/about#leadership">Leadership</Link>
                           </li>
-                        </ul>
+                        </ul> */}
                       </li>
                       <li className={`dropdown ${isActive('/services') ? "current" : ""}`}>
                         <Link href="/services">Services</Link>
@@ -395,9 +395,9 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           <li className={isActive('/software') ? "current" : ""}>
                             <Link href="/software">Software</Link>
                           </li>
-                          <li className={isActive('/development') ? "current" : ""}>
+                          {/* <li className={isActive('/development') ? "current" : ""}>
                             <Link href="/development">Development</Link>
-                          </li>
+                          </li> */}
                           <li className={isActive('/blog') ? "current" : ""}>
                             <Link href="/blog">Blog</Link>
                           </li>
@@ -482,14 +482,14 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                       </li>
                       <li className={`dropdown ${isActive('/about') ? "current" : ""}`}>
                         <Link href="/about">About Us</Link>
-                        <ul>
+                        {/* <ul>
                           <li>
                             <Link href="/about">About Agile Nexus Soits lutions</Link>
                           </li>
                           <li>
                             <Link href="/about#leadership">Leadership</Link>
                           </li>
-                        </ul>
+                        </ul> */}
                       </li>
                       <li className={`dropdown ${isActive('/services') ? "current" : ""}`}>
                         <Link href="/services">Services</Link>
@@ -591,9 +591,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           <li className={isActive('/software') ? "current" : ""}>
                             <Link href="/software">Software</Link>
                           </li>
-                          <li className={isActive('/development') ? "current" : ""}>
-                            <Link href="/development">Development</Link>
-                          </li>
+                         
                           <li className={isActive('/blog') ? "current" : ""}>
                             <Link href="/blog">Blog</Link>
                           </li>

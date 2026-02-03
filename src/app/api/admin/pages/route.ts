@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
       title: page.title,
       slug: page.slug,
       content: page.content,
-      sections: page.sections || [],
+      fileUrl: page.file_url,
       seoTitle: page.seo_title,
       seoDescription: page.seo_description,
       seoKeywords: page.seo_keywords,
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
       title, 
       slug, 
       content, 
-      sections, 
+      fileUrl,
       seoTitle, 
       seoDescription, 
       seoKeywords, 
@@ -123,28 +123,30 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate slug from title if not provided
-    const pageSlug = slug?.trim() || title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    let pageSlug = slug?.trim() || title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-    // Check if slug already exists
-    const { data: existing } = await supabaseAdmin
-      .from('pages')
-      .select('id')
-      .eq('slug', pageSlug)
-      .is('deleted_at', null)
-      .single();
+    // Check if slug already exists and append number if needed
+    let finalSlug = pageSlug;
+    let slugCounter = 1;
+    while (true) {
+      const { data: existing } = await supabaseAdmin
+        .from('pages')
+        .select('id')
+        .eq('slug', finalSlug)
+        .is('deleted_at', null)
+        .maybeSingle();
 
-    if (existing) {
-      return NextResponse.json(
-        { success: false, message: 'A page with this slug already exists' },
-        { status: 400 }
-      );
+      if (!existing) break;
+      finalSlug = `${pageSlug}-${slugCounter}`;
+      slugCounter++;
     }
+    pageSlug = finalSlug;
 
     const insertData: any = {
       title: title.trim(),
       slug: pageSlug,
       content: content?.trim() || null,
-      sections: sections || [],
+      file_url: fileUrl?.trim() || null,
       seo_title: seoTitle?.trim() || null,
       seo_description: seoDescription?.trim() || null,
       seo_keywords: seoKeywords?.trim() || null,
@@ -178,7 +180,7 @@ export async function POST(req: NextRequest) {
         title: page.title,
         slug: page.slug,
         content: page.content,
-        sections: page.sections || [],
+        fileUrl: page.file_url,
         seoTitle: page.seo_title,
         seoDescription: page.seo_description,
         seoKeywords: page.seo_keywords,
