@@ -29,6 +29,7 @@ export default function AdminLayout({
     { href: '/admin', label: 'Dashboard', icon: 'fa-tachometer-alt' },
     { href: '/admin/careers', label: 'Careers Development', icon: 'fa-briefcase' },
     { href: '/admin/sliders', label: 'Sliders', icon: 'fa-images' },
+    { href: '/admin/services', label: 'Services', icon: 'fa-cogs' },
     { href: '/admin/blog-categories', label: 'Categories', icon: 'fa-folder' },
     { href: '/admin/blogs', label: 'Blogs', icon: 'fa-newspaper' },
     { href: '/admin/pages', label: 'Pages CMS', icon: 'fa-file-alt' },

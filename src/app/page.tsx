@@ -27,7 +27,7 @@ export default function Home() {
                 <Working/>
                 <About_Two/>
                 <Team/>
-                <Portfolio/>
+                {/* <Portfolio/> */}
                 <News/>
                 <GoogleMapSection/>
             </Layout>
