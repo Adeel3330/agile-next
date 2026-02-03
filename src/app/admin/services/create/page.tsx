@@ -61,7 +61,8 @@ export default function CreateServicePage() {
       const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
       if (!token) return;
 
-      const response = await fetch('/api/admin/service-categories?limit=100&parent=null', {
+      // Fetch service categories from unified categories API (children of "service-categories" parent)
+      const response = await fetch('/api/categories/service-categories', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -69,7 +70,10 @@ export default function CreateServicePage() {
 
       const data = await response.json();
       if (data.success && data.categories) {
-        setCategories(data.categories);
+        setCategories(data.categories.map((cat: any) => ({
+          _id: cat.id,
+          name: cat.name
+        })));
       }
     } catch (err) {
       console.error('Failed to fetch categories:', err);

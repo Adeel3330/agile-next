@@ -33,11 +33,11 @@ export async function GET(
       );
     }
 
-    // Get category if exists
+    // Get category if exists (from blog_categories table)
     let category = null;
     if (service.category_id) {
       const { data: categoryData } = await supabaseAdmin
-        .from('service_categories')
+        .from('blog_categories')
         .select('id, name, slug')
         .eq('id', service.category_id)
         .is('deleted_at', null)
@@ -150,10 +150,10 @@ export async function PUT(
       }
     }
 
-    // Validate category if provided
+    // Validate category if provided (from blog_categories table)
     if (categoryId) {
       const { data: category } = await supabaseAdmin
-        .from('service_categories')
+        .from('blog_categories')
         .select('id')
         .eq('id', categoryId)
         .is('deleted_at', null)

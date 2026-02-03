@@ -19,12 +19,13 @@ if (!supabaseUrl || !supabaseServiceKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Service Categories Data from https://agilenexussolution.com/
+// These will be created as children of the "service-categories" parent in blog_categories table
 const serviceCategories = [
   {
     name: 'Physicians/Medical Groups',
     slug: 'physicians-medical-groups',
     description: 'Comprehensive medical billing services for physicians and medical groups',
-    parent_id: null,
+    parent_slug: 'service-categories', // Parent slug in blog_categories
     display_order: 1,
     status: 'active'
   },
@@ -32,7 +33,7 @@ const serviceCategories = [
     name: 'Medical Billing Companies',
     slug: 'medical-billing-companies',
     description: 'Specialized services for medical billing companies',
-    parent_id: null,
+    parent_slug: 'service-categories',
     display_order: 2,
     status: 'active'
   },
@@ -40,7 +41,7 @@ const serviceCategories = [
     name: 'Revenue Cycle Management',
     slug: 'revenue-cycle-management',
     description: 'Complete revenue cycle management services to optimize your practice\'s financial performance',
-    parent_id: null,
+    parent_slug: 'service-categories',
     display_order: 3,
     status: 'active'
   }
@@ -263,13 +264,50 @@ const services = [
 async function seedServiceCategories() {
   console.log('🌱 Seeding service categories...');
 
+  // First, ensure the parent category "service-categories" exists in blog_categories
+  let parentCategoryId: string | null = null;
+  
+  const { data: existingParent } = await supabase
+    .from('blog_categories')
+    .select('id')
+    .eq('slug', 'service-categories')
+    .is('deleted_at', null)
+    .maybeSingle();
+
+  if (existingParent) {
+    parentCategoryId = existingParent.id;
+    console.log('✅ Parent category "service-categories" already exists');
+  } else {
+    // Create the parent category
+    const { data: parentData, error: parentError } = await supabase
+      .from('blog_categories')
+      .insert({
+        name: 'Service Categories',
+        slug: 'service-categories',
+        description: 'Root category for all service categories',
+        parent_id: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (parentError) {
+      console.error('❌ Error creating parent category "service-categories":', parentError);
+      return new Map();
+    }
+
+    parentCategoryId = parentData.id;
+    console.log('✅ Created parent category "service-categories"');
+  }
+
   const categoryMap = new Map<string, string>();
 
   for (const category of serviceCategories) {
     try {
       // Check if category already exists
       const { data: existing } = await supabase
-        .from('service_categories')
+        .from('blog_categories')
         .select('id')
         .eq('slug', category.slug)
         .is('deleted_at', null)
@@ -282,14 +320,12 @@ async function seedServiceCategories() {
       }
 
       const { data, error } = await supabase
-        .from('service_categories')
+        .from('blog_categories')
         .insert({
           name: category.name,
           slug: category.slug,
           description: category.description,
-          parent_id: category.parent_id,
-          display_order: category.display_order,
-          status: category.status,
+          parent_id: parentCategoryId,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })

@@ -52,12 +52,12 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get all categories for mapping
+    // Get all categories for mapping (from blog_categories table)
     const categoryIds = (services || []).map((s: any) => s.category_id).filter(Boolean);
     let categoryMap = new Map();
     if (categoryIds.length > 0) {
       const { data: categories } = await supabaseAdmin
-        .from('service_categories')
+        .from('blog_categories')
         .select('id, name, slug')
         .in('id', categoryIds);
       categoryMap = new Map((categories || []).map((cat: any) => [cat.id, cat]));
@@ -161,10 +161,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate category if provided
+    // Validate category if provided (from blog_categories table)
     if (categoryId) {
       const { data: category } = await supabaseAdmin
-        .from('service_categories')
+        .from('blog_categories')
         .select('id')
         .eq('id', categoryId)
         .is('deleted_at', null)

@@ -51,15 +51,12 @@ export default function ServicesPage() {
       const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
       if (!token) return;
 
-      const response = await fetch('/api/admin/service-categories?limit=100&parent=null', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      // Fetch service categories from unified categories API (children of "service-categories" parent)
+      const response = await fetch('/api/categories/service-categories');
 
       const data = await response.json();
       if (data.success && data.categories) {
-        setCategories(data.categories.map((cat: any) => ({ id: cat._id, name: cat.name })));
+        setCategories(data.categories.map((cat: any) => ({ id: cat.id, name: cat.name })));
       }
     } catch (err) {
       console.error('Failed to fetch categories:', err);
