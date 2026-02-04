@@ -15,7 +15,7 @@ export default function Portfolio_Page() {
     };
   return (
     <div className="boxed_wrapper">
-      <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Pricing">
+      <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Pricing">
         <section className="pricing-section pt_120 pb_90">
             <div className="auto-container">
                 <div className="row clearfix">

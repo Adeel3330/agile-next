@@ -435,7 +435,7 @@ export default function BlogPage() {
   return (
     <Suspense fallback={
       <div className="boxed_wrapper">
-        <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Blog Grid">
+        <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Blog Grid">
           <section className="sidebar-page-container pt_120 pb_120">
             <div className="auto-container">
               <div className="text-center py-5">

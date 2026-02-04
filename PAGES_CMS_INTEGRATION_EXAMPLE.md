@@ -67,7 +67,7 @@ export default function About_Page() {
   if (loading) {
     return (
       <div className="boxed_wrapper">
-        <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="About Us">
+        <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="About Us">
           <div className="text-center py-5">
             <div className="spinner-border" role="status">
               <span className="visually-hidden">Loading...</span>
@@ -80,7 +80,7 @@ export default function About_Page() {
 
   return (
     <div className="boxed_wrapper">
-      <Layout headerStyle={3} footerStyle={1} breadcrumbTitle={pageData?.seoTitle || "About Us"}>
+      <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={pageData?.seoTitle || "About Us"}>
         <section className="about-section about-page p_relative pb_50">
           <div className="auto-container">
             <div className="upper-content mb_80">
