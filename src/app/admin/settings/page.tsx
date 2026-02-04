@@ -152,6 +152,8 @@ export default function SettingsPage() {
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
 
+    let timeoutId: NodeJS.Timeout | null = null;
+
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
       if (!token) {
@@ -174,7 +176,7 @@ export default function SettingsPage() {
 
       // Create AbortController for timeout
       const controller = new AbortController();
-      let timeoutId: NodeJS.Timeout | null = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+      timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
       // Use Cloudinary upload endpoint (consistent with other modules)
       const uploadResponse = await fetch('/api/admin/upload', {
@@ -212,6 +214,7 @@ export default function SettingsPage() {
       // Clear timeout if it exists
       if (timeoutId) {
         clearTimeout(timeoutId);
+        timeoutId = null;
       }
       
       console.error('Upload error:', err);

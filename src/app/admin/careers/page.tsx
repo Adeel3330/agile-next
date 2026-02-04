@@ -6,7 +6,8 @@ import Link from 'next/link';
 import styles from './careers.module.css';
 
 interface Career {
-  _id: string;
+  id: string;
+  _id?: string; // Legacy support
   title: string;
   department: string;
   location: string;
@@ -229,7 +230,7 @@ export default function CareersPage() {
               </thead>
               <tbody>
                 {careers.map((career) => (
-                  <tr key={career._id}>
+                  <tr key={career.id || career._id}>
                     <td>{career.title}</td>
                     <td>{career.department}</td>
                     <td>{career.location}</td>

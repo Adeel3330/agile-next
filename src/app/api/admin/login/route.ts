@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(req: NextRequest) {
@@ -40,10 +40,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate token
+    const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
+    const jwtExpire: string | number = process.env.JWT_EXPIRE || '7d';
+    // @ts-expect-error - jsonwebtoken v9 has strict typing for expiresIn, but accepts string values at runtime
     const token = jwt.sign(
       { id: admin.id },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: process.env.JWT_EXPIRE || '7d' }
+      jwtSecret,
+      { expiresIn: jwtExpire }
     );
 
     // Return success response

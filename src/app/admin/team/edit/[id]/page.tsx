@@ -49,7 +49,8 @@ export default function EditTeamMemberPage() {
     twitterUrl: '',
     displayOrder: 0,
     status: 'active' as 'active' | 'inactive',
-    department: ''
+    department: '',
+    photoUrl: ''
   });
 
   useEffect(() => {
@@ -107,7 +108,8 @@ export default function EditTeamMemberPage() {
         twitterUrl: member.twitterUrl || '',
         displayOrder: member.displayOrder,
         status: member.status,
-        department: member.department || ''
+        department: member.department || '',
+        photoUrl: member.photoUrl || ''
       });
       
       // Set existing photo as preview

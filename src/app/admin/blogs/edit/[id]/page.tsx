@@ -11,6 +11,7 @@ const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor')
 interface Blog {
   _id: string;
   title: string;
+  slug: string;
   description?: string;
   content?: string;
   file: string;

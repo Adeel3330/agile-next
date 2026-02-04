@@ -32,8 +32,9 @@ export async function GET(req: NextRequest) {
       query = query.eq('affiliate_id', affiliate_id.trim());
     }
 
-    if (converted !== undefined) {
-      query = query.eq('converted', converted === 'true' || converted === true);
+    if (converted !== undefined && typeof converted === 'string') {
+      const isConverted = converted.toLowerCase() === 'true';
+      query = query.eq('converted', isConverted);
     }
 
     if (search && typeof search === 'string' && search.trim().length > 0) {

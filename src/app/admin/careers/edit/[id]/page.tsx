@@ -9,8 +9,8 @@ import dynamic from 'next/dynamic';
 const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
 
 interface Career {
-  _id: string;
-  id?: string;
+  id: string;
+  _id?: string; // Legacy support
   title: string;
   slug?: string;
   department: string;
