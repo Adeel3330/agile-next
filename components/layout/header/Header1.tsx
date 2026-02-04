@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import MobileMenu from "../MobileMenu";
 
 // ✅ Define props type
@@ -11,9 +12,165 @@ type Header1Props = {
   handleMobileMenu: () => void;
 };
 
+interface Settings {
+  contactEmail?: string;
+  contactPhone?: string;
+  workingHours?: any;
+  socialFacebook?: string;
+  socialTwitter?: string;
+  socialInstagram?: string;
+  socialLinkedin?: string;
+  logoUrl?: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface Service {
+  id: string;
+  title: string;
+  slug: string;
+  categoryId?: string;
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+}
+
 export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
+  const pathname = usePathname();
+  const [settings, setSettings] = useState<Settings | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  // Helper function to check if a path is active
+  const isActive = (path: string) => {
+    if (!pathname || !path) return false;
+    
+    // Exact match for root - only match exactly '/'
+    if (path === '/') {
+      return pathname === '/';
+    }
+    
+    // Exact match
+    if (pathname === path) {
+      return true;
+    }
+    
+    // For paths that should match sub-routes (like /services should match /services/...)
+    // Check if pathname starts with path + '/' or path + '?'
+    // This prevents /services from matching /service-details
+    const pathWithSlash = path + '/';
+    const pathWithQuery = path + '?';
+    if (pathname.startsWith(pathWithSlash) || pathname.startsWith(pathWithQuery)) {
+      return true;
+    }
+    
+    return false;
+  };
+
+  useEffect(() => {
+    setMounted(true);
+    // Fetch settings from API
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setSettings(data.settings);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch settings:', err);
+        setLoading(false);
+      });
+
+    // Fetch service categories
+    fetch('/api/categories/service-categories')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.categories) {
+          setCategories(data.categories);
+          console.log('Categories loaded:', data.categories.length);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch categories:', err);
+      });
+
+    // Fetch all services
+    fetch('/api/services?limit=100')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.services) {
+          setServices(data.services);
+          console.log('Services loaded:', data.services.length);
+          console.log('Sample service:', data.services[0]);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch services:', err);
+      });
+  }, []);
+
+  // Debug: Log when both categories and services are loaded (simplified to prevent crashes)
+  useEffect(() => {
+    if (categories.length > 0 && services.length > 0) {
+      // Only log summary, not full arrays
+      console.log('Menu Data:', {
+        categoriesCount: categories.length,
+        servicesCount: services.length
+      });
+      
+      // Quick check for matching (limit to prevent performance issues)
+      const categoryIds = new Set(categories.map(c => c.id));
+      const servicesWithCategories = services.filter(s => s.categoryId && categoryIds.has(s.categoryId));
+      console.log('Services matched to categories:', servicesWithCategories.length);
+      
+      // Log first category match as sample
+      if (categories.length > 0) {
+        const firstCategory = categories[0];
+        const matched = services.filter(s => s.categoryId === firstCategory.id || s.category?.id === firstCategory.id);
+        console.log(`Sample: "${firstCategory.name}" has ${matched.length} services`);
+      }
+    }
+  }, [categories.length, services.length]); // Only depend on lengths to prevent infinite loops
+
+  const formatWorkingHours = () => {
+    if (!settings?.workingHours) return 'Mon - Fri: 9:00am to 6:00pm';
+    const hours = settings.workingHours;
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+    const firstDay = hours[days[0]];
+    if (firstDay && !firstDay.closed) {
+      return `Mon - Fri: ${firstDay.open || '9:00'}am to ${firstDay.close || '6:00'}pm`;
+    }
+    return 'Mon - Fri: 9:00am to 6:00pm';
+  };
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes pulse {
+            0%, 100% {
+              opacity: 1;
+            }
+            50% {
+              opacity: 0.5;
+            }
+          }
+        `
+      }} />
       {/* main header */}
       <header className={`main-header ${scroll ? "fixed-header" : ""}`}>
         <div className="header-top">
@@ -22,30 +179,51 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
               <ul className="info-list clearfix">
                 <li>
                   <i className="icon-46"></i>
-                  <a href="mailto:example@info.com">example@info.com</a>
+                  {loading ? (
+                    <span style={{ display: 'inline-block', width: '150px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
+                  ) : (
+                    <a href={settings?.contactEmail ? `mailto:${settings.contactEmail}` : 'mailto:info@agilenexussolution.com'}>
+                      {settings?.contactEmail || 'info@agilenexussolution.com'}
+                    </a>
+                  )}
                 </li>
                 <li>
                   <i className="icon-2"></i>
-                  <Link href="/">Pay your bill</Link>
+                  <Link href="/contact">Get Started</Link>
                 </li>
                 <li>
                   <i className="icon-3"></i>
-                  Open Hours: <span>Mon - Fri: 8:00am to 5:00pm</span>
+                  Open Hours: {loading ? (
+                    <span style={{ display: 'inline-block', width: '120px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
+                  ) : (
+                    <span>{formatWorkingHours()}</span>
+                  )}
                 </li>
               </ul>
               <ul className="social-links clearfix">
                 <li>
                   <h6>Follow Us</h6>
                 </li>
-                <li>
-                  <Link href="/"><i className="icon-4"></i></Link>
-                </li>
-                <li>
-                  <Link href="/"><i className="icon-5"></i></Link>
-                </li>
-                <li>
-                  <Link href="/"><i className="icon-6"></i></Link>
-                </li>
+                {settings?.socialFacebook && (
+                  <li>
+                    <Link href={settings.socialFacebook} target="_blank" rel="noopener noreferrer"><i className="icon-4"></i></Link>
+                  </li>
+                )}
+                {settings?.socialTwitter && (
+                  <li>
+                    <Link href={settings.socialTwitter} target="_blank" rel="noopener noreferrer"><i className="icon-5"></i></Link>
+                  </li>
+                )}
+                {settings?.socialInstagram && (
+                  <li>
+                    <Link href={settings.socialInstagram} target="_blank" rel="noopener noreferrer"><i className="icon-6"></i></Link>
+                  </li>
+                )}
+                {settings?.socialLinkedin && (
+                  <li>
+                    <Link href={settings.socialLinkedin} target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></Link>
+                  </li>
+                )}
               </ul>
             </div>
           </div>
@@ -57,7 +235,28 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
               <div className="logo-box">
                 <figure className="logo">
                   <Link href="/">
-                    <Image src="/assets/images/logo.png" alt="Logo Image" width={203} height={40} priority />
+                    {loading ? (
+                      <div
+                        style={{
+                          width: '203px',
+                          height: '40px',
+                          background: '#e0e0e0',
+                          borderRadius: '4px',
+                          animation: 'pulse 1.5s ease-in-out infinite',
+                        }}
+                      ></div>
+                    ) : (
+                      <Image
+                        src={settings?.logoUrl || '/assets/images/logo.png'}
+                        alt="Logo Image"
+                        width={203}
+                        height={40}
+                        priority
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/assets/images/logo.png';
+                        }}
+                      />
+                    )}
                   </Link>
                 </figure>
               </div>
@@ -74,97 +273,140 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                     id="navbarSupportedContent"
                   >
                     <ul className="navigation clearfix">
-                      <li className="current dropdown">
+                      <li className={isActive('/') ? "current" : ""}>
                         <Link href="/">Home</Link>
-                        <ul>
-                          <li>
-                            <Link href="/">Home Page One</Link>
-                          </li>
-                          <li>
-                            <Link href="/index-2">Home Page Two</Link>
-                          </li>
-                          <li>
-                            <Link href="/index-3">Home Page Three</Link>
-                          </li>
-                        </ul>
                       </li>
-                      <li>
+                      <li className={`dropdown ${isActive('/about') ? "current" : ""}`}>
                         <Link href="/about">About Us</Link>
+                        {/* <ul>
+                          <li>
+                            <Link href="/about">About Agile Nexus Solutions</Link>
+                          </li>
+                          <li>
+                            <Link href="/about#leadership">Leadership</Link>
+                          </li>
+                        </ul> */}
                       </li>
-                      <li className="dropdown">
-                        <Link href="/departments">Departments</Link>
+                      <li className={`dropdown ${isActive('/services') ? "current" : ""}`}>
+                        <Link href="/services">Services</Link>
                         <ul>
-                          <li>
-                            <Link href="/departments">Our Departments</Link>
+                          {categories.length > 0 ? (
+                            <>
+                              {categories.map((category) => {
+                                // Filter services for this category
+                                // Check both categoryId and category.id (in case service has nested category object)
+                                const categoryServices = services.filter(
+                                  (s) => {
+                                    const match1 = s.categoryId === category.id;
+                                    const match2 = s.category?.id === category.id;
+                                    return match1 || match2;
+                                  }
+                                );
+                                
+                                // Check if current page matches this category
+                                const isCategoryActive = pathname === '/services' && 
+                                  typeof window !== 'undefined' && 
+                                  window.location.search.includes(`category=${category.slug}`);
+                                
+                                // Always show category, with dropdown if it has services
+                                return (
+                                  <li key={category.id} className={`${categoryServices.length > 0 ? "dropdown" : ""} ${isCategoryActive ? "current" : ""}`}>
+                                    <Link href={`/services?category=${category.slug}`}>
+                                      {category.name}
+                                      
+                                    </Link>
+                                    {categoryServices.length > 0 && (
+                                      <ul className="submenu">
+                                        {categoryServices.map((service) => {
+                                          const isServiceActive = pathname === `/services/${service.slug}`;
+                                          return (
+                                            <li key={service.id} className={isServiceActive ? "current" : ""}>
+                                              <Link href={`/services/${service.slug}`}>
+                                                {service.title}
+                                              </Link>
+                                            </li>
+                                          );
+                                        })}
+                                      </ul>
+                                    )}
+                                  </li>
+                                );
+                              })}
+                              {/* Show services without categories at the end */}
+                              {(() => {
+                                const uncategorizedServices = services.filter(
+                                  (s) => !s.categoryId && !s.category?.id
+                                );
+                                const categorizedServiceIds = new Set(
+                                  services
+                                    .filter(s => s.categoryId || s.category?.id)
+                                    .map(s => s.id)
+                                );
+                                const allCategoryIds = new Set(categories.map(c => c.id));
+                                const servicesNotInCategories = services.filter(
+                                  (s) => {
+                                    const serviceCategoryId = s.categoryId || s.category?.id;
+                                    return serviceCategoryId && !allCategoryIds.has(serviceCategoryId);
+                                  }
+                                );
+                                
+                                if (uncategorizedServices.length > 0 || servicesNotInCategories.length > 0) {
+                                  return (
+                                    <li className="dropdown">
+                                      <Link href="/services">
+                                        Other Services
+                                        <span className="fa fa-angle-right" style={{ float: 'right', marginTop: '3px' }}></span>
+                                      </Link>
+                                      <ul className="submenu">
+                                        {uncategorizedServices.map((service) => (
+                                          <li key={service.id}>
+                                            <Link href={`/services/${service.slug}`}>
+                                              {service.title}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                        {servicesNotInCategories.map((service) => (
+                                          <li key={service.id}>
+                                            <Link href={`/services/${service.slug}`}>
+                                              {service.title}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </li>
+                                  );
+                                }
+                                return null;
+                              })()}
+                            </>
+                          ) : (
+                            <li>
+                              <Link href="/services">All Services</Link>
+                            </li>
+                          )}
+                        </ul>
+                      </li>
+                      <li className={`dropdown ${isActive('/resources') || isActive('/compliance') || isActive('/software') || isActive('/development') || isActive('/blog') ? "current" : ""}`}>
+                        <Link href="/resources">Resources</Link>
+                        <ul>
+                          <li className={isActive('/compliance') ? "current" : ""}>
+                            <Link href="/compliance">Compliance</Link>
                           </li>
-                          <li>
-                            <Link href="/department-details">Cardiology</Link>
+                          <li className={isActive('/software') ? "current" : ""}>
+                            <Link href="/software">Software</Link>
                           </li>
-                          <li>
-                            <Link href="/department-details-2">Dental</Link>
-                          </li>
-                          <li>
-                            <Link href="/department-details-3">Gastroenterology</Link>
-                          </li>
-                          <li>
-                            <Link href="/department-details-4">Neurology</Link>
-                          </li>
-                          <li>
-                            <Link href="/department-details-5">Orthopaedics</Link>
-                          </li>
-                          <li>
-                            <Link href="/department-details-6">Modern Laboratory</Link>
+                          {/* <li className={isActive('/development') ? "current" : ""}>
+                            <Link href="/development">Development</Link>
+                          </li> */}
+                          <li className={isActive('/blog') ? "current" : ""}>
+                            <Link href="/blog">Blog</Link>
                           </li>
                         </ul>
                       </li>
-                      <li className="dropdown">
-                        <Link href="/">Pages</Link>
-                        <ul>
-                          <li className="dropdown">
-                            <Link href="/">Doctors</Link>
-                            <ul>
-                              <li>
-                                <Link href="/doctors">Our Doctors</Link>
-                              </li>
-                              <li>
-                                <Link href="/doctor-details">Doctor Details</Link>
-                              </li>
-                            </ul>
-                          </li>
-                          <li className="dropdown">
-                            <Link href="/">Portfolio</Link>
-                            <ul>
-                              <li>
-                                <Link href="/portfolio">Portfolio One</Link>
-                              </li>
-                              <li>
-                                <Link href="/portfolio-2">Portfolio Two</Link>
-                              </li>
-                            </ul>
-                          </li>
-                          <li>
-                            <Link href="/pricing">Pricing</Link>
-                          </li>
-                          <li>
-                            <Link href="/error">Page Not Found</Link>
-                          </li>
-                        </ul>
+                      <li className={isActive('/careers') ? "current" : ""}>
+                        <Link href="/careers">Careers</Link>
                       </li>
-                      <li className="dropdown">
-                        <Link href="/">Blog</Link>
-                        <ul>
-                          <li>
-                            <Link href="/blog">Blog Grid</Link>
-                          </li>
-                          <li>
-                            <Link href="/blog-2">Blog Standard</Link>
-                          </li>
-                          <li>
-                            <Link href="/blog-details">Blog Details</Link>
-                          </li>
-                        </ul>
-                      </li>
-                      <li>
+                      <li className={isActive('/contact') ? "current" : ""}>
                         <Link href="/contact">Contact</Link>
                       </li>
                     </ul>
@@ -177,14 +419,20 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                   <div className="icon-box">
                     <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={25} height={25} priority />
                   </div>
-                  <span>Emergency Call</span>
+                  <span>Call Us</span>
                   <h6>
-                    <a href="tel:12463330088">+ 1 (246) 333-0088</a>
+                    {loading ? (
+                      <span style={{ display: 'inline-block', width: '120px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
+                    ) : (
+                      <Link href={settings?.contactPhone ? `tel:${settings.contactPhone.replace(/\s/g, '')}` : 'tel:17276354993'}>
+                        {settings?.contactPhone || '1-727-635-4993'}
+                      </Link>
+                    )}
                   </h6>
                 </div>
                 <div className="btn-box">
-                  <Link href="/" className="theme-btn btn-one">
-                    <span>Appointment</span>
+                  <Link href="/contact" className="theme-btn btn-one">
+                    <span>Get Started</span>
                   </Link>
                 </div>
               </div>
@@ -199,7 +447,20 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
               <div className="logo-box">
                 <figure className="logo">
                   <Link href="/">
-                    <Image src="/assets/images/logo.png" alt="Logo Image" width={203} height={40} priority />
+                    {loading ? (
+                      <div style={{ width: '203px', height: '40px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></div>
+                    ) : (
+                      <Image 
+                        src={settings?.logoUrl || '/assets/images/logo.png'} 
+                        alt="Logo Image" 
+                        width={203} 
+                        height={40} 
+                        priority 
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/assets/images/logo.png';
+                        }}
+                      />
+                    )}
                   </Link>
                 </figure>
               </div>
@@ -216,97 +477,130 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                     id="navbarSupportedContent"
                   >
                     <ul className="navigation clearfix">
-                      <li className="current dropdown">
+                      <li className={isActive('/') ? "current" : ""}>
                         <Link href="/">Home</Link>
-                        <ul>
-                          <li>
-                            <Link href="/">Home Page One</Link>
-                          </li>
-                          <li>
-                            <Link href="/index-2">Home Page Two</Link>
-                          </li>
-                          <li>
-                            <Link href="/index-3">Home Page Three</Link>
-                          </li>
-                        </ul>
                       </li>
-                      <li>
+                      <li className={`dropdown ${isActive('/about') ? "current" : ""}`}>
                         <Link href="/about">About Us</Link>
+                        {/* <ul>
+                          <li>
+                            <Link href="/about">About Agile Nexus Soits lutions</Link>
+                          </li>
+                          <li>
+                            <Link href="/about#leadership">Leadership</Link>
+                          </li>
+                        </ul> */}
                       </li>
-                      <li className="dropdown">
-                        <Link href="/departments">Departments</Link>
+                      <li className={`dropdown ${isActive('/services') ? "current" : ""}`}>
+                        <Link href="/services">Services</Link>
                         <ul>
-                          <li>
-                            <Link href="/departments">Our Departments</Link>
+                          {categories.length > 0 ? (
+                            <>
+                              {categories.map((category) => {
+                                // Filter services for this category
+                                // Check both categoryId and category.id (in case service has nested category object)
+                                const categoryServices = services.filter(
+                                  (s) => {
+                                    const match1 = s.categoryId === category.id;
+                                    const match2 = s.category?.id === category.id;
+                                    return match1 || match2;
+                                  }
+                                );
+                                
+                                // Always show category, with dropdown if it has services
+                                return (
+                                  <li key={category.id} className={categoryServices.length > 0 ? "dropdown" : ""}>
+                                    <Link href={`/services?category=${category.slug}`}>
+                                      {category.name}
+                                      
+                                    </Link>
+                                    {categoryServices.length > 0 && (
+                                      <ul className="submenu">
+                                        {categoryServices.map((service) => (
+                                          <li key={service.id}>
+                                            <Link href={`/services/${service.slug}`}>
+                                              {service.title}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </li>
+                                );
+                              })}
+                              {/* Show services without categories at the end */}
+                              {(() => {
+                                const uncategorizedServices = services.filter(
+                                  (s) => !s.categoryId && !s.category?.id
+                                );
+                                const categorizedServiceIds = new Set(
+                                  services
+                                    .filter(s => s.categoryId || s.category?.id)
+                                    .map(s => s.id)
+                                );
+                                const allCategoryIds = new Set(categories.map(c => c.id));
+                                const servicesNotInCategories = services.filter(
+                                  (s) => {
+                                    const serviceCategoryId = s.categoryId || s.category?.id;
+                                    return serviceCategoryId && !allCategoryIds.has(serviceCategoryId);
+                                  }
+                                );
+                                
+                                if (uncategorizedServices.length > 0 || servicesNotInCategories.length > 0) {
+                                  return (
+                                    <li className="dropdown">
+                                      <Link href="/services">
+                                        Other Services
+                                        <span className="fa fa-angle-right" style={{ float: 'right', marginTop: '3px' }}></span>
+                                      </Link>
+                                      <ul className="submenu">
+                                        {uncategorizedServices.map((service) => (
+                                          <li key={service.id}>
+                                            <Link href={`/services/${service.slug}`}>
+                                              {service.title}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                        {servicesNotInCategories.map((service) => (
+                                          <li key={service.id}>
+                                            <Link href={`/services/${service.slug}`}>
+                                              {service.title}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </li>
+                                  );
+                                }
+                                return null;
+                              })()}
+                            </>
+                          ) : (
+                            <li>
+                              <Link href="/services">All Services</Link>
+                            </li>
+                          )}
+                        </ul>
+                      </li>
+                      <li className={`dropdown ${isActive('/resources') || isActive('/compliance') || isActive('/software') || isActive('/development') || isActive('/blog') ? "current" : ""}`}>
+                        <Link href="/resources">Resources</Link>
+                        <ul>
+                          <li className={isActive('/compliance') ? "current" : ""}>
+                            <Link href="/compliance">Compliance</Link>
                           </li>
-                          <li>
-                            <Link href="/department-details">Cardiology</Link>
+                          <li className={isActive('/software') ? "current" : ""}>
+                            <Link href="/software">Software</Link>
                           </li>
-                          <li>
-                            <Link href="/department-details-2">Dental</Link>
-                          </li>
-                          <li>
-                            <Link href="/department-details-3">Gastroenterology</Link>
-                          </li>
-                          <li>
-                            <Link href="/department-details-4">Neurology</Link>
-                          </li>
-                          <li>
-                            <Link href="/department-details-5">Orthopaedics</Link>
-                          </li>
-                          <li>
-                            <Link href="/department-details-6">Modern Laboratory</Link>
+                         
+                          <li className={isActive('/blog') ? "current" : ""}>
+                            <Link href="/blog">Blog</Link>
                           </li>
                         </ul>
                       </li>
-                      <li className="dropdown">
-                        <Link href="/">Pages</Link>
-                        <ul>
-                          <li className="dropdown">
-                            <Link href="/">Doctors</Link>
-                            <ul>
-                              <li>
-                                <Link href="/doctors">Our Doctors</Link>
-                              </li>
-                              <li>
-                                <Link href="/doctor-details">Doctor Details</Link>
-                              </li>
-                            </ul>
-                          </li>
-                          <li className="dropdown">
-                            <Link href="/">Portfolio</Link>
-                            <ul>
-                              <li>
-                                <Link href="/portfolio">Portfolio One</Link>
-                              </li>
-                              <li>
-                                <Link href="/portfolio-2">Portfolio Two</Link>
-                              </li>
-                            </ul>
-                          </li>
-                          <li>
-                            <Link href="/pricing">Pricing</Link>
-                          </li>
-                          <li>
-                            <Link href="/error">Page Not Found</Link>
-                          </li>
-                        </ul>
+                      <li className={isActive('/careers') ? "current" : ""}>
+                        <Link href="/careers">Careers</Link>
                       </li>
-                      <li className="dropdown">
-                        <Link href="/">Blog</Link>
-                        <ul>
-                          <li>
-                            <Link href="/blog">Blog Grid</Link>
-                          </li>
-                          <li>
-                            <Link href="/blog-2">Blog Standard</Link>
-                          </li>
-                          <li>
-                            <Link href="/blog-details">Blog Details</Link>
-                          </li>
-                        </ul>
-                      </li>
-                      <li>
+                      <li className={isActive('/contact') ? "current" : ""}>
                         <Link href="/contact">Contact</Link>
                       </li>
                     </ul>
@@ -319,14 +613,20 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                   <div className="icon-box">
                     <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={25} height={25} priority />
                   </div>
-                  <span>Emergency Call</span>
+                  <span>Call Us</span>
                   <h6>
-                    <Link href="tel:12463330088">+ 1 (246) 333-0088</Link>
+                    {loading ? (
+                      <span style={{ display: 'inline-block', width: '120px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
+                    ) : (
+                      <Link href={settings?.contactPhone ? `tel:${settings.contactPhone.replace(/\s/g, '')}` : 'tel:17276354993'}>
+                        {settings?.contactPhone || '1-727-635-4993'}
+                      </Link>
+                    )}
                   </h6>
                 </div>
                 <div className="btn-box">
-                  <Link href="/" className="theme-btn btn-one">
-                    <span>Appointment</span>
+                  <Link href="/contact" className="theme-btn btn-one">
+                    <span>Get Started</span>
                   </Link>
                 </div>
               </div>

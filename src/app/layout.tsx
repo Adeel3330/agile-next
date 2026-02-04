@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto, Caveat } from "next/font/google";
-import ToggleBodyClass from "../../components/elements/Togglebtn";
-import SwitcherMenu from "../../components/elements/ColorStyle";
+import ClientLayoutWrapper from "./ClientLayoutWrapper";
 
 import "../../public/assets/css/bootstrap.css";
 import "../../public/assets/css/rtl.css";
@@ -43,10 +42,11 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={`${roboto.variable} ${caveat.variable} { fontFamily: "'Source Sans Pro', sans-serif" }`}>
+      <body className={`${roboto.variable} ${caveat.variable}`}
+      style={{ fontFamily: "'Source Sans Pro', sans-serif" }}
+      >
         {children}
-        <ToggleBodyClass/>
-        <SwitcherMenu />
+        <ClientLayoutWrapper />
       </body>
     </html>
   );

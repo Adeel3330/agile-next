@@ -26,32 +26,66 @@ export default function Preloader() {
                   <div className="load-inner">
                       <div className="spinner"></div>
                       <div className="txt-loading">
-                          <span data-text-preloader="m" className="letters-loading">
-                              m
+                          <span data-text-preloader="A" className="letters-loading">
+                              A
+                          </span>
+                          <span data-text-preloader="g" className="letters-loading">
+                              g
+                          </span>
+                          <span data-text-preloader="i" className="letters-loading">
+                              i
+                          </span>
+                          <span data-text-preloader="l" className="letters-loading">
+                              e
                           </span>
                           <span data-text-preloader="e" className="letters-loading">
                               e
                           </span>
-                          <span data-text-preloader="d" className="letters-loading">
-                              d
+                          
+                          <span data-text-preloader="n" className="letters-loading">
+                              n
+                          </span>
+                          <span data-text-preloader="e" className="letters-loading">
+                              e
+                          </span>
+                          <span data-text-preloader="x" className="letters-loading">
+                              x
+                          </span>
+                          <span data-text-preloader="s" className="letters-loading">
+                              s
+                          </span>
+                          <span data-text-preloader="u" className="letters-loading">
+                              u
+                          </span>
+                          <span data-text-preloader="s" className="letters-loading">
+                              s
+                          </span>
+                          <span data-text-preloader="s" className="letters-loading">
+                              s
+                          </span>
+                          <span data-text-preloader="o" className="letters-loading">
+                              o
+                          </span>
+                          <span data-text-preloader="l" className="letters-loading">
+                              l
+                          </span>
+                          <span data-text-preloader="u" className="letters-loading">
+                              u
+                          </span>
+                          <span data-text-preloader="t" className="letters-loading">
+                              t
                           </span>
                           <span data-text-preloader="i" className="letters-loading">
                               i
                           </span>
-                          <span data-text-preloader="c" className="letters-loading">
-                              c
-                          </span>
-                          <span data-text-preloader="i" className="letters-loading">
-                              i
+                          <span data-text-preloader="o" className="letters-loading">
+                              o
                           </span>
                           <span data-text-preloader="n" className="letters-loading">
                               n
                           </span>
                           <span data-text-preloader="s" className="letters-loading">
                               s
-                          </span>
-                          <span data-text-preloader="k" className="letters-loading">
-                              k
                           </span>
                       </div>
                   </div>

@@ -106,8 +106,10 @@
 
 
 :root{
-  --theme-color: #F3A952;
-  --secondary-color: #064ACB;
+  /* --theme-color: #F3A952; */
+  --theme-color: #F46700;
+  --secondary-color: #0A3366;
+  /* --secondary-color: #064ACB; */
   --pink-color: #FFC0CB;
   --violet-color: #7F00FF;
   --crimson-color: #DC143C;
@@ -429,6 +431,7 @@ img {
   text-transform: uppercase;
   z-index: 1;
   transition: all 500ms ease;
+  cursor: pointer;
 }
 
 .theme-btn span{
@@ -1045,7 +1048,7 @@ img {
   letter-spacing: 0.05em;
   opacity:1;
   color: #111111;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
   z-index:1;
   -webkit-transition:all 500ms ease;
@@ -1057,7 +1060,7 @@ img {
 
 .main-menu .navigation > li.current > a,
 .main-menu .navigation > li:hover > a{
-  
+  color: var(--theme-color);
 }
 
 .main-menu .navigation > li > ul,
@@ -2628,7 +2631,9 @@ button.ltr {
 }
 
 
-
+.bg-theme-one{
+  background: var(--theme-color);
+}
 
 
 
@@ -2757,4 +2762,10 @@ button.ltr {
 
 .google-map-section .map-inner{
   height: 570px;
+}
+
+
+.sidebar-menu{
+  max-height: 70%;
+  overflow-y: scroll;
 }
