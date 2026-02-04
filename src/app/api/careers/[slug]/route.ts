@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 // Public API - Get a single career by slug (no authentication required)
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> | { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const resolvedParams = await Promise.resolve(params);
