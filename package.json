@@ -25,7 +25,7 @@
     "isotope-layout": "^3.0.6",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.22.0",
-    "next": "15.5.0",
+    "next": "15.5.9",
     "next-cloudinary": "^6.17.5",
     "quill": "^2.0.3",
     "react": "19.1.0",
