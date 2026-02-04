@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "dev:no-turbo": "next dev",
     "build": "next build --turbopack",
-    "build:no-turbo": "next build",
+    "build:no-turbo": "NODE_OPTIONS='--max-old-space-size=4096' next build",
     "start": "next start",
     "lint": "eslint",
     "migrate": "ts-node --project database/tsconfig.json database/migrate.ts",
