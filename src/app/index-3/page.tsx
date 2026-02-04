@@ -17,7 +17,7 @@ export default function Home_Two() {
 
     return (
         <div className="boxed_wrapper">
-            <Layout headerStyle={3} footerStyle={1}>
+            <Layout headerStyle={1} footerStyle={1}>
                 <Banner/>
                 <Service/>
                 <About/>

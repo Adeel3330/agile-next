@@ -6,7 +6,7 @@ import ProgressBar from "../../../components/elements/ProgressBar";
 export default function Doctors_Details() {
   return (
     <div className="boxed_wrapper">
-      <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Doctors Details">
+      <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Doctors Details">
         <section className="team-details pt_120 pb_120">
           <div className="auto-container">
             <div className="team-details-content mb_100">

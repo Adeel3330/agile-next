@@ -6,7 +6,7 @@ export default function Departments_Details_Two() {
 
     return (
         <div className="boxed_wrapper">
-            <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Dental">
+            <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Dental">
                 <section className="service-details pt_120 pb_110">
                     <div className="auto-container">
                         <div className="row clearfix">

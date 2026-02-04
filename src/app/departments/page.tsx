@@ -57,7 +57,7 @@ export default function Departments_Page() {
 
     return (
         <div className="boxed_wrapper">
-            <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Our Departments">
+            <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Our Departments">
                 <section className="service-page-section p_relative">
                     <div className="auto-container">
                         <div className="row clearfix">

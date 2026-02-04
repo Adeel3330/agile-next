@@ -6,7 +6,7 @@ export default function Doctors_Page() {
 
     return (
         <div className="boxed_wrapper">
-            <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Our Doctors">
+            <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Our Doctors">
                 <section className="team-page-section pt_120 pb_90 centred">
                     <div className="auto-container">
                         <div className="row clearfix">

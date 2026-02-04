@@ -6,7 +6,7 @@ export default function Departments_Details_Six() {
 
     return (
         <div className="boxed_wrapper">
-            <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Modern Laboratory">
+            <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Modern Laboratory">
                 <section className="service-details pt_120 pb_110">
                     <div className="auto-container">
                         <div className="row clearfix">

@@ -6,7 +6,7 @@ import Cta from "../../../components/sections/home2/Cta";
 export default function Portfolio_Page() {
   return (
     <div className="boxed_wrapper">
-      <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Portfolio One">
+      <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Portfolio One">
         <section className="portfolio-page-section pt_120 pb_90">
             <div className="auto-container">
                 <div className="row clearfix">
