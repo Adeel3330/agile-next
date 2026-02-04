@@ -6,7 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 // Get a single resume (admin only)
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -82,7 +82,7 @@ export async function GET(
 // Update resume status (admin only)
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -150,7 +150,7 @@ export async function PUT(
 // DELETE /api/admin/resumes/[id] (Soft Delete)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyToken(req);

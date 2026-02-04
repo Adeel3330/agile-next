@@ -6,7 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 // Get all versions of a page
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -71,7 +71,7 @@ export async function GET(
 // Restore a specific version
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyToken(req);

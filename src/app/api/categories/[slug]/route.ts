@@ -6,7 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 // Returns child categories of a parent category identified by slug
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> | { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const resolvedParams = await Promise.resolve(params);

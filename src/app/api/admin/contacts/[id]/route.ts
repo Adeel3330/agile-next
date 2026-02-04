@@ -6,7 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 // Get a single contact submission (admin only)
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -69,7 +69,7 @@ export async function GET(
 // Update contact status (admin only)
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyToken(req);
@@ -137,7 +137,7 @@ export async function PUT(
 // DELETE /api/admin/contacts/[id] (Soft Delete)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyToken(req);

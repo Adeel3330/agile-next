@@ -6,7 +6,7 @@ import { verifyToken } from '@/lib/auth';
 // Admin API - Get a single booking
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify admin authentication
@@ -52,7 +52,7 @@ export async function GET(
 // Admin API - Update a booking
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify admin authentication
@@ -140,7 +140,7 @@ export async function PUT(
 // Admin API - Delete a booking (soft delete)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify admin authentication
