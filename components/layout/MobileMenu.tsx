@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 type MobileMenuProps = {
   isSidebar: boolean;
@@ -10,20 +11,60 @@ type MobileMenuProps = {
   handleSidebar: () => void;
 };
 
-export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar }: MobileMenuProps) {
-  const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
-  const toggleDropdown = (key: number) => {
-    if (activeDropdown === key) {
-      setActiveDropdown(null);
-    } else {
-      setActiveDropdown(key);
-    }
+interface Service {
+  id: string;
+  title: string;
+  slug: string;
+  categoryId?: string;
+  category?: { id: string; name: string; slug: string } | null;
+}
+
+export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar }: MobileMenuProps) {
+  const pathname = usePathname();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [openKeys, setOpenKeys] = useState<Set<string>>(new Set());
+
+  const toggle = (key: string) => {
+    setOpenKeys(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   };
+
+  useEffect(() => {
+    fetch('/api/categories/service-categories')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.categories) setCategories(data.categories);
+      })
+      .catch(() => {});
+    fetch('/api/services?limit=100')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.services) setServices(data.services);
+      })
+      .catch(() => {});
+  }, []);
+
+  const uncategorizedServices = services.filter(s => !s.categoryId && !s.category?.id);
+  const allCategoryIds = new Set(categories.map(c => c.id));
+  const servicesNotInCategories = services.filter(s => {
+    const id = s.categoryId || s.category?.id;
+    return id && !allCategoryIds.has(id);
+  });
+  const hasOtherServices = uncategorizedServices.length > 0 || servicesNotInCategories.length > 0;
 
   return (
     <>
-      {/* Mobile Menu */}
       <div className="mobile-menu">
         <div className="menu-backdrop" onClick={handleMobileMenu} />
         <div className="close-btn" onClick={handleMobileMenu}>
@@ -36,84 +77,109 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
           <div className="menu-outer">
             <ul className="navigation clearfix">
 
-              {/* Home */}
-              <li className={`dropdown ${activeDropdown === 1 ? "current" : ""}`}>
-                <Link href="/">Home</Link>
-                <ul style={{ display: activeDropdown === 1 ? "block" : "none" }}>
-                  <li><Link href="/">Home Page One</Link></li>
-                  <li><Link href="/index-2">Home Page Two</Link></li>
-                  <li><Link href="/index-3">Home Page Three</Link></li>
+              <li>
+                <Link href="/" onClick={handleMobileMenu}>Home</Link>
+              </li>
+
+              <li>
+                <Link href="/about" onClick={handleMobileMenu}>About Us</Link>
+              </li>
+
+              {/* Services - same structure as Header1 */}
+              <li className={openKeys.has("services") ? "current" : ""}>
+                <Link href="/services" onClick={handleMobileMenu}>Services</Link>
+                {(categories.length > 0 || hasOtherServices) && (
+                  <>
+                    <ul style={{ display: openKeys.has("services") ? "block" : "none" }}>
+                      {categories.map((category) => {
+                        const categoryServices = services.filter(
+                          s => s.categoryId === category.id || s.category?.id === category.id
+                        );
+                        const catKey = `cat-${category.id}`;
+                        const isCatOpen = openKeys.has(catKey);
+                        return (
+                          <li key={category.id} className={categoryServices.length > 0 ? (isCatOpen ? "current" : "") : ""}>
+                            {categoryServices.length > 0 ? (
+                              <>
+                                <Link href={`/services?category=${category.slug}`} onClick={handleMobileMenu}>{category.name}</Link>
+                                <ul className="submenu" style={{ display: isCatOpen ? "block" : "none" }}>
+                                  {categoryServices.map((service) => (
+                                    <li key={service.id}>
+                                      <Link href={`/services/${service.slug}`} onClick={handleMobileMenu}>{service.title}</Link>
+                                    </li>
+                                  ))}
+                                </ul>
+                                <div className={`dropdown-btn ${isCatOpen ? "open" : ""}`} onClick={() => toggle(catKey)}>
+                                  <span className="fa fa-angle-right" />
+                                </div>
+                              </>
+                            ) : (
+                              <Link href={`/services?category=${category.slug}`} onClick={handleMobileMenu}>{category.name}</Link>
+                            )}
+                          </li>
+                        );
+                      })}
+                      {hasOtherServices && (
+                        <li className={openKeys.has("other-services") ? "current" : ""}>
+                          <Link href="/services" onClick={handleMobileMenu}>Other Services</Link>
+                          <ul className="submenu" style={{ display: openKeys.has("other-services") ? "block" : "none" }}>
+                            {uncategorizedServices.map((service) => (
+                              <li key={service.id}>
+                                <Link href={`/services/${service.slug}`} onClick={handleMobileMenu}>{service.title}</Link>
+                              </li>
+                            ))}
+                            {servicesNotInCategories.map((service) => (
+                              <li key={service.id}>
+                                <Link href={`/services/${service.slug}`} onClick={handleMobileMenu}>{service.title}</Link>
+                              </li>
+                            ))}
+                          </ul>
+                          <div className={`dropdown-btn ${openKeys.has("other-services") ? "open" : ""}`} onClick={() => toggle("other-services")}>
+                            <span className="fa fa-angle-right" />
+                          </div>
+                        </li>
+                      )}
+                    </ul>
+                    <div className={`dropdown-btn ${openKeys.has("services") ? "open" : ""}`} onClick={() => toggle("services")}>
+                      <span className="fa fa-angle-right" />
+                    </div>
+                  </>
+                )}
+              </li>
+
+              {/* Resources - same as Header1 */}
+              <li className={openKeys.has("resources") ? "current" : ""}>
+                <Link href="/resources" onClick={handleMobileMenu}>Resources</Link>
+                <ul style={{ display: openKeys.has("resources") ? "block" : "none" }}>
+                  <li><Link href="/compliance" onClick={handleMobileMenu}>Compliance</Link></li>
+                  <li><Link href="/software" onClick={handleMobileMenu}>Software</Link></li>
+                  <li><Link href="/blog" onClick={handleMobileMenu}>Blog</Link></li>
                 </ul>
-                <div className={`dropdown-btn ${activeDropdown === 1 ? "open" : ""}`} onClick={() => toggleDropdown(1)}>
+                <div className={`dropdown-btn ${openKeys.has("resources") ? "open" : ""}`} onClick={() => toggle("resources")}>
                   <span className="fa fa-angle-right" />
                 </div>
               </li>
 
-              {/* About */}
-              <li><Link href="/about">About Us</Link></li>
-
-              {/* Services */}
-              <li className={`dropdown ${activeDropdown === 2 ? "current" : ""}`}>
-                <Link href="/#">Departments</Link>
-                <ul style={{ display: activeDropdown === 2 ? "block" : "none" }}>
-                  <li><Link href="/departments">Our Departments</Link></li>
-                  <li><Link href="/department-details">Cardiology</Link></li>
-                  <li><Link href="/department-details-2">Dental</Link></li>
-                  <li><Link href="/department-details-3">Gastroenterology</Link></li>
-                  <li><Link href="/department-details-4">Neurology</Link></li>
-                  <li><Link href="/department-details-5">Orthopaedics</Link></li>
-                  <li><Link href="/department-details-6">Modern Laboratory</Link></li>
-                </ul>
-                <div className={`dropdown-btn ${activeDropdown === 2 ? "open" : ""}`} onClick={() => toggleDropdown(2)}>
-                  <span className="fa fa-angle-right" />
-                </div>
+              <li>
+                <Link href="/careers" onClick={handleMobileMenu}>Careers</Link>
               </li>
 
-              {/* Pages */}
-              <li className={`dropdown ${activeDropdown === 3 ? "current" : ""}`}>
-                <Link href="/#">Pages</Link>
-                <ul style={{ display: activeDropdown === 3 ? "block" : "none" }}>
-                  <li><Link href="/doctors">Our Doctors</Link></li>
-                  <li><Link href="/doctor-details">Doctor Details</Link></li>
-                  <li><Link href="/portfolio">Portfolio One</Link></li>
-                  <li><Link href="/portfolio-2">Portfolio Two</Link></li>
-                  <li><Link href="/pricing">Pricing</Link></li>
-                  <li><Link href="/error">Page Not Found</Link></li>
-                </ul>
-                <div className={`dropdown-btn ${activeDropdown === 3 ? "open" : ""}`} onClick={() => toggleDropdown(3)}>
-                  <span className="fa fa-angle-right" />
-                </div>
+              <li>
+                <Link href="/contact" onClick={handleMobileMenu}>Contact</Link>
               </li>
-
-              {/* Shop */}
-              <li className={`dropdown ${activeDropdown === 4 ? "current" : ""}`}>
-                <Link href="/#">Blog</Link>
-                <ul style={{ display: activeDropdown === 4 ? "block" : "none" }}>
-                  <li><Link href="/blog">Blog Grid</Link></li>
-                  <li><Link href="/blog-2">Blog Standard</Link></li>
-                  <li><Link href="/blog-details">Blog Details</Link></li>
-                </ul>
-                <div className={`dropdown-btn ${activeDropdown === 4 ? "open" : ""}`} onClick={() => toggleDropdown(4)}>
-                  <span className="fa fa-angle-right" />
-                </div>
-              </li>
-
-              {/* Contact */}
-              <li><Link href="/contact">Contact</Link></li>
 
             </ul>
           </div>
 
           <div className="contact-info">
-              <h4>Contact Info</h4>
-              <ul>
-                  <li>Chicago 12, Melborne City, USA</li>
-                  <li><Link href="tel:+8801682648101">+88 01682648101</Link></li>
-                  <li><Link href="mailto:info@example.com">info@example.com</Link></li>
-              </ul>
+            <h4>Contact Info</h4>
+            <ul>
+              <li>Chicago 12, Melborne City, USA</li>
+              <li><Link href="tel:+8801682648101">+88 01682648101</Link></li>
+              <li><Link href="mailto:info@example.com">info@example.com</Link></li>
+            </ul>
           </div>
 
-          {/* Social Links */}
           <div className="social-links">
             <ul className="clearfix">
               <li><Link href="/#"><span className="fab fa-twitter" /></Link></li>
@@ -127,7 +193,6 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
         </nav>
       </div>
 
-      {/* Overlay */}
       <div
         className="nav-overlay"
         style={{ display: isSidebar ? "block" : "none" }}

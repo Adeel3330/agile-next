@@ -24,12 +24,10 @@ export default function Testimonial() {
           <span className="sub-title mb_5">Testimonial</span>
           <h2>
             What Our Patient&apos;s Say About <br />
-            Medicinsk
+            Agile Nexus Solutions
           </h2>
           <p>
-            Medical care is the practice of providing diagnosis, treatment, and
-            preventive care for various <br />
-            illnesses, injuries, and diseases.
+            Agile Nexus Solutions is a leading medical billing company in the USA. We provide comprehensive medical billing and revenue cycle management services for healthcare providers and medical billing companies across the USA.
           </p>
         </div>
 
