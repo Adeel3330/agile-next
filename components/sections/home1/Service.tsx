@@ -97,14 +97,10 @@ export default function Service() {
       <span className="big-text">AGILLE NESUS SOLUTIONS</span>
       <div className="auto-container">
         <div className="sec-title mb_60">
-          <span className="sub-title mb_5">What we do for our patients</span>
-          <h2>Our Medical Departments Services</h2>
+          <span className="sub-title mb_5">What we do for our Providers</span>
+          <h2>Our Revenue Cycle Management Services</h2>
           <p>
-            Medical care is the practice of providing diagnosis, treatment, and
-            preventive care for various illnesses, injuries, and diseases. It
-            involves a wide range of healthcare professionals such as doctors,
-            nurses, pharmacists, therapists, and many more, who work together to
-            provide the best possible care for patients.
+            Our revenue cycle management services are designed to help healthcare providers streamline their revenue cycle and improve their financial performance. We offer a wide range of services to help providers manage their revenue cycle, including eligibility and benefits verification, claims submission, and patient collections.
           </p>
         </div>
 
@@ -173,9 +169,9 @@ export default function Service() {
                     </figure>
                     <div className="lower-content">
                       <div className="inner">
-                        <div className="icon-box">
+                        {/* <div className="icon-box">
                           <i className={service.icon || defaultIcons[index] || 'icon-18'}></i>
-                        </div>
+                        </div> */}
                         <h3>
                           {loading ? (
                             <div className="skeleton" style={{ 

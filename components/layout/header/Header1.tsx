@@ -403,12 +403,16 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           </li>
                         </ul>
                       </li>
+                      <li className={isActive('/affiliations') ? "current" : ""}>
+                        <Link href="/affiliations">Affiliations</Link>
+                      </li>
                       <li className={isActive('/careers') ? "current" : ""}>
                         <Link href="/careers">Careers</Link>
                       </li>
                       <li className={isActive('/contact') ? "current" : ""}>
                         <Link href="/contact">Contact</Link>
                       </li>
+                     
                     </ul>
                   </div>
                 </nav>
