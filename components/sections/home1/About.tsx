@@ -202,7 +202,7 @@ export default function About() {
                                             <p>{aboutDescription}</p>
                                         )}
                                     </div>
-                                    <div className="inner-box">
+                                    {/* <div className="inner-box">
                                         <div className="row clearfix">
                                             <div className="col-lg-6 col-md-6 col-sm-12 single-column">
                                                 <div className="specialities-box">
@@ -225,7 +225,7 @@ export default function About() {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>

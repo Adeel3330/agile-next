@@ -240,6 +240,8 @@ export default function MediaPage() {
             <option value="services">Services</option>
             <option value="about">About</option>
             <option value="contact">Contact</option>
+            <option value="certifications">Certifications</option>
+            <option value="specialties">Specialties</option>
             <option value="cta">CTA</option>
             <option value="other">Other</option>
           </select>
