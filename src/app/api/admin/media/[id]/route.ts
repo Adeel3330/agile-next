@@ -120,13 +120,13 @@ export async function PUT(
     if (fileSize !== undefined) updateData.file_size = fileSize || null;
     if (fileType !== undefined) updateData.file_type = fileType?.trim() || null;
     if (position !== undefined) {
-      if (!['home', 'services', 'about', 'contact', 'cta', 'compliance', 'other'].includes(position)) {
+      if (typeof position !== 'string' || position.trim().length === 0) {
         return NextResponse.json(
-          { success: false, message: 'Invalid position. Must be: home, services, about, contact, cta, compliance, or other' },
+          { success: false, message: 'Position must be a non-empty string (e.g. home, services, specialties, certifications, other)' },
           { status: 400 }
         );
       }
-      updateData.position = position;
+      updateData.position = position.trim();
     }
     if (status !== undefined) updateData.status = status;
     if (displayOrder !== undefined) updateData.display_order = displayOrder;

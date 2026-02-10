@@ -34,6 +34,7 @@ export default function AdminLayout({
     { href: '/admin/blogs', label: 'Blogs', icon: 'fa-newspaper' },
     { href: '/admin/pages', label: 'Pages CMS', icon: 'fa-file-alt' },
     { href: '/admin/media', label: 'Media Management', icon: 'fa-image' },
+    { href: '/admin/faqs', label: 'FAQs', icon: 'fa-question-circle' },
     { href: '/admin/team', label: 'Team Management', icon: 'fa-users' },
     { href: '/admin/affiliates', label: 'Affiliates', icon: 'fa-handshake' },
   ];

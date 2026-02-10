@@ -132,12 +132,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!position || !['home', 'services', 'about', 'contact', 'cta', 'compliance', 'other'].includes(position)) {
+    if (!position || typeof position !== 'string' || position.trim().length === 0) {
       return NextResponse.json(
-        { success: false, message: 'Please provide a valid position (home, services, about, contact, cta, compliance, other)' },
+        { success: false, message: 'Please provide a position (e.g. home, services, about, specialties, certifications, contact, cta, compliance, affiliate, other)' },
         { status: 400 }
       );
     }
+
+    const positionValue = position.trim();
 
     const insertData: any = {
       title: title.trim(),
@@ -146,7 +148,7 @@ export async function POST(req: NextRequest) {
       file_name: fileName?.trim() || null,
       file_size: fileSize || null,
       file_type: fileType?.trim() || null,
-      position: position,
+      position: positionValue,
       status: status || 'active',
       display_order: displayOrder || 0,
       alt_text: altText?.trim() || null,

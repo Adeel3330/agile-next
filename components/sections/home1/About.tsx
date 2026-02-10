@@ -202,7 +202,7 @@ export default function About() {
                                             <p>{aboutDescription}</p>
                                         )}
                                     </div>
-                                    <div className="inner-box">
+                                    {/* <div className="inner-box">
                                         <div className="row clearfix">
                                             <div className="col-lg-6 col-md-6 col-sm-12 single-column">
                                                 <div className="specialities-box">
@@ -225,7 +225,7 @@ export default function About() {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>
@@ -252,8 +252,8 @@ export default function About() {
                                     )}
                                     <div className="text-box">
                                         <div className="image-shape"style={{ backgroundImage: "url(assets/images/shape/shape-7.png)" }}></div>
-                                        <h2>30</h2>
-                                        <span>Years of Experience in This Field</span>
+                                        <h2>{new Date().getFullYear() - 2018}</h2>
+                                        <span>Years of Experience (Since 2018)</span>
                                     </div>
                                 </div>
                             </div>

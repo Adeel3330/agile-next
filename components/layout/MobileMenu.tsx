@@ -153,6 +153,7 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
                 <ul style={{ display: openKeys.has("resources") ? "block" : "none" }}>
                   <li><Link href="/compliance" onClick={handleMobileMenu}>Compliance</Link></li>
                   <li><Link href="/software" onClick={handleMobileMenu}>Software</Link></li>
+                  <li><Link href="/affiliate-program" onClick={handleMobileMenu}>Affiliate Program</Link></li>
                   <li><Link href="/blog" onClick={handleMobileMenu}>Blog</Link></li>
                 </ul>
                 <div className={`dropdown-btn ${openKeys.has("resources") ? "open" : ""}`} onClick={() => toggle("resources")}>

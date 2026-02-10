@@ -8,7 +8,7 @@ export default function Contact_Info() {
                     <div className="info-block-one">
                         <div className="inner-box">
                             <div className="icon-box"><i className="icon-10"></i></div>
-                            <span>Get your doctors</span>
+                            <span>Get your Appointments</span>
                             <h4>Request Appointment</h4>
                         </div>
                     </div>
@@ -17,8 +17,8 @@ export default function Contact_Info() {
                     <div className="info-block-one">
                         <div className="inner-box">
                             <div className="icon-box"><i className="icon-34"></i></div>
-                            <span>Get your doctors</span>
-                            <h4>Find Doctors</h4>
+                            <span>Get your Specialties</span>
+                            <h4>Find Specialties</h4>
                         </div>
                     </div>
                 </div>
@@ -35,7 +35,7 @@ export default function Contact_Info() {
                     <div className="info-block-one">
                         <div className="inner-box">
                             <div className="icon-box"><i className="icon-13"></i></div>
-                            <span>Doctor location</span>
+                            <span>location</span>
                             <h4>Find Location</h4>
                         </div>
                     </div>

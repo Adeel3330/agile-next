@@ -41,16 +41,6 @@ export default function Service() {
     fetchServices();
   }, []);
 
-  // Start autoplay when services are loaded
-  useEffect(() => {
-    if (!loading && services.length > 0 && swiperRef.current) {
-      // Ensure autoplay is enabled
-      if (swiperRef.current.autoplay) {
-        swiperRef.current.autoplay.start();
-      }
-    }
-  }, [loading, services]);
-
   const fetchServices = async () => {
     setLoading(true);
     try {
@@ -97,32 +87,30 @@ export default function Service() {
       <span className="big-text">AGILLE NESUS SOLUTIONS</span>
       <div className="auto-container">
         <div className="sec-title mb_60">
-          <span className="sub-title mb_5">What we do for our patients</span>
-          <h2>Our Medical Departments Services</h2>
+          <span className="sub-title mb_5">What we do for our Providers</span>
+          <h2>Our Revenue Cycle Management Services</h2>
           <p>
-            Medical care is the practice of providing diagnosis, treatment, and
-            preventive care for various illnesses, injuries, and diseases. It
-            involves a wide range of healthcare professionals such as doctors,
-            nurses, pharmacists, therapists, and many more, who work together to
-            provide the best possible care for patients.
+            Our revenue cycle management services are designed to help healthcare providers streamline their revenue cycle and improve their financial performance. We offer a wide range of services to help providers manage their revenue cycle, including eligibility and benefits verification, claims submission, and patient collections.
           </p>
         </div>
 
-        {/* ✅ Swiper wrapper */}
+        {/* ✅ Swiper wrapper with autoplay */}
         {displayServices.length > 0 && (
           <Swiper
             modules={[Autoplay, Pagination, Navigation]}
             slidesPerView={1}
             spaceBetween={30}
             autoplay={{
-              delay: 5000,
+              delay: 4000,
               disableOnInteraction: false,
-              pauseOnMouseEnter: false,
+              pauseOnMouseEnter: true,
+              stopOnLastSlide: false,
             }}
-            loop={displayServices.length >= 3}
+            loop={displayServices.length >= 2}
+            speed={600}
             navigation={{
-              nextEl: '.swiper-prev',
-              prevEl: '.swiper-next',
+              nextEl: '.service-section .swiper-next',
+              prevEl: '.service-section .swiper-prev',
             }}
             breakpoints={{
               320: { slidesPerView: 1 },
@@ -134,7 +122,8 @@ export default function Service() {
             }}
             onSwiper={(swiper) => {
               swiperRef.current = swiper;
-              // Start autoplay immediately
+            }}
+            onAfterInit={(swiper) => {
               if (swiper.autoplay) {
                 swiper.autoplay.start();
               }
@@ -173,9 +162,6 @@ export default function Service() {
                     </figure>
                     <div className="lower-content">
                       <div className="inner">
-                        <div className="icon-box">
-                          <i className={service.icon || defaultIcons[index] || 'icon-18'}></i>
-                        </div>
                         <h3>
                           {loading ? (
                             <div className="skeleton" style={{ 

@@ -8,26 +8,19 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
     const position = searchParams.get('position') || '';
 
-    if (!position) {
+    if (!position || typeof position !== 'string' || position.trim().length === 0) {
       return NextResponse.json(
         { success: false, message: 'Please provide a position parameter' },
         { status: 400 }
       );
     }
 
-    // Validate position
-    const validPositions = ['home', 'services', 'about', 'contact', 'cta', 'compliance', 'other'];
-    if (!validPositions.includes(position)) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid position. Must be: home, services, about, contact, cta, compliance, or other' },
-        { status: 400 }
-      );
-    }
+    const positionValue = position.trim();
 
     const { data: mediaItems, error } = await supabaseAdmin
       .from('media')
       .select('*')
-      .eq('position', position)
+      .eq('position', positionValue)
       .eq('status', 'active')
       .is('deleted_at', null)
       .order('display_order', { ascending: true })

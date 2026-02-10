@@ -386,7 +386,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           )}
                         </ul>
                       </li>
-                      <li className={`dropdown ${isActive('/resources') || isActive('/compliance') || isActive('/software') || isActive('/development') || isActive('/blog') ? "current" : ""}`}>
+                      <li className={`dropdown ${isActive('/resources') || isActive('/compliance') || isActive('/software') || isActive('/development') || isActive('/blog') || isActive('/affiliate-program') ? "current" : ""}`}>
                         <Link href="/resources">Resources</Link>
                         <ul>
                           <li className={isActive('/compliance') ? "current" : ""}>
@@ -395,6 +395,9 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           <li className={isActive('/software') ? "current" : ""}>
                             <Link href="/software">Software</Link>
                           </li>
+                          {/* <li className={isActive('/affiliate-program') ? "current" : ""}>
+                            <Link href="/affiliate-program">Affiliate Program</Link>
+                          </li> */}
                           {/* <li className={isActive('/development') ? "current" : ""}>
                             <Link href="/development">Development</Link>
                           </li> */}
@@ -403,12 +406,16 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           </li>
                         </ul>
                       </li>
+                      <li className={isActive('/affiliate-program') ? "current" : ""}>
+                        <Link href="/affiliate-program">Affiliate Program</Link>
+                      </li>
                       <li className={isActive('/careers') ? "current" : ""}>
                         <Link href="/careers">Careers</Link>
                       </li>
                       <li className={isActive('/contact') ? "current" : ""}>
                         <Link href="/contact">Contact</Link>
                       </li>
+                     
                     </ul>
                   </div>
                 </nav>
@@ -582,7 +589,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           )}
                         </ul>
                       </li>
-                      <li className={`dropdown ${isActive('/resources') || isActive('/compliance') || isActive('/software') || isActive('/development') || isActive('/blog') ? "current" : ""}`}>
+                      <li className={`dropdown ${isActive('/resources') || isActive('/compliance') || isActive('/software') || isActive('/development') || isActive('/blog') || isActive('/affiliate-program') ? "current" : ""}`}>
                         <Link href="/resources">Resources</Link>
                         <ul>
                           <li className={isActive('/compliance') ? "current" : ""}>
@@ -591,7 +598,9 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           <li className={isActive('/software') ? "current" : ""}>
                             <Link href="/software">Software</Link>
                           </li>
-                         
+                          <li className={isActive('/affiliate-program') ? "current" : ""}>
+                            <Link href="/affiliate-program">Affiliate Program</Link>
+                          </li>
                           <li className={isActive('/blog') ? "current" : ""}>
                             <Link href="/blog">Blog</Link>
                           </li>
