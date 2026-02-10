@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS faqs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   question VARCHAR(500) NOT NULL,
   answer TEXT NOT NULL,
-  position VARCHAR(50) NOT NULL DEFAULT 'home' CHECK (position IN ('home', 'affiliate')),
+  position VARCHAR(50) NOT NULL,
   display_order INTEGER DEFAULT 0,
   status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
