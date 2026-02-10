@@ -5,6 +5,7 @@ import About_Two from "../../components/sections/home1/About_Two";
 import Appointment from "../../components/sections/home1/Appointment";
 import Banner from "../../components/sections/home1/Banner";
 import Certifications from "../../components/sections/home1/Certifications";
+import FaqSection from "../../components/sections/home1/FaqSection";
 // import Chooseus from "../../components/sections/home1/Chooseus";
 import Contact_Info from "../../components/sections/home1/Contact_Info";
 import News from "../../components/sections/home1/News";
@@ -33,6 +34,7 @@ export default function Home() {
                 {/* <Team/> */}
                 {/* <Portfolio/> */}
                 <News/>
+                <FaqSection/>
                 <Testimonial/>
                 <GoogleMapSection/>
             </Layout>

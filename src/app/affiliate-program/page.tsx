@@ -39,6 +39,7 @@ export default function AffiliateProgramPage() {
   const [pageLoading, setPageLoading] = useState(true);
   const [mediaLoading, setMediaLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [apiFaqs, setApiFaqs] = useState<{ id: string; question: string; answer: string }[]>([]);
 
   useEffect(() => {
     setMounted(true);
@@ -48,8 +49,21 @@ export default function AffiliateProgramPage() {
     if (mounted) {
       fetchPageData();
       fetchAffiliateMedia();
+      fetchAffiliateFaqs();
     }
   }, [mounted]);
+
+  const fetchAffiliateFaqs = useCallback(async () => {
+    try {
+      const response = await fetch('/api/faqs?position=affiliate');
+      const data = await response.json();
+      if (data.success && data.faqs?.length > 0) {
+        setApiFaqs(data.faqs);
+      }
+    } catch (err) {
+      console.error('Failed to fetch affiliate FAQs:', err);
+    }
+  }, []);
 
   const fetchPageData = useCallback(async () => {
     setPageLoading(true);
@@ -317,33 +331,51 @@ export default function AffiliateProgramPage() {
           </section>
         )}
 
-        {/* FAQ - from admin */}
-        {faqSection?.items?.length > 0 && (
+        {/* FAQ - from FAQs API (admin) or CMS fallback */}
+        {((apiFaqs.length > 0) || (faqSection?.items?.length > 0)) && (
           <section className="about-section p_relative pt_90 pb_90" style={{ background: '#f5f8fa' }}>
             <div className="auto-container">
               <div className="sec-title mb_60 centred">
-                {(faqSection.subTitle || (faqSection as any).sub_title) && <span className="sub-title mb_5">{faqSection.subTitle || (faqSection as any).sub_title}</span>}
-                <h2>{faqSection.title}</h2>
+                <span className="sub-title mb_5">{(faqSection as any)?.subTitle || (faqSection as any)?.sub_title || 'FAQs'}</span>
+                <h2>{apiFaqs.length > 0 ? 'Frequently Asked Questions' : (faqSection?.title || 'Frequently Asked Questions')}</h2>
               </div>
               <div className="row clearfix justify-content-center">
                 <div className="col-lg-8 col-md-12">
-                  {faqSection.items.map((faq: any, index: number) => (
-                    <div key={index} className="faq-block" style={{ background: '#fff', marginBottom: '12px', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
-                      <button
-                        type="button"
-                        onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                        style={{ width: '100%', padding: '20px 24px', textAlign: 'left', border: 'none', background: 'none', fontSize: '18px', fontWeight: '600', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                      >
-                        {faq.question || faq.title}
-                        <span style={{ fontSize: '24px', color: 'var(--theme-color)' }}>{openFaq === index ? '−' : '+'}</span>
-                      </button>
-                      {openFaq === index && (
-                        <div style={{ padding: '0 24px 20px' }}>
-                          <p style={{ color: '#666', lineHeight: '26px', margin: 0 }}>{faq.answer || faq.description || faq.text}</p>
+                  {apiFaqs.length > 0
+                    ? apiFaqs.map((faq, index) => (
+                        <div key={faq.id} className="faq-block" style={{ background: '#fff', marginBottom: '12px', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
+                          <button
+                            type="button"
+                            onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                            style={{ width: '100%', padding: '20px 24px', textAlign: 'left', border: 'none', background: 'none', fontSize: '18px', fontWeight: '600', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                          >
+                            {faq.question}
+                            <span style={{ fontSize: '24px', color: 'var(--theme-color)' }}>{openFaq === index ? '−' : '+'}</span>
+                          </button>
+                          {openFaq === index && (
+                            <div style={{ padding: '0 24px 20px' }}>
+                              <p style={{ color: '#666', lineHeight: '26px', margin: 0 }}>{faq.answer}</p>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  ))}
+                      ))
+                    : faqSection!.items.map((faq: any, index: number) => (
+                        <div key={index} className="faq-block" style={{ background: '#fff', marginBottom: '12px', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
+                          <button
+                            type="button"
+                            onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                            style={{ width: '100%', padding: '20px 24px', textAlign: 'left', border: 'none', background: 'none', fontSize: '18px', fontWeight: '600', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                          >
+                            {faq.question || faq.title}
+                            <span style={{ fontSize: '24px', color: 'var(--theme-color)' }}>{openFaq === index ? '−' : '+'}</span>
+                          </button>
+                          {openFaq === index && (
+                            <div style={{ padding: '0 24px 20px' }}>
+                              <p style={{ color: '#666', lineHeight: '26px', margin: 0 }}>{faq.answer || faq.description || faq.text}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                 </div>
               </div>
             </div>
