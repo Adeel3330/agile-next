@@ -170,19 +170,18 @@ export default function RevenueChallenges() {
               className="image-box"
               style={{
                 textAlign: 'center',
-                padding: '24px',
                 borderRadius: '16px',
                 background: '#fff',
                 boxShadow: '0 10px 30px rgba(0,0,0,0.06)',
               }}
             >
               {heroImage ? (
-                <div style={{ position: 'relative', width: '100%', height: '260px' }}>
+                <div style={{ position: 'relative', width: '100%', height: '400px',borderRadius: '16px' }}>
                   <Image
                     src={getCloudinaryImageUrl(heroImage)}
                     alt={heroAlt}
                     fill
-                    style={{ objectFit: 'contain' }}
+                    style={{ objectFit: 'cover', borderRadius: '16px' }}
                   />
                 </div>
               ) : (
