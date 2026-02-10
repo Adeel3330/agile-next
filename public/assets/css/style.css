@@ -2764,3 +2764,9 @@ button.ltr {
   max-height: 70%;
   overflow-y: scroll;
 }
+
+.service-block-one .inner-box .lower-content p{
+  max-height: 210px;
+  overflow: hidden;
+ 
+}
