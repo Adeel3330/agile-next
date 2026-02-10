@@ -16,7 +16,8 @@
     "seed:cms-modules": "ts-node seed-cms-modules.ts",
     "seed:sliders-careers": "ts-node seed-sliders-careers.ts",
     "seed:services": "ts-node seed-services.ts",
-    "seed:medivantek-home": "ts-node seed-medivantek-home.ts"
+    "seed:medivantek-home": "ts-node seed-medivantek-home.ts",
+    "seed:software-media": "ts-node seed-software-media.ts"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",

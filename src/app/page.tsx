@@ -12,6 +12,7 @@ import News from "../../components/sections/home1/News";
 import Portfolio from "../../components/sections/home1/Portfolio";
 import Service from "../../components/sections/home1/Service";
 import Specialties from "../../components/sections/home1/Specialties";
+import Software from "../../components/sections/home1/Software";
 import Team from "../../components/sections/home1/Team";
 import Testimonial from "../../components/sections/home1/Testimonial";
 // import Working from "../../components/sections/home1/Working";
@@ -31,6 +32,7 @@ export default function Home() {
                 <RevenueChallenges/>
                 <BenefitsMedicalBilling/>
                 <Specialties/>
+                <Software/>
                 {/* <Chooseus/> */}
                 {/* <Appointment/> */}
                 {/* <Working/> */}
