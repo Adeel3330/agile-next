@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
 import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
 
 interface MediaItem {
@@ -85,16 +89,7 @@ export default function Specialties() {
                       style={{
                         width: '70%',
                         height: '20px',
-                        marginBottom: '8px',
-                        borderRadius: '4px',
-                        background: '#e0e0e0',
-                      }}
-                    />
-                    <div
-                      className="skeleton"
-                      style={{
-                        width: '100%',
-                        height: '32px',
+                        marginTop: '10px',
                         borderRadius: '4px',
                         background: '#e0e0e0',
                       }}
@@ -105,52 +100,91 @@ export default function Specialties() {
             ))}
           </div>
         ) : items.length > 0 ? (
-          <div className="row clearfix">
-            {items.map((item, index) => {
-              const inner = (
-                <div className="chooseus-block-one">
-                  <div className="inner-box">
-                    <div className="icon-box">
-                      <div className="icon">
-                        <Image
-                          src={getCloudinaryImageUrl(item.fileUrl)}
-                          alt={item.altText || item.title || 'Specialty'}
-                          width={60}
-                          height={60}
-                          style={{ objectFit: 'cover', borderRadius: '50%',width: '50px',height: '50px' }}
-                        />
+          <>
+            <Swiper
+              modules={[Autoplay, Navigation]}
+              slidesPerView={2}
+              spaceBetween={20}
+              autoplay={{
+                delay: 2500,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }}
+              loop={items.length > 3}
+              navigation={{
+                nextEl: '#specialties .swiper-next',
+                prevEl: '#specialties .swiper-prev',
+              }}
+              breakpoints={{
+                320: { slidesPerView: 1 },
+                575: { slidesPerView: 2 },
+                991: { slidesPerView: 3 },
+                1200: { slidesPerView: 4 },
+              }}
+              className="specialties-carousel"
+            >
+              {items.map((item, index) => {
+                const inner = (
+                  <div className="chooseus-block-one">
+                    <div className="inner-box">
+                      <div className="icon-box">
+                        <div className="icon">
+                          <Image
+                            src={getCloudinaryImageUrl(item.fileUrl)}
+                            alt={item.altText || item.title || 'Specialty'}
+                            width={60}
+                            height={60}
+                            style={{
+                              objectFit: 'cover',
+                              borderRadius: '50%',
+                              width: '50px',
+                              height: '50px',
+                            }}
+                          />
+                        </div>
+                        <span className="count-text">
+                          {index + 1 < 10 ? `0${index + 1}` : index + 1}
+                        </span>
                       </div>
-                      <span className="count-text">
-                        {index + 1 < 10 ? `0${index + 1}` : index + 1}
-                      </span>
-                    </div>
-                    <div className="text">
-                    <h3>{item.title}</h3>
-                    <p>
-                      {item.description ||
-                        `Comprehensive billing and RCM support for ${item.title}.`}
-                    </p>
+                      <div className="text">
+                        <h3>{item.title}</h3>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
+                );
 
-              return (
-                <div key={item.id} className="col-lg-3 col-md-6 col-sm-12 chooseus-block">
-                  {item.linkUrl ? (
-                    <Link
-                      href={item.linkUrl}
-                      style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}
-                    >
-                      {inner}
-                    </Link>
-                  ) : (
-                    inner
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                return (
+                  <SwiperSlide key={item.id}>
+                    {item.linkUrl ? (
+                      <Link
+                        href={item.linkUrl}
+                        style={{
+                          textDecoration: 'none',
+                          color: 'inherit',
+                          display: 'block',
+                          height: '100%',
+                        }}
+                      >
+                        {inner}
+                      </Link>
+                    ) : (
+                      inner
+                    )}
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+            <div className="nav-style-one" style={{ marginTop: '20px' }}>
+              <div className="swiper-nav">
+                <button type="button" className="swiper-prev">
+                  <span className="icon-21" />
+                </button>
+                <button type="button" className="swiper-next">
+                  <span className="icon-22" />
+                </button>
+              </div>
+            </div>
+          </>
         ) : null}
       </div>
       <style dangerouslySetInnerHTML={{ __html: `
@@ -165,26 +199,25 @@ export default function Specialties() {
         }
         .chooseus-block-one .inner-box .icon-box {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 15px;
-          margin-bottom: 15px;
-          left: 0px !important;
           justify-content: center;
+          gap: 10px;
+          margin-bottom: 10px;
+          left: 0px !important;
         }
-          .chooseus-block-one .inner-box .text {
-            left: 0px !important;
+        .chooseus-block-one .inner-box .text {
+          text-align: center;
+          left: 0px !important;
             position: relative;
             left: 62px !important;
             width: 200px;
-          }
-          .chooseus-block-one .inner-box .text h3 {
-            
-            margin-bottom: 0px;
-          }
-          .chooseus-block-one .inner-box .text p {
-            font-size: 14px;
-            color: #666;
-          }
+        }
+        .chooseus-block-one .inner-box .text h3 {
+          margin-bottom: 0;
+          font-size: 16px;
+          font-weight: 600;
+        }
         .chooseus-block-one .inner-box .icon-box .icon {
           width: 60px;
           height: 60px;
