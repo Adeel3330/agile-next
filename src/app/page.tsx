@@ -12,6 +12,7 @@ import Portfolio from "../../components/sections/home1/Portfolio";
 import Service from "../../components/sections/home1/Service";
 import Specialties from "../../components/sections/home1/Specialties";
 import Team from "../../components/sections/home1/Team";
+import Testimonial from "../../components/sections/home1/Testimonial";
 // import Working from "../../components/sections/home1/Working";
 import GoogleMapSection from "../../components/sections/home1/GoogleMap";
 export default function Home() {
@@ -32,6 +33,7 @@ export default function Home() {
                 {/* <Team/> */}
                 {/* <Portfolio/> */}
                 <News/>
+                <Testimonial/>
                 <GoogleMapSection/>
             </Layout>
         </div>
