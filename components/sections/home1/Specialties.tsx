@@ -200,7 +200,7 @@ export default function Specialties() {
           font-weight: 700;
           color: var(--theme-color);
           top:5px!important;
-          left: 1px!important;
+          left: 1px!important; 
         }
         .chooseus-block-one .inner-box h3 {
           font-size: 18px;
