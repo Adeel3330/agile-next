@@ -41,16 +41,6 @@ export default function Service() {
     fetchServices();
   }, []);
 
-  // Start autoplay when services are loaded
-  useEffect(() => {
-    if (!loading && services.length > 0 && swiperRef.current) {
-      // Ensure autoplay is enabled
-      if (swiperRef.current.autoplay) {
-        swiperRef.current.autoplay.start();
-      }
-    }
-  }, [loading, services]);
-
   const fetchServices = async () => {
     setLoading(true);
     try {
@@ -104,21 +94,23 @@ export default function Service() {
           </p>
         </div>
 
-        {/* ✅ Swiper wrapper */}
+        {/* ✅ Swiper wrapper with autoplay */}
         {displayServices.length > 0 && (
           <Swiper
             modules={[Autoplay, Pagination, Navigation]}
             slidesPerView={1}
             spaceBetween={30}
             autoplay={{
-              delay: 5000,
+              delay: 4000,
               disableOnInteraction: false,
-              pauseOnMouseEnter: false,
+              pauseOnMouseEnter: true,
+              stopOnLastSlide: false,
             }}
-            loop={displayServices.length >= 3}
+            loop={displayServices.length >= 2}
+            speed={600}
             navigation={{
-              nextEl: '.swiper-prev',
-              prevEl: '.swiper-next',
+              nextEl: '.service-section .swiper-next',
+              prevEl: '.service-section .swiper-prev',
             }}
             breakpoints={{
               320: { slidesPerView: 1 },
@@ -130,7 +122,8 @@ export default function Service() {
             }}
             onSwiper={(swiper) => {
               swiperRef.current = swiper;
-              // Start autoplay immediately
+            }}
+            onAfterInit={(swiper) => {
               if (swiper.autoplay) {
                 swiper.autoplay.start();
               }
@@ -169,9 +162,6 @@ export default function Service() {
                     </figure>
                     <div className="lower-content">
                       <div className="inner">
-                        {/* <div className="icon-box">
-                          <i className={service.icon || defaultIcons[index] || 'icon-18'}></i>
-                        </div> */}
                         <h3>
                           {loading ? (
                             <div className="skeleton" style={{ 
