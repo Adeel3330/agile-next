@@ -318,11 +318,7 @@ export default function AboutPage() {
                         </figure>
                                         <div className="lower-content">
                                             <div className="inner">
-                            {service.icon && (
-                              <div className="icon-box">
-                                <i className={service.icon}></i>
-                              </div>
-                            )}
+                           
                             <h3>
                               <Link href={`/services/${service.slug}`}>{service.title}</Link>
                             </h3>
@@ -437,7 +433,7 @@ export default function AboutPage() {
                     </div>
                 </div>
 
-                <div className="auto-container">
+                {/* <div className="auto-container">
                     <div className="inner-container">
                     <div
                         className="shape"
@@ -505,7 +501,7 @@ export default function AboutPage() {
                         </div>
                     </div>
                     </div>
-                </div>
+                </div> */}
                 </section>
 
         {/* <Clients /> */}

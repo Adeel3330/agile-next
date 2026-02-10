@@ -140,10 +140,6 @@ export default function CompliancePage() {
     return null;
   }
 
-  // Parse sections for features/stats
-  const featuresSection = pageData?.sections?.find((s: any) => s.type === 'features');
-  const statsSection = pageData?.sections?.find((s: any) => s.type === 'stats');
-
   return (
     <div className="boxed_wrapper">
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={pageData?.title || 'Compliance'}>
@@ -205,44 +201,6 @@ export default function CompliancePage() {
           </div>
         </section>
 
-        {/* Features Section */}
-        {featuresSection && featuresSection.items && Array.isArray(featuresSection.items) && featuresSection.items.length > 0 && (
-          <section className="service-section p_relative pt_120 pb_90">
-            <div className="pattern-layer" style={{ backgroundImage: 'url(assets/images/shape/shape-13.png)' }}></div>
-            <div className="auto-container">
-              <div className="sec-title mb_60 centred">
-                <span className="sub-title mb_5">Our Compliance Standards</span>
-                <h2>{featuresSection.title || 'Key Compliance Areas'}</h2>
-              </div>
-              <div className="row clearfix">
-                {featuresSection.items.slice(0, 6).map((item: any, index: number) => (
-                  <div key={index} className="col-lg-4 col-md-6 col-sm-12 service-block">
-                    <div className="service-block-one">
-                      <div className="inner-box" style={{ background: '#fff', padding: '40px 30px', borderRadius: '10px', boxShadow: '0 5px 20px rgba(0,0,0,0.08)', transition: 'all 0.3s ease', height: '100%' }}>
-                        <div className="lower-content">
-                          <div className="inner">
-                            {item.icon && (
-                              <div className="icon-box" style={{ marginBottom: '20px' }}>
-                                <i className={item.icon} style={{ fontSize: '50px', color: 'var(--theme-color)' }}></i>
-                              </div>
-                            )}
-                            <h3 style={{ marginBottom: '15px', fontSize: '22px', fontWeight: '700' }}>
-                              {item.title || `Feature ${index + 1}`}
-                            </h3>
-                            <p style={{ color: '#666', lineHeight: '26px' }}>
-                              {item.description || item.text || ''}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* Content Section */}
         <section className="about-section about-page p_relative pb_120 pt_90">
           <div className="auto-container">
@@ -261,40 +219,6 @@ export default function CompliancePage() {
                         {pageData?.content && (
                           <div className="text-box mb_30 pb_30">
                             <div dangerouslySetInnerHTML={{ __html: pageData.content }}></div>
-                          </div>
-                        )}
-                        {pageData?.sections && Array.isArray(pageData.sections) && pageData.sections.length > 0 && (
-                          <div className="sections-content">
-                            {pageData.sections.map((section: any, index: number) => {
-                              if (section.type === 'content' || section.type === 'text') {
-                                return (
-                                  <div key={index} className="section-item mb_30">
-                                    {section.title && <h3 style={{ fontSize: '28px', marginBottom: '20px', fontWeight: '700' }}>{section.title}</h3>}
-                                    {section.content && (
-                                      <div dangerouslySetInnerHTML={{ __html: section.content }}></div>
-                                    )}
-                                    {section.text && <p style={{ lineHeight: '28px', color: '#666' }}>{section.text}</p>}
-                                  </div>
-                                );
-                              }
-                              if (section.type === 'list' && section.type !== 'features') {
-                                return (
-                                  <div key={index} className="section-item mb_30">
-                                    {section.title && <h3 style={{ fontSize: '28px', marginBottom: '20px', fontWeight: '700' }}>{section.title}</h3>}
-                                    {section.items && Array.isArray(section.items) && (
-                                      <ul className="list-style-one clearfix">
-                                        {section.items.map((item: any, itemIndex: number) => (
-                                          <li key={itemIndex} style={{ marginBottom: '10px', fontSize: '16px', lineHeight: '28px' }}>
-                                            {typeof item === 'string' ? item : (item.title || item.text || item)}
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    )}
-                                  </div>
-                                );
-                              }
-                              return null;
-                            })}
                           </div>
                         )}
                       </>
@@ -394,40 +318,6 @@ export default function CompliancePage() {
           </section>
         )}
 
-        {/* Stats Section */}
-        {statsSection && statsSection.items && Array.isArray(statsSection.items) && statsSection.items.length > 0 && (
-          <section className="funfact-section p_relative pt_90 pb_90" style={{ background: '#f5f8fa' }}>
-            <div className="auto-container">
-              <div className="inner-container">
-                <div className="row clearfix">
-                  {statsSection.items.map((stat: any, index: number) => (
-                    <div key={index} className="col-lg-3 col-md-6 col-sm-12 funfact-block">
-                      <div className="funfact-block-two">
-                        <div className="inner-box" style={{ textAlign: 'center', padding: '30px 20px' }}>
-                          {stat.icon && (
-                            <div className="icon-box" style={{ marginBottom: '20px' }}>
-                              <i className={stat.icon} style={{ fontSize: '50px', color: 'var(--theme-color)' }}></i>
-                            </div>
-                          )}
-                          <div className="count-outer count-box">
-                            <span style={{ fontSize: '48px', fontWeight: '700', color: 'var(--theme-color)' }}>
-                              {stat.value}
-                            </span>
-                            {stat.suffix && <span style={{ fontSize: '48px', fontWeight: '700', color: 'var(--theme-color)' }}>{stat.suffix}</span>}
-                          </div>
-                          <p style={{ fontSize: '18px', fontWeight: '600', marginTop: '15px', color: '#333' }}>
-                            {stat.label || stat.title}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* Contact Form Section */}
         <section className="contact-section sec-pad p_relative pt_120 pb_120">
           <div className="pattern-layer" style={{ backgroundImage: 'url(assets/images/shape/shape-42.png)' }}></div>
@@ -443,13 +333,11 @@ export default function CompliancePage() {
                   <div className="sec-title mb_40 centred">
                     <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>Get in Touch</span>
                     <h2 style={{ fontSize: '36px', marginBottom: '15px' }}>
-                      {pageData?.sections?.find((s: any) => s.type === 'form')?.title || 'Contact Us for Compliance Information'}
+                      Contact Us for Compliance Information
                     </h2>
-                    {pageData?.sections?.find((s: any) => s.type === 'form')?.description && (
-                      <p style={{ fontSize: '16px', color: '#666', maxWidth: '700px', margin: '0 auto' }}>
-                        {pageData.sections.find((s: any) => s.type === 'form')?.description}
-                      </p>
-                    )}
+                    <p style={{ fontSize: '16px', color: '#666', maxWidth: '700px', margin: '0 auto' }}>
+                      Have questions about HIPAA, audits, or compliance documentation? Send us a message and our team will follow up promptly.
+                    </p>
                   </div>
                 </>
               )}
