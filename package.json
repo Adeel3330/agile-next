@@ -15,7 +15,8 @@
     "seed:medical-billing": "ts-node seed-medical-billing.ts",
     "seed:cms-modules": "ts-node seed-cms-modules.ts",
     "seed:sliders-careers": "ts-node seed-sliders-careers.ts",
-    "seed:services": "ts-node seed-services.ts"
+    "seed:services": "ts-node seed-services.ts",
+    "seed:medivantek-home": "ts-node seed-medivantek-home.ts"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",

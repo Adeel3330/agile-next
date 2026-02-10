@@ -16,6 +16,8 @@ import Team from "../../components/sections/home1/Team";
 import Testimonial from "../../components/sections/home1/Testimonial";
 // import Working from "../../components/sections/home1/Working";
 import GoogleMapSection from "../../components/sections/home1/GoogleMap";
+import RevenueChallenges from "../../components/sections/home1/RevenueChallenges";
+import BenefitsMedicalBilling from "../../components/sections/home1/BenefitsMedicalBilling";
 export default function Home() {
 
     return (
@@ -26,6 +28,8 @@ export default function Home() {
                 <Certifications/>
                 <About/>
                 <Service/>
+                <RevenueChallenges/>
+                <BenefitsMedicalBilling/>
                 <Specialties/>
                 {/* <Chooseus/> */}
                 {/* <Appointment/> */}
