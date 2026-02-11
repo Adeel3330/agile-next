@@ -86,10 +86,19 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
               </li>
 
               {/* Services - same structure as Header1 */}
-              <li className={openKeys.has("services") ? "current" : ""}>
-                <Link href="/services" onClick={handleMobileMenu}>Services</Link>
-                {(categories.length > 0 || hasOtherServices) && (
+              <li className={`${categories.length > 0 || hasOtherServices ? "dropdown " : ""}${openKeys.has("services") ? "current" : ""}`}>
+                {categories.length > 0 || hasOtherServices ? (
                   <>
+                    <span
+                      className="mobile-menu-trigger"
+                      onClick={() => toggle("services")}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle("services"); } }}
+                      style={{ display: "block", padding: "10px 45px 10px 25px", lineHeight: "24px", fontSize: "15px", fontWeight: 500, color: "#fff", textTransform: "uppercase", cursor: "pointer" }}
+                    >
+                      Services
+                    </span>
                     <ul style={{ display: openKeys.has("services") ? "block" : "none" }}>
                       {categories.map((category) => {
                         const categoryServices = services.filter(
@@ -98,10 +107,19 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
                         const catKey = `cat-${category.id}`;
                         const isCatOpen = openKeys.has(catKey);
                         return (
-                          <li key={category.id} className={categoryServices.length > 0 ? (isCatOpen ? "current" : "") : ""}>
+                          <li key={category.id} className={`${categoryServices.length > 0 ? "dropdown " : ""}${isCatOpen ? "current" : ""}`}>
                             {categoryServices.length > 0 ? (
                               <>
-                                <Link href={`/services?category=${category.slug}`} onClick={handleMobileMenu}>{category.name}</Link>
+                                <span
+                                  className="mobile-menu-trigger"
+                                  onClick={() => toggle(catKey)}
+                                  role="button"
+                                  tabIndex={0}
+                                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(catKey); } }}
+                                  style={{ display: "block", padding: "10px 45px 10px 20px", lineHeight: "24px", fontSize: "16px", color: "#fff", cursor: "pointer", marginLeft: "20px" }}
+                                >
+                                  {category.name}
+                                </span>
                                 <ul className="submenu" style={{ display: isCatOpen ? "block" : "none" }}>
                                   {categoryServices.map((service) => (
                                     <li key={service.id}>
@@ -109,19 +127,28 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
                                     </li>
                                   ))}
                                 </ul>
-                                <div className={`dropdown-btn ${isCatOpen ? "open" : ""}`} onClick={() => toggle(catKey)}>
+                                <div className={`dropdown-btn ${isCatOpen ? "open" : ""}`} onClick={(e) => { e.stopPropagation(); toggle(catKey); }}>
                                   <span className="fa fa-angle-right" />
                                 </div>
                               </>
                             ) : (
-                              <Link href={`/services?category=${category.slug}`} onClick={handleMobileMenu}>{category.name}</Link>
+                              <Link href={`/services?category=${category.slug}`} onClick={handleMobileMenu} style={{ marginLeft: "20px" }}>{category.name}</Link>
                             )}
                           </li>
                         );
                       })}
                       {hasOtherServices && (
-                        <li className={openKeys.has("other-services") ? "current" : ""}>
-                          <Link href="/services" onClick={handleMobileMenu}>Other Services</Link>
+                        <li className={`dropdown ${openKeys.has("other-services") ? "current" : ""}`}>
+                          <span
+                            className="mobile-menu-trigger"
+                            onClick={() => toggle("other-services")}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle("other-services"); } }}
+                            style={{ display: "block", padding: "10px 45px 10px 20px", lineHeight: "24px", fontSize: "16px", color: "#fff", cursor: "pointer", marginLeft: "20px" }}
+                          >
+                            Other Services
+                          </span>
                           <ul className="submenu" style={{ display: openKeys.has("other-services") ? "block" : "none" }}>
                             {uncategorizedServices.map((service) => (
                               <li key={service.id}>
@@ -134,29 +161,40 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
                               </li>
                             ))}
                           </ul>
-                          <div className={`dropdown-btn ${openKeys.has("other-services") ? "open" : ""}`} onClick={() => toggle("other-services")}>
+                          <div className={`dropdown-btn ${openKeys.has("other-services") ? "open" : ""}`} onClick={(e) => { e.stopPropagation(); toggle("other-services"); }}>
                             <span className="fa fa-angle-right" />
                           </div>
                         </li>
                       )}
                     </ul>
-                    <div className={`dropdown-btn ${openKeys.has("services") ? "open" : ""}`} onClick={() => toggle("services")}>
+                    <div className={`dropdown-btn ${openKeys.has("services") ? "open" : ""}`} onClick={(e) => { e.stopPropagation(); toggle("services"); }}>
                       <span className="fa fa-angle-right" />
                     </div>
                   </>
+                ) : (
+                  <Link href="/services" onClick={handleMobileMenu}>Services</Link>
                 )}
               </li>
 
               {/* Resources - same as Header1 */}
-              <li className={openKeys.has("resources") ? "current" : ""}>
-                <Link href="/resources" onClick={handleMobileMenu}>Resources</Link>
+              <li className={`dropdown ${openKeys.has("resources") ? "current" : ""}`}>
+                <span
+                  className="mobile-menu-trigger"
+                  onClick={() => toggle("resources")}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle("resources"); } }}
+                  style={{ display: "block", padding: "10px 45px 10px 25px", lineHeight: "24px", fontSize: "15px", fontWeight: 500, color: "#fff", textTransform: "uppercase", cursor: "pointer" }}
+                >
+                  Resources
+                </span>
                 <ul style={{ display: openKeys.has("resources") ? "block" : "none" }}>
                   <li><Link href="/compliance" onClick={handleMobileMenu}>Compliance</Link></li>
                   <li><Link href="/software" onClick={handleMobileMenu}>Software</Link></li>
                   <li><Link href="/affiliate-program" onClick={handleMobileMenu}>Affiliate Program</Link></li>
                   <li><Link href="/blog" onClick={handleMobileMenu}>Blog</Link></li>
                 </ul>
-                <div className={`dropdown-btn ${openKeys.has("resources") ? "open" : ""}`} onClick={() => toggle("resources")}>
+                <div className={`dropdown-btn ${openKeys.has("resources") ? "open" : ""}`} onClick={(e) => { e.stopPropagation(); toggle("resources"); }}>
                   <span className="fa fa-angle-right" />
                 </div>
               </li>
