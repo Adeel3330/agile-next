@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
+import { Autoplay, Navigation } from 'swiper/modules';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -76,9 +76,14 @@ export default function Service() {
 
         {displayServices.length > 0 && (
           <Swiper
-            modules={[Navigation]}
+            modules={[Autoplay, Navigation]}
             loop={displayServices.length > 3}
             spaceBetween={30}
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true,
+            }}
             breakpoints={{
               320: { slidesPerView: 1 },
               768: { slidesPerView: 2 },
