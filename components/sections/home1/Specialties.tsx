@@ -132,19 +132,19 @@ export default function Specialties() {
                           <Image
                             src={getCloudinaryImageUrl(item.fileUrl)}
                             alt={item.altText || item.title || 'Specialty'}
-                            width={60}
-                            height={60}
+                            width={80}
+                            height={80}
                             style={{
                               objectFit: 'cover',
                               borderRadius: '50%',
-                              width: '50px',
-                              height: '50px',
+                              width: '80px',
+                              height: '80px',
                             }}
                           />
                         </div>
-                        <span className="count-text">
+                        {/* <span className="count-text">
                           {index + 1 < 10 ? `0${index + 1}` : index + 1}
-                        </span>
+                        </span> */}
                       </div>
                       <div className="text">
                         <h3>{item.title}</h3>
@@ -219,8 +219,8 @@ export default function Specialties() {
           font-weight: 600;
         }
         .chooseus-block-one .inner-box .icon-box .icon {
-          width: 60px;
-          height: 60px;
+          width: 80px;
+          height: 80px;
           border-radius: 50%;
           overflow: hidden;
           display: flex;
