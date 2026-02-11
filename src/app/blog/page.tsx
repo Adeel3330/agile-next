@@ -267,7 +267,9 @@ function BlogPageContent() {
                                     <li suppressHydrationWarning><i className="icon-59"></i>{formatDate(blog.created_at)}</li>
                                     <li><i className="icon-60"></i><Link href={`/blog-details/${blog.slug}`}>Admin</Link></li>
                                                         </ul>
-                                  <p>{blog.description || blog.content?.substring(0, 150) + '...'}</p>
+                                  <div
+                            dangerouslySetInnerHTML={{ __html: blog.description || blog.content?.substring(0, 150) + '...' }}
+                          />
                                                         <div className="link">
                                     <Link href={`/blog-details/${blog.slug}`}>Read More</Link>
                                                         </div>
