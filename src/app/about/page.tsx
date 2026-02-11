@@ -9,6 +9,7 @@ import ContactForm from '../../../components/elements/ContactForm';
 import Clients from '../../../components/sections/home3/Clients';
 import Team from '../../../components/sections/home1/Team';
 import Cta from '../../../components/sections/home2/Cta';
+import Service from '../../../components/sections/home1/Service';
 import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
 
 interface MediaItem {
@@ -31,15 +32,6 @@ interface PageData {
   seoImage?: string;
 }
 
-interface Service {
-  id: string;
-  title: string;
-  slug: string;
-  description?: string;
-  imageUrl?: string;
-  icon?: string;
-}
-
 interface Settings {
   contactPhone?: string;
   contactEmail?: string;
@@ -52,12 +44,10 @@ export default function AboutPage() {
   const [mounted, setMounted] = useState(false);
   const [pageData, setPageData] = useState<PageData | null>(null);
   const [aboutImage, setAboutImage] = useState<MediaItem | null>(null);
-  const [services, setServices] = useState<Service[]>([]);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);
   const [mediaLoading, setMediaLoading] = useState(true);
-  const [servicesLoading, setServicesLoading] = useState(true);
   const [settingsLoading, setSettingsLoading] = useState(true);
 
   useEffect(() => {
@@ -68,7 +58,6 @@ export default function AboutPage() {
     if (mounted) {
       fetchPageData();
       fetchAboutMedia();
-      fetchServices();
       fetchSettings();
     }
   }, [mounted]);
@@ -115,22 +104,6 @@ export default function AboutPage() {
       console.error('Failed to fetch about media:', err);
     } finally {
       setMediaLoading(false);
-    }
-  }, []);
-
-  const fetchServices = useCallback(async () => {
-    setServicesLoading(true);
-    try {
-      const response = await fetch('/api/services?limit=3');
-      const data = await response.json();
-
-      if (data.success && data.services) {
-        setServices(data.services.slice(0, 3));
-      }
-    } catch (err) {
-      console.error('Failed to fetch services:', err);
-    } finally {
-      setServicesLoading(false);
     }
   }, []);
 
@@ -259,81 +232,8 @@ export default function AboutPage() {
                     </div>
                 </section>
 
-        {/* Second Section - Three Services */}
-                <section className="service-section about-page p_relative">
-          <div className="pattern-layer" style={{ backgroundImage: 'url(assets/images/shape/shape-13.png)' }}></div>
-                    <div className="auto-container">
-                        <div className="sec-title mb_60 centred">
-                            <span className="sub-title mb_5">What we do for our patients</span>
-              <h2>Our Services</h2>
-              <p>Agile Nexus Solutions proudly supports Healthcare providers, Physicians, Medical Groups, and Medical Billing Companies.</p>
-                        </div>
-            {servicesLoading ? (
-                        <div className="row clearfix">
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <div key={`skeleton-${index}`} className="col-lg-4 col-md-6 col-sm-12 service-block">
-                                <div className="service-block-one">
-                                    <div className="inner-box">
-                        <figure className="image-box">
-                          <div style={{ width: '100%', height: '358px', background: '#e0e0e0', borderRadius: '8px' }}></div>
-                        </figure>
-                                        <div className="lower-content">
-                                            <div className="inner">
-                            <div className="skeleton" style={{ width: '60px', height: '60px', borderRadius: '50%' }}></div>
-                            <div className="skeleton skeleton-text" style={{ width: '80%', height: '24px', marginTop: '15px' }}></div>
-                            <div className="skeleton skeleton-text" style={{ width: '100%', height: '16px', marginTop: '10px' }}></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                ))}
-              </div>
-            ) : services.length > 0 ? (
-              <div className="row clearfix">
-                {services.map((service) => (
-                  <div key={service.id} className="col-lg-4 col-md-6 col-sm-12 service-block">
-                                <div className="service-block-one">
-                                    <div className="inner-box">
-                        <figure className="image-box">
-                          <Link href={`/services/${service.slug}`}>
-                            {service.imageUrl ? (
-                              <Image 
-                                src={getCloudinaryImageUrl(service.imageUrl)} 
-                                alt={service.title} 
-                                width={416} 
-                                height={358} 
-                                priority 
-                                style={{ objectFit: 'cover' }}
-                              />
-                            ) : (
-                              <Image 
-                                src="/assets/images/service/service-1.jpg" 
-                                alt={service.title} 
-                                width={416} 
-                                height={358} 
-                                priority 
-                              />
-                            )}
-                          </Link>
-                        </figure>
-                                        <div className="lower-content">
-                                            <div className="inner">
-                           
-                            <h3>
-                              <Link href={`/services/${service.slug}`}>{service.title}</Link>
-                            </h3>
-                            <p>{service.description ? (service.description.length > 100 ? service.description.substring(0, 100) + '...' : service.description) : 'Professional service for your needs.'}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                ))}
-              </div>
-            ) : null}
-                                            </div>
-        </section>
+        {/* Second Section - Services (same as home page) */}
+                <Service />
 
         {/* Contact Section - Replacing Appointment */}
         <section className="contact-section about-page p_relative pt_120 pb_120">
