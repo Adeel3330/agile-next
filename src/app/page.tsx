@@ -19,6 +19,9 @@ import Testimonial from "../../components/sections/home1/Testimonial";
 import GoogleMapSection from "../../components/sections/home1/GoogleMap";
 import RevenueChallenges from "../../components/sections/home1/RevenueChallenges";
 import BenefitsMedicalBilling from "../../components/sections/home1/BenefitsMedicalBilling";
+import WhyAgileSolutions from "../../components/sections/home1/WhyAgileSolutions";
+import EffortlessOnboarding from "../../components/sections/home1/EffortlessOnboarding";
+
 export default function Home() {
 
     return (
@@ -31,6 +34,8 @@ export default function Home() {
                 <Service/>
                 <RevenueChallenges/>
                 <BenefitsMedicalBilling/>
+                <WhyAgileSolutions/>
+                <EffortlessOnboarding/>
                 <Specialties/>
                 <Software/>
                 {/* <Chooseus/> */}

@@ -17,6 +17,7 @@
     "seed:sliders-careers": "ts-node seed-sliders-careers.ts",
     "seed:services": "ts-node seed-services.ts",
     "seed:medivantek-home": "ts-node seed-medivantek-home.ts",
+    "seed:why-agile-onboarding": "ts-node seed-why-agile-onboarding.ts",
     "seed:software-media": "ts-node seed-software-media.ts"
   },
   "dependencies": {

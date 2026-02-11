@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation } from 'swiper/modules';
-import type { Swiper as SwiperType } from 'swiper';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -24,10 +23,6 @@ export default function Service() {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [services, setServices] = useState<Service[]>([]);
-
-  const prevRef = useRef<HTMLButtonElement>(null);
-  const nextRef = useRef<HTMLButtonElement>(null);
-  const swiperRef = useRef<SwiperType | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -61,7 +56,7 @@ export default function Service() {
     : services;
 
   return (
-    <section className="service-section p_relative">
+    <section className="service-section p_relative" id="services">
       <div
         className="pattern-layer"
         style={{ backgroundImage: 'url(/assets/images/shape/shape-13.png)' }}
@@ -83,26 +78,22 @@ export default function Service() {
           <Swiper
             modules={[Autoplay, Navigation]}
             loop={displayServices.length > 3}
-            speed={5000}
+            spaceBetween={30}
             autoplay={{
-              delay: 0,
+              delay: 3000,
               disableOnInteraction: false,
               pauseOnMouseEnter: true,
             }}
-            spaceBetween={30}
             breakpoints={{
               320: { slidesPerView: 1 },
               768: { slidesPerView: 2 },
               1200: { slidesPerView: 3 },
             }}
-            onBeforeInit={(swiper) => {
-              // @ts-ignore
-              swiper.params.navigation.prevEl = prevRef.current;
-              // @ts-ignore
-              swiper.params.navigation.nextEl = nextRef.current;
-              swiperRef.current = swiper;
+            navigation={{
+              nextEl: '#services .swiper-next',
+              prevEl: '#services .swiper-prev',
             }}
-            className="service-swiper continuous-swiper"
+            className="service-swiper"
           >
             {displayServices.map((service, index) => (
               <SwiperSlide key={service.id || index}>
@@ -153,14 +144,16 @@ export default function Service() {
         )}
 
         {/* Navigation */}
-        {/* <div className="nav-style-one">
-          <button ref={prevRef} className="swiper-prev">
-            <span className="icon-21"></span>
-          </button>
-          <button ref={nextRef} className="swiper-next">
-            <span className="icon-22"></span>
-          </button>
-        </div> */}
+        <div className="nav-style-one" style={{ marginTop: '20px' }}>
+          <div className="swiper-nav">
+            <button type="button" className="swiper-prev">
+              <span className="icon-21" />
+            </button>
+            <button type="button" className="swiper-next">
+              <span className="icon-22" />
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
