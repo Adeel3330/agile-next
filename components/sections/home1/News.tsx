@@ -190,7 +190,7 @@ export default function News() {
                       <h3>
                         <Link href={`/blog-details/${blog.slug}`}>{blog.title}</Link>
                       </h3>
-                      <ul className="post-info clearfix">
+                      {/* <ul className="post-info clearfix">
                         <li><i className="icon-59"></i>{formatDate(blog.created_at)}</li>
                         {blog.category && (
                           <li><i className="icon-60"></i><Link href={`/blog?category=${blog.category.slug}`}>{blog.category.name}</Link></li>
@@ -198,7 +198,7 @@ export default function News() {
                       </ul>
                       {blog.description && (
                         <p>{blog.description.length > 100 ? blog.description.substring(0, 100) + '...' : blog.description}</p>
-                      )}
+                      )} */}
                       <div className="link">
                         <Link href={`/blog-details/${blog.slug}`}>Read More</Link>
                       </div>

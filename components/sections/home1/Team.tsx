@@ -111,7 +111,7 @@ export default function Team() {
                 <div className="team-block-one wow fadeInUp animated" data-wow-delay={`${index * 300}ms`} data-wow-duration="1500ms">
                   <div className="inner-box">
                     <figure className="image-box">
-                      <Link href="/doctor-details">
+                      <Link href={`/team/${member.id}`}>
                         <Image 
                           src={member.photoUrl || '/assets/images/team/team-1.jpg'} 
                           alt={member.name} 
@@ -122,7 +122,7 @@ export default function Team() {
                       </Link>
                     </figure>
                     <div className="content-box">
-                      <h3><Link href="/doctor-details">{member.name}</Link></h3>
+                      <h3><Link href={`/team/${member.id}`}>{member.name}</Link></h3>
                       <span className="designation">{member.title}</span>
                       <ul className="social-links clearfix">
                         {member.linkedinUrl && (

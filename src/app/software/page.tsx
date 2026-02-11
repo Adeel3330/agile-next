@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Layout from '../../../components/layout/Layout';
 import ContactForm from '../../../components/elements/ContactForm';
 import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
+import Software from '../../../components/sections/home1/Software';
 
 interface MediaItem {
   id: string;
@@ -332,6 +333,10 @@ export default function SoftwarePage() {
             </div>
           </div>
         </section>
+
+
+
+        <Software/>
 
         {/* Software Media Section - service-style-two design */}
         {allMedia.length > 0 && (

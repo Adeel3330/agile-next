@@ -217,7 +217,10 @@ export default function BlogDetailsPage() {
                             <li><i className="icon-60"></i><Link href="/blog">Admin</Link></li>
                           </ul>
                           {blog.description && (
-                            <p>{blog.description}</p>
+                            // <p>{blog.description}</p>
+                            <div
+                            dangerouslySetInnerHTML={{ __html: blog.description || blog.content?.substring(0, 150) + '...' }}
+                          />
                           )}
                           {blog.content && (
                             <div 
@@ -266,18 +269,7 @@ export default function BlogDetailsPage() {
                         </li>
                       </ul>
                     </div>
-                    <div className="author-box mb_60">
-                      <figure className="author-thumb">
-                        <Image src="/assets/images/news/author-1.jpg" alt="Author" width={172} height={172} priority />
-                      </figure>
-                      <h3>Admin</h3>
-                      <p>Our expert team provides professional insights and updates on medical billing, healthcare management, and industry best practices.</p>
-                      <ul className="social-links clearfix">
-                        <li><Link href="#"><i className="fab fa-facebook-f"></i></Link></li>
-                        <li><Link href="#"><i className="fab fa-twitter"></i></Link></li>
-                        <li><Link href="#"><i className="fab fa-linkedin-in"></i></Link></li>
-                      </ul>
-                    </div>
+                    
                   </div>
                 </div>
                 <div className="col-lg-4 col-md-12 col-sm-12 sidebar-side">
