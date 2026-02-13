@@ -12,7 +12,7 @@ interface Media {
   fileName?: string;
   fileSize?: number;
   fileType?: string;
-  position: 'home' | 'services' | 'about' | 'contact' | 'other' | 'cta';
+  position: 'home' | 'services' | 'about' | 'contact' | 'other' | 'cta' | 'testimonials';
   status: 'active' | 'inactive';
   displayOrder: number;
   altText?: string;
@@ -38,7 +38,7 @@ export default function EditMediaPage() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    position: 'home' as 'home' | 'services' | 'about' | 'contact' | 'cta' | 'other',
+    position: 'home' as 'home' | 'services' | 'about' | 'contact' | 'cta' | 'other' | 'testimonials',
     status: 'active' as 'active' | 'inactive',
     displayOrder: 0,
     altText: '',
@@ -310,6 +310,7 @@ export default function EditMediaPage() {
                     <option value="services">Services</option>
                     <option value="about">About</option>
                     <option value="contact">Contact</option>
+                    <option value="testimonials">Testimonials (doctor/client photo + quote)</option>
                     <option value="cta">CTA</option>
                     <option value="compliance">Compliance</option>
                     <option value="other">Other</option>
