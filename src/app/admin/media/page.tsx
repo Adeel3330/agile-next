@@ -13,7 +13,7 @@ interface Media {
   fileName?: string;
   fileSize?: number;
   fileType?: string;
-  position: 'home' | 'services' | 'about' | 'contact' | 'other' | 'cta';
+  position: 'home' | 'services' | 'about' | 'contact' | 'other' | 'cta' | 'testimonials';
   status: 'active' | 'inactive';
   displayOrder: number;
   altText?: string;
@@ -180,6 +180,7 @@ export default function MediaPage() {
       services: styles.badgeServices,
       about: styles.badgeAbout,
       contact: styles.badgeContact,
+      testimonials: styles.badgeOther,
       cta: styles.badgeCta,
       other: styles.badgeOther
     };
@@ -243,6 +244,7 @@ export default function MediaPage() {
             <option value="certifications">Certifications</option>
             <option value="software">Software</option>
             <option value="specialties">Specialties</option>
+            <option value="testimonials">Testimonials</option>
             <option value="cta">CTA</option>
             <option value="other">Other</option>
           </select>

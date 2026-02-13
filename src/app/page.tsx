@@ -31,10 +31,11 @@ export default function Home() {
                 <Contact_Info/>
                 <Certifications/>
                 <About/>
+                <WhyAgileSolutions/>
                 <Service/>
                 <RevenueChallenges/>
                 <BenefitsMedicalBilling/>
-                <WhyAgileSolutions/>
+                
                 <EffortlessOnboarding/>
                 <Specialties/>
                 <Software/>

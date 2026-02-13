@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
 
 interface MediaItem {
   id: string;
@@ -60,6 +63,9 @@ export default function Testimonial() {
           <p>
             Agile Nexus Solutions is a leading medical billing company in the USA. We provide comprehensive medical billing and revenue cycle management services for healthcare providers and medical billing companies across the USA.
           </p>
+          <Link href="/testimonials/submit" className="theme-btn btn-one mt-3" style={{ marginTop: '12px' }}>
+            <span>Share your experience</span>
+          </Link>
         </div>
 
         {loading ? (
@@ -102,7 +108,18 @@ export default function Testimonial() {
                     <div className="icon-box">
                       <i className="icon-41" />
                     </div>
-                    <div className="author-box">
+                    <div className={`author-box ${!item.fileUrl ? 'author-box-no-thumb' : ''}`}>
+                      {item.fileUrl ? (
+                        <figure className="author-thumb">
+                          <Image
+                            src={getCloudinaryImageUrl(item.fileUrl)}
+                            alt={item.altText || item.title || 'Testimonial author'}
+                            width={120}
+                            height={120}
+                            style={{ objectFit: 'cover', borderRadius: '50%',height:'100%' }}
+                          />
+                        </figure>
+                      ) : null}
                       <h3>{item.title || 'Client'}</h3>
                       <ul className="rating clearfix">
                         {[1, 2, 3, 4, 5].map((i) => (
@@ -138,6 +155,7 @@ export default function Testimonial() {
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .testimonial-section .author-box .designation { display: none; }
+        .testimonial-section .author-box.author-box-no-thumb { padding-left: 0; }
       `}} />
     </section>
   );
