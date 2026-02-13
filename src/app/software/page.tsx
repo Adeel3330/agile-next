@@ -351,8 +351,8 @@ export default function SoftwarePage() {
               <div className="row clearfix">
                 {allMedia.slice(0, 3).map((media: MediaItem, index: number) => (
                   <div key={media.id || index} className="col-lg-4 col-md-6 col-sm-12 service-block">
-                    <div className="chooseus-block-one">
-                      <div className="inner-box">
+                    <div className="chooseus-block-one" >
+                      <div className="inner-box" style={{ padding: '0' }}>
                         <figure className="image-box">
                           <Image 
                             src={getCloudinaryImageUrl(media.fileUrl)} 
@@ -363,11 +363,11 @@ export default function SoftwarePage() {
                             style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                           />
                         </figure>
-                        <div className="lower-content">
+                        <div className="lower-content" style={{ padding: '31px 30px 33px 30px' }}>
                           <div className="inner">
-                            <div className="icon-box">
+                            {/* <div className="icon-box">
                               <i className={`icon-${18 + index}`}></i>
-                            </div>
+                            </div> */}
                             <h3>
                               <span>{media.title || `Software ${index + 1}`}</span>
                             </h3>

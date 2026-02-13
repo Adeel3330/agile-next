@@ -386,7 +386,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           )}
                         </ul>
                       </li>
-                      <li className={`dropdown ${isActive('/resources') || isActive('/compliance') || isActive('/software') || isActive('/development') || isActive('/blog') || isActive('/affiliate-program') ? "current" : ""}`}>
+                      <li className={`dropdown ${isActive('/resources') || isActive('/compliance') || isActive('/software') || isActive('/blog')}`}>
                         <Link href="/resources">Resources</Link>
                         <ul>
                           <li className={isActive('/compliance') ? "current" : ""}>
