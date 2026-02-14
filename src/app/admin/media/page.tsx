@@ -34,7 +34,7 @@ interface MediaResponse {
 
 export default function MediaPage() {
   const router = useRouter();
-  
+
   const [media, setMedia] = useState<Media[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -46,6 +46,7 @@ export default function MediaPage() {
   const [total, setTotal] = useState(0);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [availablePositions, setAvailablePositions] = useState<string[]>([]);
 
   const fetchMedia = useCallback(async () => {
     setLoading(true);
@@ -98,9 +99,30 @@ export default function MediaPage() {
     }
   }, [router, currentPage, searchTerm, positionFilter, statusFilter]);
 
+  const fetchPositions = useCallback(async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
+      if (!token) return;
+
+      const response = await fetch('/api/admin/media/positions', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.positions) {
+        setAvailablePositions(data.positions);
+      }
+    } catch (err) {
+      console.error('Fetch positions error:', err);
+    }
+  }, []);
+
   useEffect(() => {
     setMounted(true);
-    
+
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('adminToken');
       if (!token) {
@@ -109,8 +131,9 @@ export default function MediaPage() {
       }
 
       fetchMedia();
+      fetchPositions();
     }
-  }, [router, fetchMedia]);
+  }, [router, fetchMedia, fetchPositions]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -237,17 +260,11 @@ export default function MediaPage() {
             onChange={(e) => handlePositionChange(e.target.value)}
           >
             <option value="">All Positions</option>
-            <option value="home">Home</option>
-            <option value="services">Services</option>
-            <option value="about">About</option>
-            <option value="contact">Contact</option>
-            <option value="certifications">Certifications</option>
-            <option value="software">Software</option>
-            <option value="specialties">Specialties</option>
-            <option value="testimonials">Testimonials</option>
-            
-            <option value="cta">CTA</option>
-            <option value="other">Other</option>
+            {availablePositions.map((position) => (
+              <option key={position} value={position}>
+                {position.charAt(0).toUpperCase() + position.slice(1)}
+              </option>
+            ))}
           </select>
           <select
             className={styles.statusFilter}
