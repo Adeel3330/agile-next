@@ -115,7 +115,7 @@ export default function MediaPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchMedia();
+    // useEffect will refetch when currentPage updates (avoids stale closure)
   };
 
   const handlePositionChange = (position: string) => {
@@ -245,6 +245,7 @@ export default function MediaPage() {
             <option value="software">Software</option>
             <option value="specialties">Specialties</option>
             <option value="testimonials">Testimonials</option>
+            
             <option value="cta">CTA</option>
             <option value="other">Other</option>
           </select>
