@@ -48,21 +48,21 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
   const [services, setServices] = useState<Service[]>([]);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   // Helper function to check if a path is active
   const isActive = (path: string) => {
     if (!pathname || !path) return false;
-    
+
     // Exact match for root - only match exactly '/'
     if (path === '/') {
       return pathname === '/';
     }
-    
+
     // Exact match
     if (pathname === path) {
       return true;
     }
-    
+
     // For paths that should match sub-routes (like /services should match /services/...)
     // Check if pathname starts with path + '/' or path + '?'
     // This prevents /services from matching /service-details
@@ -71,7 +71,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
     if (pathname.startsWith(pathWithSlash) || pathname.startsWith(pathWithQuery)) {
       return true;
     }
-    
+
     return false;
   };
 
@@ -127,12 +127,12 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
         categoriesCount: categories.length,
         servicesCount: services.length
       });
-      
+
       // Quick check for matching (limit to prevent performance issues)
       const categoryIds = new Set(categories.map(c => c.id));
       const servicesWithCategories = services.filter(s => s.categoryId && categoryIds.has(s.categoryId));
       console.log('Services matched to categories:', servicesWithCategories.length);
-      
+
       // Log first category match as sample
       if (categories.length > 0) {
         const firstCategory = categories[0];
@@ -186,6 +186,20 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                       {settings?.contactEmail || 'info@agilenexussolution.com'}
                     </a>
                   )}
+                </li>
+                <li>
+                  <div className="d-flex justify-center align-items-center">
+                    <div className="icon-box">
+                    <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={15} height={15} priority />
+                  </div>
+                  {loading ? (
+                    <span style={{ display: 'inline-block', width: '150px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
+                  ) : (
+                    <a href={settings?.contactPhone ? `tel:${settings.contactPhone}` : 'tel:17276354993'}>
+                      {settings?.contactPhone || '1-727-635-4993'}
+                    </a>
+                  )}
+                  </div>
                 </li>
                 <li>
                   <i className="icon-2"></i>
@@ -302,18 +316,18 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                                     return match1 || match2;
                                   }
                                 );
-                                
+
                                 // Check if current page matches this category
-                                const isCategoryActive = pathname === '/services' && 
-                                  typeof window !== 'undefined' && 
+                                const isCategoryActive = pathname === '/services' &&
+                                  typeof window !== 'undefined' &&
                                   window.location.search.includes(`category=${category.slug}`);
-                                
+
                                 // Always show category, with dropdown if it has services
                                 return (
                                   <li key={category.id} className={`${categoryServices.length > 0 ? "dropdown" : ""} ${isCategoryActive ? "current" : ""}`}>
                                     <Link href={`/services?category=${category.slug}`}>
                                       {category.name}
-                                      
+
                                     </Link>
                                     {categoryServices.length > 0 && (
                                       <ul className="submenu">
@@ -349,7 +363,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                                     return serviceCategoryId && !allCategoryIds.has(serviceCategoryId);
                                   }
                                 );
-                                
+
                                 if (uncategorizedServices.length > 0 || servicesNotInCategories.length > 0) {
                                   return (
                                     <li className="dropdown">
@@ -415,14 +429,14 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                       <li className={isActive('/contact') ? "current" : ""}>
                         <Link href="/contact">Contact</Link>
                       </li>
-                     
+
                     </ul>
                   </div>
                 </nav>
               </div>
 
               <div className="menu-right-content">
-                <div className="support-box">
+                {/* <div className="support-box">
                   <div className="icon-box">
                     <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={25} height={25} priority />
                   </div>
@@ -436,7 +450,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                       </Link>
                     )}
                   </h6>
-                </div>
+                </div> */}
                 <div className="btn-box">
                   <Link href="/contact" className="theme-btn btn-one">
                     <span>Get Started</span>
@@ -457,12 +471,12 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                     {loading ? (
                       <div style={{ width: '203px', height: '40px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></div>
                     ) : (
-                      <Image 
-                        src={settings?.logoUrl || '/assets/images/logo.png'} 
-                        alt="Logo Image" 
-                        width={203} 
-                        height={40} 
-                        priority 
+                      <Image
+                        src={settings?.logoUrl || '/assets/images/logo.png'}
+                        alt="Logo Image"
+                        width={203}
+                        height={40}
+                        priority
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = '/assets/images/logo.png';
                         }}
@@ -513,13 +527,13 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                                     return match1 || match2;
                                   }
                                 );
-                                
+
                                 // Always show category, with dropdown if it has services
                                 return (
                                   <li key={category.id} className={categoryServices.length > 0 ? "dropdown" : ""}>
                                     <Link href={`/services?category=${category.slug}`}>
                                       {category.name}
-                                      
+
                                     </Link>
                                     {categoryServices.length > 0 && (
                                       <ul className="submenu">
@@ -552,7 +566,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                                     return serviceCategoryId && !allCategoryIds.has(serviceCategoryId);
                                   }
                                 );
-                                
+
                                 if (uncategorizedServices.length > 0 || servicesNotInCategories.length > 0) {
                                   return (
                                     <li className="dropdown">
@@ -598,7 +612,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           <li className={isActive('/software') ? "current" : ""}>
                             <Link href="/software">Software</Link>
                           </li>
-                          
+
                           <li className={isActive('/blog') ? "current" : ""}>
                             <Link href="/blog">Blog</Link>
                           </li>
@@ -648,7 +662,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
         <MobileMenu
           isSidebar={false}
           handleMobileMenu={handleMobileMenu}
-          handleSidebar={() => {}}
+          handleSidebar={() => { }}
         />
       </header>
     </>
