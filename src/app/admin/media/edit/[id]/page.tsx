@@ -301,20 +301,18 @@ export default function EditMediaPage() {
                 <div className="col-md-4">
                   <label className="form-label">Position *</label>
                   <select
-                    className="form-select"
-                    value={formData.position}
-                    onChange={(e) => setFormData({ ...formData, position: e.target.value as any })}
-                    required
-                  >
-                    <option value="home">Home</option>
-                    <option value="services">Services</option>
-                    <option value="about">About</option>
-                    <option value="contact">Contact</option>
-                    <option value="testimonials">Testimonials (doctor/client photo + quote)</option>
-                    <option value="cta">CTA</option>
-                    <option value="compliance">Compliance</option>
-                    <option value="other">Other</option>
-                  </select>
+            className="form-select"
+            value={formData.position}
+            onChange={(e) => setFormData({ ...formData, position: e.target.value as any })}
+            required
+          >
+            <option value="">All Positions</option>
+            {availablePositions.map((position) => (
+              <option key={position} value={position}>
+                {position.charAt(0).toUpperCase() + position.slice(1)}
+              </option>
+            ))}
+          </select>
                 </div>
 
                 <div className="col-md-4">

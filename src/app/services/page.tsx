@@ -193,9 +193,9 @@ export default function ServicesPage() {
     try {
       // Build API URL with category filter if present
       let apiUrl = '/api/services?limit=50';
-      if (categorySlug) {
-        apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
-      }
+      // if (categorySlug) {
+      //   apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
+      // }
       
       const response = await fetch(apiUrl);
       const data = await response.json();
@@ -217,6 +217,34 @@ export default function ServicesPage() {
   return (
     <div className="boxed_wrapper">
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Our Services">
+
+      {pageLoading ? (
+          <section className="chooseus-section service-page sec-pad p_relative">
+            <div className="auto-container">
+              <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : pageData && tabs.length > 0 ? (
+          <section className="chooseus-section service-page sec-pad p_relative">
+            <div className="auto-container">
+              <div className="sec-title centred mb_55">
+                <span className="sub-title mb_5">Why Choose Us</span>
+                <h2>{pageData.title || 'What\'s Our Speciality'}</h2>
+                {pageData.content && (
+                  <p dangerouslySetInnerHTML={{ __html: pageData.content }}></p>
+                )}
+              </div>
+
+              
+            </div>
+          </section>
+        ) : null}
+
+        
         <section className="service-page-section p_relative">
           <div className="auto-container">
             {loading ? (
