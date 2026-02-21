@@ -122,7 +122,7 @@ export default function ContactPage() {
 
     // Fetch page content (contact page)
     try {
-      const pageRes = await fetch('/api/pages/contact');
+      const pageRes = await fetch('/api/pages/contact-us');
       const pageData = await pageRes.json();
       if (pageData.success && pageData.page) {
         setPageData(pageData.page);
@@ -287,6 +287,16 @@ export default function ContactPage() {
           </div>
           <div className="auto-container">
             <div className="row clearfix">
+              <div className="col-md-8">
+                {pageData?.content && (
+                    <div
+                      style={{ color: '#666', fontSize: '16px', lineHeight: '28px', marginBottom: '22px' }}
+                      dangerouslySetInnerHTML={{ __html: pageData.content }}
+                    />
+                  )}
+              </div>
+            </div>
+            <div className="row clearfix">
               <div className="col-lg-4 col-md-6 col-sm-12 info-block">
                 <div className="info-block-two wow fadeInUp animated" data-wow-delay="00ms" data-wow-duration="1500ms">
                   <div className="inner-box">
@@ -384,9 +394,7 @@ export default function ContactPage() {
               ) : (
                 <>
                   <h2>{pageData?.title || 'Leave a Comment'}</h2>
-                  <p style={{ color: '#666', fontSize: '16px', lineHeight: '28px', marginBottom: '22px' }}>
-                    We’re here to help you simplify billing operations and strengthen your revenue cycle. Share your requirements and our team will respond with the right next steps.
-                  </p>
+                  
                   {(settings?.whatsappUrl || settings?.chatbotUrl) && (
                     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px' }}>
                       {settings?.whatsappUrl && (
