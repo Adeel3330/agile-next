@@ -29,6 +29,7 @@ interface Settings {
   contactEmail?: string;
   contactPhone?: string;
   contactAddress?: string;
+  contactAddress2?: string;
   contactCity?: string;
   contactState?: string;
   contactZip?: string;
@@ -40,6 +41,8 @@ interface Settings {
   seoDefaultDescription?: string;
   seoDefaultKeywords?: string;
   seoDefaultImage?: string;
+  whatsappUrl?: string;
+  chatbotUrl?: string;
 }
 
 export default function ContactPage() {
@@ -119,7 +122,7 @@ export default function ContactPage() {
 
     // Fetch page content (contact page)
     try {
-      const pageRes = await fetch('/api/pages/contact');
+      const pageRes = await fetch('/api/pages/contact-us');
       const pageData = await pageRes.json();
       if (pageData.success && pageData.page) {
         setPageData(pageData.page);
@@ -147,14 +150,39 @@ export default function ContactPage() {
 
   const formatAddress = () => {
     if (!settings) return '2972 Westheimer Rd. Santa Ana, Illinois 85486';
-    const parts = [
-      settings.contactAddress,
+
+    const addressLine1 = settings.contactAddress?.trim();
+    const addressLine2 = settings.contactAddress2?.trim();
+    const locationLine = [
       settings.contactCity,
       settings.contactState,
       settings.contactZip,
       settings.contactCountry
-    ].filter(Boolean);
-    return parts.length > 0 ? parts.join(', ') : '2972 Westheimer Rd. Santa Ana, Illinois 85486';
+    ]
+      .filter(Boolean)
+      .join(', ');
+
+    if (!addressLine1 && !addressLine2 && !locationLine) {
+      return '2972 Westheimer Rd. Santa Ana, Illinois 85486';
+    }
+
+    return (
+      <>
+        {addressLine1 ? (
+          <>
+            {addressLine1}     {locationLine ? locationLine : null}
+            <br />
+          </>
+        ) : null}
+        {addressLine2 ? (
+          <>
+            {addressLine2}
+            <br />
+          </>
+        ) : null}
+
+      </>
+    );
   };
 
   const formatWorkingHours = () => {
@@ -259,6 +287,16 @@ export default function ContactPage() {
           </div>
           <div className="auto-container">
             <div className="row clearfix">
+              <div className="col-md-8">
+                {pageData?.content && (
+                    <div
+                      style={{ color: '#666', fontSize: '16px', lineHeight: '28px', marginBottom: '22px' }}
+                      dangerouslySetInnerHTML={{ __html: pageData.content }}
+                    />
+                  )}
+              </div>
+            </div>
+            <div className="row clearfix">
               <div className="col-lg-4 col-md-6 col-sm-12 info-block">
                 <div className="info-block-two wow fadeInUp animated" data-wow-delay="00ms" data-wow-duration="1500ms">
                   <div className="inner-box">
@@ -356,7 +394,21 @@ export default function ContactPage() {
               ) : (
                 <>
                   <h2>{pageData?.title || 'Leave a Comment'}</h2>
-                 
+                  
+                  {(settings?.whatsappUrl || settings?.chatbotUrl) && (
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px' }}>
+                      {settings?.whatsappUrl && (
+                        <Link href={settings.whatsappUrl} target="_blank" rel="noopener noreferrer" className="theme-btn btn-one">
+                          <span>WhatsApp Direct</span>
+                        </Link>
+                      )}
+                      {settings?.chatbotUrl && (
+                        <Link href={settings.chatbotUrl} target="_blank" rel="noopener noreferrer" className="theme-btn btn-two">
+                          <span>AI Bot</span>
+                        </Link>
+                      )}
+                    </div>
+                  )}
                 </>
               )}
               <ContactForm />

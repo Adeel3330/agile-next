@@ -102,11 +102,11 @@ export default function ServiceDetailsPage() {
 
   const fetchServices = useCallback(async () => {
     try {
-      const response = await fetch('/api/services?limit=5');
+      const response = await fetch('/api/services');
       const data = await response.json();
 
       if (data.success && data.services) {
-        setServices(data.services.slice(0, 5).map((s: Service) => ({
+        setServices(data.services.map((s: Service) => ({
           id: s.id,
           title: s.title,
           slug: s.slug
@@ -199,7 +199,7 @@ export default function ServiceDetailsPage() {
                       </ul>
                     </div>
                   </div>
-                  <div className="sidebar-widget schedule-widget">
+                  {/* <div className="sidebar-widget schedule-widget">
                     <div className="widget-title">
                       <h2>Working Hours</h2>
                     </div>
@@ -214,7 +214,7 @@ export default function ServiceDetailsPage() {
                         <li>Saturday<span>Closed</span></li>
                       </ul>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="col-lg-8 col-md-12 col-sm-12 content-side">

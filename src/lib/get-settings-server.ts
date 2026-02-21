@@ -6,6 +6,7 @@ const DEFAULT_SETTINGS = {
   contactEmail: null as string | null,
   contactPhone: null as string | null,
   contactAddress: null as string | null,
+  contactAddress2: null as string | null,
   contactCity: null as string | null,
   contactState: null as string | null,
   contactZip: null as string | null,
@@ -16,6 +17,8 @@ const DEFAULT_SETTINGS = {
   socialLinkedin: null as string | null,
   socialYoutube: null as string | null,
   socialPinterest: null as string | null,
+  whatsappUrl: null as string | null,
+  chatbotUrl: null as string | null,
   workingHours: {} as Record<string, unknown>,
   seoDefaultTitle: null as string | null,
   seoDefaultDescription: null as string | null,
@@ -55,6 +58,11 @@ export async function getSettingsForServer(): Promise<SettingsForServer> {
     contactEmail: settings.contact_email ?? null,
     contactPhone: settings.contact_phone ?? null,
     contactAddress: settings.contact_address ?? null,
+    contactAddress2:
+      settings.contact_address_2 ??
+      settings.additional_settings?.contactAddress2 ??
+      settings.additional_settings?.contact_address_2 ??
+      null,
     contactCity: settings.contact_city ?? null,
     contactState: settings.contact_state ?? null,
     contactZip: settings.contact_zip ?? null,
@@ -65,6 +73,8 @@ export async function getSettingsForServer(): Promise<SettingsForServer> {
     socialLinkedin: settings.social_linkedin ?? null,
     socialYoutube: settings.social_youtube ?? null,
     socialPinterest: settings.social_pinterest ?? null,
+    whatsappUrl: settings.whatsapp_url ?? settings.additional_settings?.whatsappUrl ?? null,
+    chatbotUrl: settings.chatbot_url ?? settings.additional_settings?.chatbotUrl ?? null,
     workingHours: settings.working_hours ?? {},
     seoDefaultTitle: settings.seo_default_title ?? null,
     seoDefaultDescription: settings.seo_default_description ?? null,

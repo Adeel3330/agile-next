@@ -35,25 +35,24 @@ export default function CreateBlogCategoryPage() {
 
   const fetchCategories = async () => {
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
-      if (!token) return;
-
-      const response = await fetch('/api/admin/blog-categories?limit=100', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await fetch('/api/categories');
 
       const data = await response.json();
       if (data.success && data.categories) {
-        // Only show parent categories (categories without a parent)
-        setCategories(data.categories
-          .filter((cat: any) => !cat.parentId && !cat.parent_id) // Only parents
-          .map((cat: any) => ({
-            id: cat._id || cat.id,
-            name: cat.name,
-            slug: cat.slug
-          })));
+        const allCategories = data.categories as any[];
+        const taxonomyRoots = allCategories.filter(
+          (cat) => cat.slug === 'service-categories' || cat.slug === 'blog-categories'
+        );
+        const taxonomyRootIds = new Set(taxonomyRoots.map((cat) => cat.id));
+        const directChildren = allCategories.filter((cat) => taxonomyRootIds.has(cat.parentId));
+
+        const options = [...taxonomyRoots, ...directChildren].map((cat) => ({
+          id: cat.id,
+          name: taxonomyRootIds.has(cat.parentId) ? `— ${cat.name}` : cat.name,
+          slug: cat.slug
+        }));
+
+        setCategories(options);
       }
     } catch (err) {
       console.error('Fetch categories error:', err);

@@ -175,8 +175,8 @@ export default function GoogleMapSection({ settings, loading = false }: GoogleMa
                     verticalAlign: 'middle'
                   }}></span>
                 ) : (
-                  <Link href={settings?.contactPhone ? `tel:${settings.contactPhone.replace(/\s/g, '')}` : 'tel:+123045615523'}>
-                    {settings?.contactPhone || '+1 (230)-456-155-23'}
+                  <Link href={settings?.contactPhone ? `tel:${settings.contactPhone.replace(/\s/g, '')}` : 'tel:+17276354993'}>
+                    {settings?.contactPhone || '+1(727) 635 4993'}
                   </Link>
                 )}
               </li>

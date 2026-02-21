@@ -21,6 +21,7 @@ import RevenueChallenges from "../../components/sections/home1/RevenueChallenges
 import BenefitsMedicalBilling from "../../components/sections/home1/BenefitsMedicalBilling";
 import WhyAgileSolutions from "../../components/sections/home1/WhyAgileSolutions";
 import EffortlessOnboarding from "../../components/sections/home1/EffortlessOnboarding";
+import DedicatedTeamPractice from "../../components/sections/home1/DedicatedTeamPractice";
 
 export default function Home() {
 
@@ -28,26 +29,29 @@ export default function Home() {
         <div className="boxed_wrapper">
             <Layout headerStyle={1} footerStyle={1}>
                 <Banner/>
+
                 <Contact_Info/>
                 <Certifications/>
                 <About/>
+              
                 <WhyAgileSolutions/>
                 <Service/>
-                <RevenueChallenges/>
-                <BenefitsMedicalBilling/>
-                
-                <EffortlessOnboarding/>
                 <Specialties/>
                 <Software/>
+                <RevenueChallenges/>
+                <BenefitsMedicalBilling/>
+                <DedicatedTeamPractice/>
+                {/* <Team/> */}
+                <EffortlessOnboarding/>
+                <FaqSection/>
+                {/* <News/> */}
+                <Testimonial/>
+              
                 {/* <Chooseus/> */}
                 {/* <Appointment/> */}
                 {/* <Working/> */}
                 {/* <About_Two/> */}
-                {/* <Team/> */}
                 {/* <Portfolio/> */}
-                <News/>
-                <FaqSection/>
-                <Testimonial/>
                 <GoogleMapSection/>
             </Layout>
         </div>

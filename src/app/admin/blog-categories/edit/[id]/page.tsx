@@ -54,28 +54,24 @@ export default function EditBlogCategoryPage() {
 
   const fetchCategories = async () => {
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
-      if (!token) return;
-
-      const response = await fetch(`/api/admin/blog-categories?limit=100`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await fetch('/api/categories');
 
       const data = await response.json();
       if (data.success && data.categories) {
-        // Only show parent categories (categories without a parent) and exclude current category
-        setCategories(data.categories
-          .filter((cat: any) => 
-            (cat._id || cat.id) !== id && // Exclude current category to prevent circular references
-            !cat.parentId && !cat.parent_id // Only show parent categories
-          )
-          .map((cat: any) => ({
-            id: cat._id || cat.id,
-            name: cat.name,
-            slug: cat.slug
-          })));
+        const allCategories = (data.categories as any[]).filter((cat) => cat.id !== id);
+        const taxonomyRoots = allCategories.filter(
+          (cat) => cat.slug === 'service-categories' || cat.slug === 'blog-categories'
+        );
+        const taxonomyRootIds = new Set(taxonomyRoots.map((cat) => cat.id));
+        const directChildren = allCategories.filter((cat) => taxonomyRootIds.has(cat.parentId));
+
+        const options = [...taxonomyRoots, ...directChildren].map((cat) => ({
+          id: cat.id,
+          name: taxonomyRootIds.has(cat.parentId) ? `— ${cat.name}` : cat.name,
+          slug: cat.slug
+        }));
+
+        setCategories(options);
       }
     } catch (err) {
       console.error('Fetch categories error:', err);

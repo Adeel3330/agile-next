@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import ToggleBodyClass from "../../components/elements/Togglebtn";
 import SwitcherMenu from "../../components/elements/ColorStyle";
+import FloatingChatWidgets from '../../components/elements/FloatingChatWidgets';
 
 export default function ClientLayoutWrapper() {
   const pathname = usePathname();
@@ -24,6 +25,7 @@ export default function ClientLayoutWrapper() {
     <>
       {/* <ToggleBodyClass /> */}
       {/* <SwitcherMenu /> */}
+      <FloatingChatWidgets />
     </>
   );
 }

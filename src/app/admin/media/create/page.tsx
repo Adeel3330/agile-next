@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -13,7 +13,8 @@ export default function CreateMediaPage() {
   const [error, setError] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [uploadedFileData, setUploadedFileData] = useState<any>(null);
-
+  const [availablePositions, setAvailablePositions] = useState<string[]>([]);
+  const [customPosition, setCustomPosition] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -26,6 +27,7 @@ export default function CreateMediaPage() {
 
   useEffect(() => {
     setMounted(true);
+    fetchPositions();
     
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('adminToken');
@@ -36,6 +38,28 @@ export default function CreateMediaPage() {
     }
   }, [router]);
 
+  const fetchPositions = useCallback(async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
+      if (!token) return;
+
+      const response = await fetch('/api/admin/media/positions', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.positions) {
+        setAvailablePositions(data.positions);
+      }
+    } catch (err) {
+      console.error('Fetch positions error:', err);
+    }
+  }, []);
+
+  
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -107,6 +131,13 @@ export default function CreateMediaPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    const normalizedPosition = formData.position === 'other' ? customPosition.trim() : formData.position;
+
+    if (!normalizedPosition) {
+      setError('Please provide a position');
+      return;
+    }
     
     if (!uploadedFileData) {
       setError('Please upload an image first');
@@ -124,6 +155,7 @@ export default function CreateMediaPage() {
 
       const submitData = {
         ...formData,
+        position: normalizedPosition,
         fileUrl: uploadedFileData.url,
         fileName: uploadedFileData.fileName,
         fileSize: uploadedFileData.fileSize,
@@ -206,15 +238,26 @@ export default function CreateMediaPage() {
                     onChange={(e) => setFormData({ ...formData, position: e.target.value as any })}
                     required
                   >
-                    <option value="home">Home</option>
-                    <option value="services">Services</option>
-                    <option value="about">About</option>
-                    <option value="contact">Contact</option>
-                    <option value="testimonials">Testimonials (doctor/client photo + quote)</option>
-                    <option value="cta">CTA</option>
-                    <option value="compliance">Compliance</option>
+                    <option value="">Select Position</option>
+                    {availablePositions
+                      .filter((position) => position !== 'other')
+                      .map((position) => (
+                        <option key={position} value={position}>
+                          {position.charAt(0).toUpperCase() + position.slice(1)}
+                        </option>
+                      ))}
                     <option value="other">Other</option>
                   </select>
+                  {formData.position === 'other' && (
+                    <input
+                      type="text"
+                      className="form-control mt-2"
+                      value={customPosition}
+                      onChange={(e) => setCustomPosition(e.target.value)}
+                      placeholder="Enter custom position"
+                      required
+                    />
+                  )}
                 </div>
 
                 <div className="col-md-4">

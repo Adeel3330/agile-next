@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
           contactEmail: null,
           contactPhone: null,
           contactAddress: null,
+          contactAddress2: null,
           contactCity: null,
           contactState: null,
           contactZip: null,
@@ -41,6 +42,8 @@ export async function GET(req: NextRequest) {
           socialLinkedin: null,
           socialYoutube: null,
           socialPinterest: null,
+          whatsappUrl: null,
+          chatbotUrl: null,
           workingHours: {},
           seoDefaultTitle: null,
           seoDefaultDescription: null,
@@ -74,6 +77,11 @@ export async function GET(req: NextRequest) {
       contactEmail: settings.contact_email,
       contactPhone: settings.contact_phone,
       contactAddress: settings.contact_address,
+      contactAddress2:
+        settings.contact_address_2 ||
+        settings.additional_settings?.contactAddress2 ||
+        settings.additional_settings?.contact_address_2 ||
+        null,
       contactCity: settings.contact_city,
       contactState: settings.contact_state,
       contactZip: settings.contact_zip,
@@ -84,6 +92,8 @@ export async function GET(req: NextRequest) {
       socialLinkedin: settings.social_linkedin,
       socialYoutube: settings.social_youtube,
       socialPinterest: settings.social_pinterest,
+      whatsappUrl: settings.whatsapp_url || settings.additional_settings?.whatsappUrl || null,
+      chatbotUrl: settings.chatbot_url || settings.additional_settings?.chatbotUrl || null,
       workingHours: settings.working_hours || {},
       seoDefaultTitle: settings.seo_default_title,
       seoDefaultDescription: settings.seo_default_description,

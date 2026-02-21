@@ -11,6 +11,7 @@ const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor')
 interface Category {
   _id: string;
   name: string;
+  parentId?: string | null;
 }
 
 export default function CreateServicePage() {
@@ -58,22 +59,54 @@ export default function CreateServicePage() {
 
   const fetchCategories = async () => {
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
-      if (!token) return;
-
-      // Fetch service categories from unified categories API (children of "service-categories" parent)
-      const response = await fetch('/api/categories/service-categories', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await fetch('/api/categories');
 
       const data = await response.json();
       if (data.success && data.categories) {
-        setCategories(data.categories.map((cat: any) => ({
-          _id: cat.id,
-          name: cat.name
-        })));
+        const allCategories = data.categories as any[];
+        const serviceRoot = allCategories.find((cat) => cat.slug === 'service-categories');
+
+        if (!serviceRoot) {
+          setCategories([]);
+          return;
+        }
+
+        const selectedIds = new Set<string>();
+        const queue = [serviceRoot.id];
+
+        while (queue.length > 0) {
+          const currentId = queue.shift() as string;
+          const children = allCategories.filter((cat) => cat.parentId === currentId);
+          for (const child of children) {
+            if (!selectedIds.has(child.id)) {
+              selectedIds.add(child.id);
+              queue.push(child.id);
+            }
+          }
+        }
+
+        const categoryMap = new Map(allCategories.map((cat) => [cat.id, cat]));
+        const getDepth = (category: any) => {
+          let depth = 0;
+          let parentId = category.parentId;
+          while (parentId && parentId !== serviceRoot.id) {
+            const parent = categoryMap.get(parentId);
+            if (!parent) break;
+            depth += 1;
+            parentId = parent.parentId;
+          }
+          return depth;
+        };
+
+        const options = allCategories
+          .filter((cat) => selectedIds.has(cat.id))
+          .map((cat) => ({
+            _id: cat.id,
+            name: `${'— '.repeat(getDepth(cat))}${cat.name}`,
+            parentId: cat.parentId || null,
+          }));
+
+        setCategories(options);
       }
     } catch (err) {
       console.error('Failed to fetch categories:', err);
