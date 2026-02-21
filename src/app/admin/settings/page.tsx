@@ -605,13 +605,100 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label">AI Chatbot URL</label>
-                    <input
-                      type="url"
+                    <label className="form-label">Talk.to Link</label>
+                    <textarea
                       className="form-control"
                       value={formData.chatbotUrl || ''}
                       onChange={(e) => setFormData({ ...formData, chatbotUrl: e.target.value })}
-                      placeholder="https://example.com/chatbot"
+                      rows={3}
+                      placeholder="Paste Talk.to URL or full widget embed script"
+                    />
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-md-6">
+                    <label className="form-label">WhatsApp Bot Phone Number</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.additionalSettings?.whatsappBotPhone || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        additionalSettings: {
+                          ...(formData.additionalSettings || {}),
+                          whatsappBotPhone: e.target.value
+                        }
+                      })}
+                      placeholder="e.g. 15551234567"
+                    />
+                    <small className="text-muted">Used by floating WhatsApp bot. Digits only recommended.</small>
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-md-6">
+                    <label className="form-label">WhatsApp Button 1 Label</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.additionalSettings?.whatsappBotButton1Label || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        additionalSettings: {
+                          ...(formData.additionalSettings || {}),
+                          whatsappBotButton1Label: e.target.value
+                        }
+                      })}
+                      placeholder="Billing Support"
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">WhatsApp Button 1 Message</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.additionalSettings?.whatsappBotButton1Message || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        additionalSettings: {
+                          ...(formData.additionalSettings || {}),
+                          whatsappBotButton1Message: e.target.value
+                        }
+                      })}
+                      placeholder="Hi, I need help with medical billing support."
+                    />
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-md-6">
+                    <label className="form-label">WhatsApp Button 2 Label</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.additionalSettings?.whatsappBotButton2Label || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        additionalSettings: {
+                          ...(formData.additionalSettings || {}),
+                          whatsappBotButton2Label: e.target.value
+                        }
+                      })}
+                      placeholder="Sales Inquiry"
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">WhatsApp Button 2 Message</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.additionalSettings?.whatsappBotButton2Message || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        additionalSettings: {
+                          ...(formData.additionalSettings || {}),
+                          whatsappBotButton2Message: e.target.value
+                        }
+                      })}
+                      placeholder="Hi, I want to discuss your medical billing services."
                     />
                   </div>
                 </div>

@@ -84,8 +84,8 @@ export async function GET(req: NextRequest) {
       socialLinkedin: settings.social_linkedin,
       socialYoutube: settings.social_youtube,
       socialPinterest: settings.social_pinterest,
-      whatsappUrl: settings.whatsapp_url,
-      chatbotUrl: settings.chatbot_url,
+      whatsappUrl: settings.whatsapp_url || settings.additional_settings?.whatsappUrl || null,
+      chatbotUrl: settings.chatbot_url || settings.additional_settings?.chatbotUrl || null,
       workingHours: settings.working_hours || {},
       seoDefaultTitle: settings.seo_default_title,
       seoDefaultDescription: settings.seo_default_description,
@@ -148,12 +148,14 @@ export async function PUT(req: NextRequest) {
       additionalSettings
     } = body;
 
-    // Check if settings exist
-    const { data: existing } = await supabaseAdmin
+    // Check if settings exist (pick first row safely)
+    const { data: existingRows } = await supabaseAdmin
       .from('settings')
       .select('id, additional_settings')
-      .limit(1)
-      .single();
+      .order('created_at', { ascending: true })
+      .limit(1);
+
+    const existing = Array.isArray(existingRows) && existingRows.length > 0 ? existingRows[0] : null;
 
     const updateData: any = {
       updated_at: new Date().toISOString()
@@ -175,8 +177,15 @@ export async function PUT(req: NextRequest) {
     if (socialLinkedin !== undefined) updateData.social_linkedin = socialLinkedin?.trim() || null;
     if (socialYoutube !== undefined) updateData.social_youtube = socialYoutube?.trim() || null;
     if (socialPinterest !== undefined) updateData.social_pinterest = socialPinterest?.trim() || null;
-    if (whatsappUrl !== undefined) updateData.whatsapp_url = whatsappUrl?.trim() || null;
-    if (chatbotUrl !== undefined) updateData.chatbot_url = chatbotUrl?.trim() || null;
+    const normalizedWhatsappUrl = whatsappUrl !== undefined ? whatsappUrl?.trim() || null : undefined;
+    const normalizedChatbotUrl = chatbotUrl !== undefined ? chatbotUrl?.trim() || null : undefined;
+
+    if (normalizedWhatsappUrl !== undefined) {
+      updateData.whatsapp_url = normalizedWhatsappUrl && normalizedWhatsappUrl.length <= 500 ? normalizedWhatsappUrl : null;
+    }
+    if (normalizedChatbotUrl !== undefined) {
+      updateData.chatbot_url = normalizedChatbotUrl && normalizedChatbotUrl.length <= 500 ? normalizedChatbotUrl : null;
+    }
     if (workingHours !== undefined) updateData.working_hours = workingHours || {};
     if (seoDefaultTitle !== undefined) updateData.seo_default_title = seoDefaultTitle?.trim() || null;
     if (seoDefaultDescription !== undefined) updateData.seo_default_description = seoDefaultDescription?.trim() || null;
@@ -184,51 +193,87 @@ export async function PUT(req: NextRequest) {
     if (seoDefaultImage !== undefined) updateData.seo_default_image = seoDefaultImage?.trim() || null;
     if (additionalSettings !== undefined) updateData.additional_settings = additionalSettings || {};
 
-    if (contactAddress2 !== undefined) {
+    if (
+      additionalSettings !== undefined ||
+      normalizedWhatsappUrl !== undefined ||
+      normalizedChatbotUrl !== undefined ||
+      contactAddress2 !== undefined
+    ) {
       const nextAdditional = {
-        ...(updateData.additional_settings || existing?.additional_settings || {}),
-        contactAddress2: contactAddress2?.trim() || null,
-        contact_address_2: contactAddress2?.trim() || null
-      };
+        ...(existing?.additional_settings || {}),
+        ...(updateData.additional_settings || {}),
+      } as any;
+
+      if (normalizedWhatsappUrl !== undefined) {
+        nextAdditional.whatsappUrl = normalizedWhatsappUrl;
+      }
+
+      if (normalizedChatbotUrl !== undefined) {
+        nextAdditional.chatbotUrl = normalizedChatbotUrl;
+      }
+
+      if (contactAddress2 !== undefined) {
+        nextAdditional.contactAddress2 = contactAddress2?.trim() || null;
+        nextAdditional.contact_address_2 = contactAddress2?.trim() || null;
+      }
+
       updateData.additional_settings = nextAdditional;
     }
 
-    let result;
-    if (existing) {
-      // Update existing settings
-      const { data: updated, error } = await supabaseAdmin
-        .from('settings')
-        .update(updateData)
-        .eq('id', existing.id)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Supabase error:', error);
-        return NextResponse.json(
-          { success: false, message: 'Failed to update settings' },
-          { status: 500 }
-        );
+    const executeSave = async (payload: any) => {
+      if (existing) {
+        return await supabaseAdmin
+          .from('settings')
+          .update(payload)
+          .eq('id', existing.id)
+          .select()
+          .single();
       }
 
-      result = updated;
-    } else {
-      // Create new settings record
-      const { data: created, error } = await supabaseAdmin
+      return await supabaseAdmin
         .from('settings')
-        .insert(updateData)
+        .insert(payload)
         .select()
         .single();
+    };
 
-      if (error) {
-        console.error('Supabase error:', error);
-        return NextResponse.json(
-          { success: false, message: 'Failed to create settings' },
-          { status: 500 }
-        );
+    const extractMissingColumn = (message: string) => {
+      const patterns = [
+        /Could not find the '([a-zA-Z0-9_]+)' column/i,
+        /column\s+"([a-zA-Z0-9_]+)"/i,
+        /column\s+'([a-zA-Z0-9_]+)'/i,
+        /column\s+([a-zA-Z0-9_]+)\s+does not exist/i
+      ];
+
+      for (const pattern of patterns) {
+        const match = message.match(pattern);
+        if (match?.[1]) return match[1];
       }
 
-      result = created;
+      return null;
+    };
+
+    let payload = { ...updateData };
+    let { data: result, error: saveError } = await executeSave(payload);
+
+    for (let i = 0; i < 8 && saveError; i++) {
+      const missingColumn = extractMissingColumn(String(saveError.message || ''));
+      if (!missingColumn || !(missingColumn in payload)) {
+        break;
+      }
+
+      delete payload[missingColumn];
+      const retryResult = await executeSave(payload);
+      result = retryResult.data;
+      saveError = retryResult.error;
+    }
+
+    if (saveError || !result) {
+      console.error('Supabase error:', saveError);
+      return NextResponse.json(
+        { success: false, message: saveError?.message || 'Failed to update settings' },
+        { status: 500 }
+      );
     }
 
     // Map response back to frontend format
@@ -252,8 +297,8 @@ export async function PUT(req: NextRequest) {
       socialLinkedin: result.social_linkedin,
       socialYoutube: result.social_youtube,
       socialPinterest: result.social_pinterest,
-      whatsappUrl: result.whatsapp_url,
-      chatbotUrl: result.chatbot_url,
+      whatsappUrl: result.whatsapp_url || result.additional_settings?.whatsappUrl || null,
+      chatbotUrl: result.chatbot_url || result.additional_settings?.chatbotUrl || null,
       workingHours: result.working_hours || {},
       seoDefaultTitle: result.seo_default_title,
       seoDefaultDescription: result.seo_default_description,
@@ -275,7 +320,7 @@ export async function PUT(req: NextRequest) {
   } catch (error) {
     console.error('Update settings error:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to update settings' },
+      { success: false, message: error instanceof Error ? error.message : 'Failed to update settings' },
       { status: 500 }
     );
   }
