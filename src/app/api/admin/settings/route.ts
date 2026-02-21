@@ -70,6 +70,7 @@ export async function GET(req: NextRequest) {
       contactPhone: settings.contact_phone,
       contactAddress: settings.contact_address,
       contactAddress2:
+        settings.contact_address_2 ||
         settings.additional_settings?.contactAddress2 ||
         settings.additional_settings?.contact_address_2 ||
         null,
@@ -163,6 +164,7 @@ export async function PUT(req: NextRequest) {
     if (contactEmail !== undefined) updateData.contact_email = contactEmail?.trim() || null;
     if (contactPhone !== undefined) updateData.contact_phone = contactPhone?.trim() || null;
     if (contactAddress !== undefined) updateData.contact_address = contactAddress?.trim() || null;
+    if (contactAddress2 !== undefined) updateData.contact_address_2 = contactAddress2?.trim() || null;
     if (contactCity !== undefined) updateData.contact_city = contactCity?.trim() || null;
     if (contactState !== undefined) updateData.contact_state = contactState?.trim() || null;
     if (contactZip !== undefined) updateData.contact_zip = contactZip?.trim() || null;
@@ -236,6 +238,7 @@ export async function PUT(req: NextRequest) {
       contactPhone: result.contact_phone,
       contactAddress: result.contact_address,
       contactAddress2:
+        result.contact_address_2 ||
         result.additional_settings?.contactAddress2 ||
         result.additional_settings?.contact_address_2 ||
         null,

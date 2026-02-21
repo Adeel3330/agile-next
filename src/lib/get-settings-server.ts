@@ -59,6 +59,7 @@ export async function getSettingsForServer(): Promise<SettingsForServer> {
     contactPhone: settings.contact_phone ?? null,
     contactAddress: settings.contact_address ?? null,
     contactAddress2:
+      settings.contact_address_2 ??
       settings.additional_settings?.contactAddress2 ??
       settings.additional_settings?.contact_address_2 ??
       null,

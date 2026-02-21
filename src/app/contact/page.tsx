@@ -150,15 +150,39 @@ export default function ContactPage() {
 
   const formatAddress = () => {
     if (!settings) return '2972 Westheimer Rd. Santa Ana, Illinois 85486';
-    const parts = [
-      settings.contactAddress,
-      settings.contactAddress2,
+
+    const addressLine1 = settings.contactAddress?.trim();
+    const addressLine2 = settings.contactAddress2?.trim();
+    const locationLine = [
       settings.contactCity,
       settings.contactState,
       settings.contactZip,
       settings.contactCountry
-    ].filter(Boolean);
-    return parts.length > 0 ? parts.join(', ') : '2972 Westheimer Rd. Santa Ana, Illinois 85486';
+    ]
+      .filter(Boolean)
+      .join(', ');
+
+    if (!addressLine1 && !addressLine2 && !locationLine) {
+      return '2972 Westheimer Rd. Santa Ana, Illinois 85486';
+    }
+
+    return (
+      <>
+        {addressLine1 ? (
+          <>
+            {addressLine1}     {locationLine ? locationLine : null}
+            <br />
+          </>
+        ) : null}
+        {addressLine2 ? (
+          <>
+            {addressLine2}
+            <br />
+          </>
+        ) : null}
+
+      </>
+    );
   };
 
   const formatWorkingHours = () => {

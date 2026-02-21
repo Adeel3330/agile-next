@@ -78,6 +78,7 @@ export async function GET(req: NextRequest) {
       contactPhone: settings.contact_phone,
       contactAddress: settings.contact_address,
       contactAddress2:
+        settings.contact_address_2 ||
         settings.additional_settings?.contactAddress2 ||
         settings.additional_settings?.contact_address_2 ||
         null,

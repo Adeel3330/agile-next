@@ -29,8 +29,11 @@ export default function Home() {
         <div className="boxed_wrapper">
             <Layout headerStyle={1} footerStyle={1}>
                 <Banner/>
+
                 <Contact_Info/>
+                    <Certifications/>
                 <About/>
+              
                 <WhyAgileSolutions/>
                 <Service/>
                 <Specialties/>
@@ -38,12 +41,12 @@ export default function Home() {
                 <RevenueChallenges/>
                 <BenefitsMedicalBilling/>
                 <DedicatedTeamPractice/>
-                <Team/>
+                {/* <Team/> */}
                 <EffortlessOnboarding/>
                 <FaqSection/>
-                <News/>
+                {/* <News/> */}
                 <Testimonial/>
-                <Certifications/>
+              
                 {/* <Chooseus/> */}
                 {/* <Appointment/> */}
                 {/* <Working/> */}
