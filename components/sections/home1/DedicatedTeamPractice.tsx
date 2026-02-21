@@ -72,7 +72,7 @@ export default function DedicatedTeamPractice() {
 
   const parsedListItems = useMemo(() => {
     if (!pageData?.content) return [] as string[];
-    const matches = Array.from(pageData.content.matchAll(/<li[^>]*>(.*?)<\/li>/gis));
+    const matches = Array.from(pageData.content.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi));
     return matches
       .map((match) => match[1].replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim())
       .filter(Boolean);

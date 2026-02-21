@@ -50,7 +50,7 @@ export default function RevenueChallenges() {
 
   const parseChallengesFromContent = (html?: string): string[] => {
     if (!html) return [];
-    const matches = Array.from(html.matchAll(/<li[^>]*>(.*?)<\/li>/gis));
+    const matches = Array.from(html.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi));
     return matches
       .map((match) => match[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim())
       .filter(Boolean);
