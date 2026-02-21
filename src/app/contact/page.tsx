@@ -29,6 +29,7 @@ interface Settings {
   contactEmail?: string;
   contactPhone?: string;
   contactAddress?: string;
+  contactAddress2?: string;
   contactCity?: string;
   contactState?: string;
   contactZip?: string;
@@ -151,6 +152,7 @@ export default function ContactPage() {
     if (!settings) return '2972 Westheimer Rd. Santa Ana, Illinois 85486';
     const parts = [
       settings.contactAddress,
+      settings.contactAddress2,
       settings.contactCity,
       settings.contactState,
       settings.contactZip,

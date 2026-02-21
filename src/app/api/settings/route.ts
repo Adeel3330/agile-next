@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
           contactEmail: null,
           contactPhone: null,
           contactAddress: null,
+          contactAddress2: null,
           contactCity: null,
           contactState: null,
           contactZip: null,
@@ -76,6 +77,10 @@ export async function GET(req: NextRequest) {
       contactEmail: settings.contact_email,
       contactPhone: settings.contact_phone,
       contactAddress: settings.contact_address,
+      contactAddress2:
+        settings.additional_settings?.contactAddress2 ||
+        settings.additional_settings?.contact_address_2 ||
+        null,
       contactCity: settings.contact_city,
       contactState: settings.contact_state,
       contactZip: settings.contact_zip,

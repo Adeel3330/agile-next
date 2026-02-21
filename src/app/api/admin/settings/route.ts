@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
             contactEmail: null,
             contactPhone: null,
             contactAddress: null,
+            contactAddress2: null,
             contactCity: null,
             contactState: null,
             contactZip: null,
@@ -68,6 +69,10 @@ export async function GET(req: NextRequest) {
       contactEmail: settings.contact_email,
       contactPhone: settings.contact_phone,
       contactAddress: settings.contact_address,
+      contactAddress2:
+        settings.additional_settings?.contactAddress2 ||
+        settings.additional_settings?.contact_address_2 ||
+        null,
       contactCity: settings.contact_city,
       contactState: settings.contact_state,
       contactZip: settings.contact_zip,
@@ -121,6 +126,7 @@ export async function PUT(req: NextRequest) {
       contactEmail,
       contactPhone,
       contactAddress,
+      contactAddress2,
       contactCity,
       contactState,
       contactZip,
@@ -144,7 +150,7 @@ export async function PUT(req: NextRequest) {
     // Check if settings exist
     const { data: existing } = await supabaseAdmin
       .from('settings')
-      .select('id')
+      .select('id, additional_settings')
       .limit(1)
       .single();
 
@@ -175,6 +181,15 @@ export async function PUT(req: NextRequest) {
     if (seoDefaultKeywords !== undefined) updateData.seo_default_keywords = seoDefaultKeywords?.trim() || null;
     if (seoDefaultImage !== undefined) updateData.seo_default_image = seoDefaultImage?.trim() || null;
     if (additionalSettings !== undefined) updateData.additional_settings = additionalSettings || {};
+
+    if (contactAddress2 !== undefined) {
+      const nextAdditional = {
+        ...(updateData.additional_settings || existing?.additional_settings || {}),
+        contactAddress2: contactAddress2?.trim() || null,
+        contact_address_2: contactAddress2?.trim() || null
+      };
+      updateData.additional_settings = nextAdditional;
+    }
 
     let result;
     if (existing) {
@@ -220,6 +235,10 @@ export async function PUT(req: NextRequest) {
       contactEmail: result.contact_email,
       contactPhone: result.contact_phone,
       contactAddress: result.contact_address,
+      contactAddress2:
+        result.additional_settings?.contactAddress2 ||
+        result.additional_settings?.contact_address_2 ||
+        null,
       contactCity: result.contact_city,
       contactState: result.contact_state,
       contactZip: result.contact_zip,

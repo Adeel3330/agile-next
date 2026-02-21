@@ -58,13 +58,20 @@ export default function EditBlogCategoryPage() {
 
       const data = await response.json();
       if (data.success && data.categories) {
-        setCategories(data.categories
-          .filter((cat: any) => cat.id !== id && !cat.parentId)
-          .map((cat: any) => ({
-            id: cat.id,
-            name: cat.name,
-            slug: cat.slug
-          })));
+        const allCategories = (data.categories as any[]).filter((cat) => cat.id !== id);
+        const taxonomyRoots = allCategories.filter(
+          (cat) => cat.slug === 'service-categories' || cat.slug === 'blog-categories'
+        );
+        const taxonomyRootIds = new Set(taxonomyRoots.map((cat) => cat.id));
+        const directChildren = allCategories.filter((cat) => taxonomyRootIds.has(cat.parentId));
+
+        const options = [...taxonomyRoots, ...directChildren].map((cat) => ({
+          id: cat.id,
+          name: taxonomyRootIds.has(cat.parentId) ? `— ${cat.name}` : cat.name,
+          slug: cat.slug
+        }));
+
+        setCategories(options);
       }
     } catch (err) {
       console.error('Fetch categories error:', err);

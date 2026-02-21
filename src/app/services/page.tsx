@@ -14,6 +14,19 @@ interface Service {
   slug: string;
   description?: string;
   imageUrl?: string;
+  categoryId?: string;
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  parentId?: string | null;
 }
 
 interface PageData {
@@ -37,6 +50,7 @@ export default function ServicesPage() {
 
   const [mounted, setMounted] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [pageData, setPageData] = useState<PageData | null>(null);
 
@@ -80,12 +94,97 @@ export default function ServicesPage() {
     }
   }, [categorySlug]);
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await fetch('/api/categories');
+      const data = await response.json();
+      if (data.success && data.categories) {
+        setCategories(data.categories);
+      }
+    } catch (err) {
+      console.error('Failed to fetch categories:', err);
+    }
+  }, []);
+
   useEffect(() => {
     if (mounted) {
       fetchPageData();
       fetchServices();
+      fetchCategories();
     }
-  }, [mounted, fetchPageData, fetchServices]);
+  }, [mounted, fetchPageData, fetchServices, fetchCategories]);
+
+  const serviceRoot = categories.find((category) => category.slug === 'service-categories');
+  const serviceCategories = serviceRoot
+    ? categories.filter((category) => category.parentId === serviceRoot.id)
+    : [];
+
+  const selectedCategory = categorySlug
+    ? categories.find((category) => category.slug === categorySlug)
+    : null;
+
+  const getDescendantIds = (parentId: string) => {
+    const ids = new Set<string>([parentId]);
+    const queue = [parentId];
+
+    while (queue.length > 0) {
+      const currentId = queue.shift() as string;
+      const children = categories.filter((category) => category.parentId === currentId);
+
+      for (const child of children) {
+        if (!ids.has(child.id)) {
+          ids.add(child.id);
+          queue.push(child.id);
+        }
+      }
+    }
+
+    return ids;
+  };
+
+  const groupedServices = (() => {
+    if (services.length === 0) return [] as Array<{ id: string; title: string; services: Service[] }>;
+
+    if (!selectedCategory) {
+      return serviceCategories
+        .map((category) => {
+          const ids = getDescendantIds(category.id);
+          const items = services.filter((service) => service.categoryId && ids.has(service.categoryId));
+
+          return {
+            id: category.id,
+            title: category.name,
+            services: items
+          };
+        })
+        .filter((group) => group.services.length > 0);
+    }
+
+    const directSubcategories = categories.filter((category) => category.parentId === selectedCategory.id);
+
+    if (directSubcategories.length > 0) {
+      return directSubcategories
+        .map((subcategory) => {
+          const ids = getDescendantIds(subcategory.id);
+          const items = services.filter((service) => service.categoryId && ids.has(service.categoryId));
+
+          return {
+            id: subcategory.id,
+            title: subcategory.name,
+            services: items
+          };
+        })
+        .filter((group) => group.services.length > 0);
+    }
+
+    return [
+      {
+        id: selectedCategory.id,
+        title: selectedCategory.name,
+        services
+      }
+    ];
+  })();
 
   if (!mounted) {
     return null;
@@ -119,7 +218,11 @@ export default function ServicesPage() {
 
             <div className="sec-title mb_40">
               <span className="sub-title mb_5">Detailed Service Modules</span>
-              <h3>Explore Service Details</h3>
+              <h3>
+                {selectedCategory
+                  ? `Services in ${selectedCategory.name}`
+                  : 'All Services by Category'}
+              </h3>
             </div>
 
             {loading ? (
@@ -138,51 +241,65 @@ export default function ServicesPage() {
               <div className="text-center py-5">
                 <p className="text-muted">No services available at the moment.</p>
               </div>
+            ) : groupedServices.length === 0 ? (
+              <div className="text-center py-5">
+                <p className="text-muted">No services found for this category.</p>
+              </div>
             ) : (
-              <div className="row clearfix">
-                {services.map((service) => (
-                  <div key={service.id} className="col-lg-4 col-md-6 col-sm-12 service-block">
-                    <div className="service-block-one">
-                      <div className="inner-box">
-                        <figure className="image-box">
-                          <Link href={`/services/${service.slug}`}>
-                            {service.imageUrl ? (
-                              <Image
-                                src={getCloudinaryImageUrl(service.imageUrl)}
-                                alt={service.title}
-                                width={416}
-                                height={358}
-                                style={{ objectFit: 'cover' }}
-                              />
-                            ) : (
-                              <Image
-                                src="/assets/images/service/service-1.jpg"
-                                alt={service.title}
-                                width={416}
-                                height={358}
-                              />
-                            )}
-                          </Link>
-                        </figure>
-                        <div className="lower-content">
-                          <div className="inner">
-                            <h3>
-                              <Link href={`/services/${service.slug}`}>{service.title}</Link>
-                            </h3>
-                            <p>
-                              {service.description
-                                ? service.description.length > 120
-                                  ? `${service.description.slice(0, 120)}...`
-                                  : service.description
-                                : 'Professional service module with detailed backend-managed content.'}
-                            </p>
+              <>
+                {groupedServices.map((group) => (
+                  <div key={group.id} className="mb_55">
+                    <div className="sec-title mb_25">
+                      <h3>{group.title}</h3>
+                    </div>
+
+                    <div className="row clearfix">
+                      {group.services.map((service) => (
+                        <div key={service.id} className="col-lg-4 col-md-6 col-sm-12 service-block">
+                          <div className="service-block-one">
+                            <div className="inner-box">
+                              <figure className="image-box">
+                                <Link href={`/services/${service.slug}`}>
+                                  {service.imageUrl ? (
+                                    <Image
+                                      src={getCloudinaryImageUrl(service.imageUrl)}
+                                      alt={service.title}
+                                      width={416}
+                                      height={358}
+                                      style={{ objectFit: 'cover' }}
+                                    />
+                                  ) : (
+                                    <Image
+                                      src="/assets/images/service/service-1.jpg"
+                                      alt={service.title}
+                                      width={416}
+                                      height={358}
+                                    />
+                                  )}
+                                </Link>
+                              </figure>
+                              <div className="lower-content">
+                                <div className="inner">
+                                  <h3>
+                                    <Link href={`/services/${service.slug}`}>{service.title}</Link>
+                                  </h3>
+                                  <p>
+                                    {service.description
+                                      ? service.description.length > 120
+                                        ? `${service.description.slice(0, 120)}...`
+                                        : service.description
+                                      : 'Professional service module with detailed backend-managed content.'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 ))}
-              </div>
+              </>
             )}
           </div>
         </section>

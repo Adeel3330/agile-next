@@ -13,6 +13,7 @@ interface Settings {
   contactEmail?: string;
   contactPhone?: string;
   contactAddress?: string;
+  contactAddress2?: string;
   contactCity?: string;
   contactState?: string;
   contactZip?: string;
@@ -59,6 +60,7 @@ export default function SettingsPage() {
     contactEmail: '',
     contactPhone: '',
     contactAddress: '',
+    contactAddress2: '',
     contactCity: '',
     contactState: '',
     contactZip: '',
@@ -465,6 +467,18 @@ export default function SettingsPage() {
                       value={formData.contactAddress || ''}
                       onChange={(e) => setFormData({ ...formData, contactAddress: e.target.value })}
                       placeholder="Street address"
+                    />
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-md-12">
+                    <label className="form-label">Address 2</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.contactAddress2 || ''}
+                      onChange={(e) => setFormData({ ...formData, contactAddress2: e.target.value })}
+                      placeholder="Suite, floor, building, landmark (optional)"
                     />
                   </div>
                 </div>

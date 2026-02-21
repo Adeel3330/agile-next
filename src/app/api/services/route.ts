@@ -23,16 +23,32 @@ export async function GET(req: NextRequest) {
 
     // Filter by category if provided
     if (category && typeof category === 'string' && category.trim().length > 0) {
-      // First, get category ID from slug
-      const { data: categoryData } = await supabaseAdmin
+      const { data: allCategories } = await supabaseAdmin
         .from('blog_categories')
-        .select('id')
-        .eq('slug', category.trim())
-        .is('deleted_at', null)
-        .maybeSingle();
+        .select('id, slug, parent_id')
+        .is('deleted_at', null);
 
-      if (categoryData) {
-        query = query.eq('category_id', categoryData.id);
+      const selectedCategory = (allCategories || []).find(
+        (item: any) => item.slug === category.trim()
+      );
+
+      if (selectedCategory) {
+        const categoryIds = new Set<string>([selectedCategory.id]);
+        const queue = [selectedCategory.id];
+
+        while (queue.length > 0) {
+          const currentId = queue.shift() as string;
+          const children = (allCategories || []).filter((item: any) => item.parent_id === currentId);
+
+          for (const child of children) {
+            if (!categoryIds.has(child.id)) {
+              categoryIds.add(child.id);
+              queue.push(child.id);
+            }
+          }
+        }
+
+        query = query.in('category_id', Array.from(categoryIds));
       }
     }
 

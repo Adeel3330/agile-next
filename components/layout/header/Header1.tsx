@@ -95,11 +95,13 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
       });
   }, []);
 
-  const rootCategories = categories.filter((category) => !category.parentId);
+  const serviceRoot = categories.find((category) => category.slug === 'service-categories');
+  const serviceCategories = serviceRoot
+    ? categories.filter((category) => category.parentId === serviceRoot.id)
+    : [];
 
-  const getSubcategories = (parentId: string) => {
-    return categories.filter((category) => category.parentId === parentId);
-  };
+  const getSubcategories = (parentId: string) =>
+    categories.filter((category) => category.parentId === parentId);
 
   const formatWorkingHours = () => {
     if (!settings?.workingHours) return 'Mon - Fri: 9:00am to 6:00pm';
@@ -276,25 +278,25 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           </li>
                         </ul> */}
                       </li>
-                      <li className={`dropdown ${isActive('/blog') ? "current" : ""}`}>
-                        <Link href="/blog">Categories</Link>
+                      <li className={`dropdown ${isActive('/services') ? "current" : ""}`}>
+                        <Link href="/services">Services</Link>
                         <ul>
-                          {rootCategories.length > 0 ? (
+                          {serviceCategories.length > 0 ? (
                             <>
-                              {rootCategories.map((category) => {
+                              {serviceCategories.map((category) => {
                                 const subcategories = getSubcategories(category.id);
-                                const isCategoryActive = isActive(`/blog?category=${category.slug}`) || pathname === '/blog';
+                                const isCategoryActive = pathname === '/services';
 
                                 return (
                                   <li key={category.id} className={`${subcategories.length > 0 ? "dropdown" : ""} ${isCategoryActive ? "current" : ""}`}>
-                                    <Link href={`/blog?category=${category.slug}`}>
+                                    <Link href={`/services?category=${category.slug}`}>
                                       {category.name}
                                     </Link>
                                     {subcategories.length > 0 && (
                                       <ul className="submenu">
                                         {subcategories.map((subcategory) => (
                                           <li key={subcategory.id}>
-                                            <Link href={`/blog?category=${subcategory.slug}`}>
+                                            <Link href={`/services?category=${subcategory.slug}`}>
                                               {subcategory.name}
                                             </Link>
                                           </li>
@@ -307,7 +309,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                             </>
                           ) : (
                             <li>
-                              <Link href="/blog">All Categories</Link>
+                              <Link href="/services">All Services</Link>
                             </li>
                           )}
                         </ul>
@@ -427,24 +429,24 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                           </li>
                         </ul> */}
                       </li>
-                      <li className={`dropdown ${isActive('/blog') ? "current" : ""}`}>
-                        <Link href="/blog">Categories</Link>
+                      <li className={`dropdown ${isActive('/services') ? "current" : ""}`}>
+                        <Link href="/services">Services</Link>
                         <ul>
-                          {rootCategories.length > 0 ? (
+                          {serviceCategories.length > 0 ? (
                             <>
-                              {rootCategories.map((category) => {
+                              {serviceCategories.map((category) => {
                                 const subcategories = getSubcategories(category.id);
 
                                 return (
                                   <li key={category.id} className={subcategories.length > 0 ? "dropdown" : ""}>
-                                    <Link href={`/blog?category=${category.slug}`}>
+                                    <Link href={`/services?category=${category.slug}`}>
                                       {category.name}
                                     </Link>
                                     {subcategories.length > 0 && (
                                       <ul className="submenu">
                                         {subcategories.map((subcategory) => (
                                           <li key={subcategory.id}>
-                                            <Link href={`/blog?category=${subcategory.slug}`}>
+                                            <Link href={`/services?category=${subcategory.slug}`}>
                                               {subcategory.name}
                                             </Link>
                                           </li>
@@ -457,7 +459,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                             </>
                           ) : (
                             <li>
-                              <Link href="/blog">All Categories</Link>
+                              <Link href="/services">All Services</Link>
                             </li>
                           )}
                         </ul>
