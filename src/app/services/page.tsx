@@ -47,6 +47,7 @@ const coreOfferings = [
 export default function ServicesPage() {
   const searchParams = useSearchParams();
   const categorySlug = searchParams.get('category');
+  const hasCategoryParam = Boolean(categorySlug);
 
   const [mounted, setMounted] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
@@ -73,10 +74,7 @@ export default function ServicesPage() {
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
-      let apiUrl = '/api/services?limit=100';
-      if (categorySlug) {
-        apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
-      }
+      const apiUrl = '/api/services?limit=100';
 
       const response = await fetch(apiUrl);
       const data = await response.json();
@@ -92,7 +90,7 @@ export default function ServicesPage() {
     } finally {
       setLoading(false);
     }
-  }, [categorySlug]);
+  }, []);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -193,7 +191,7 @@ export default function ServicesPage() {
   return (
     <div className="boxed_wrapper">
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Our Services">
-        <section className="service-page-section p_relative pt_100 pb_70">
+        <section className="service-page-section p_relative pt_100 pb_70 services-safe-grid">
           <div className="auto-container">
             <div className="sec-title centred mb_55">
               <span className="sub-title mb_5">Our Services</span>
@@ -219,9 +217,7 @@ export default function ServicesPage() {
             <div className="sec-title mb_40">
               <span className="sub-title mb_5">Detailed Service Modules</span>
               <h3>
-                {selectedCategory
-                  ? `Services in ${selectedCategory.name}`
-                  : 'All Services by Category'}
+                {hasCategoryParam ? 'All Services' : 'All Services by Category'}
               </h3>
             </div>
 
@@ -240,6 +236,51 @@ export default function ServicesPage() {
             ) : services.length === 0 ? (
               <div className="text-center py-5">
                 <p className="text-muted">No services available at the moment.</p>
+              </div>
+            ) : hasCategoryParam ? (
+              <div className="row clearfix">
+                {services.map((service) => (
+                  <div key={service.id} className="col-lg-4 col-md-6 col-sm-12 service-block">
+                    <div className="service-block-one">
+                      <div className="inner-box">
+                        <figure className="image-box">
+                          <Link href={`/services/${service.slug}`}>
+                            {service.imageUrl ? (
+                              <Image
+                                src={getCloudinaryImageUrl(service.imageUrl)}
+                                alt={service.title}
+                                width={416}
+                                height={358}
+                                style={{ objectFit: 'cover' }}
+                              />
+                            ) : (
+                              <Image
+                                src="/assets/images/service/service-1.jpg"
+                                alt={service.title}
+                                width={416}
+                                height={358}
+                              />
+                            )}
+                          </Link>
+                        </figure>
+                        <div className="lower-content">
+                          <div className="inner">
+                            <h3>
+                              <Link href={`/services/${service.slug}`}>{service.title}</Link>
+                            </h3>
+                            <p>
+                              {service.description
+                                ? service.description.length > 120
+                                  ? `${service.description.slice(0, 120)}...`
+                                  : service.description
+                                : 'Professional service module with detailed backend-managed content.'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : groupedServices.length === 0 ? (
               <div className="text-center py-5">
@@ -302,6 +343,47 @@ export default function ServicesPage() {
               </>
             )}
           </div>
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+                .services-safe-grid .service-block-one .inner-box {
+                  padding-bottom: 0;
+                  border-radius: 14px;
+                  overflow: hidden;
+                  background: #fff;
+                  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+                }
+                .services-safe-grid .service-block-one .inner-box .image-box,
+                .services-safe-grid .service-block-one .inner-box .image-box img {
+                  border-radius: 0;
+                }
+                .services-safe-grid .service-block-one .inner-box:hover .image-box img {
+                  transform: none !important;
+                }
+                .services-safe-grid .service-block-one .inner-box .lower-content {
+                  position: static;
+                  width: 100%;
+                  height: auto;
+                  border: 0;
+                  border-radius: 0;
+                  box-shadow: none;
+                  background: #fff;
+                  padding: 20px 18px;
+                  display: block;
+                  text-align: left;
+                }
+                .services-safe-grid .service-block-one .inner-box .lower-content:before {
+                  display: none;
+                }
+                .services-safe-grid .service-block-one .inner-box:hover .lower-content,
+                .services-safe-grid .service-block-one .inner-box:hover .lower-content h3 a,
+                .services-safe-grid .service-block-one .inner-box:hover .lower-content p {
+                  color: inherit;
+                  border-color: transparent;
+                }
+              `,
+            }}
+          />
         </section>
         <Cta />
       </Layout>
