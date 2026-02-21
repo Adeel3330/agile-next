@@ -269,14 +269,14 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                       </li>
                       <li className={`dropdown ${isActive('/about') ? "current" : ""}`}>
                         <Link href="/about">About Us</Link>
-                        {/* <ul>
+                        <ul>
                           <li>
-                            <Link href="/about">About Agile Nexus Solutions</Link>
+                            <Link href="/about?view=all">About Agile Nexus Solutions</Link>
                           </li>
                           <li>
-                            <Link href="/about#leadership">Leadership</Link>
+                            <Link href="/about?view=team#our-teams">Our Teams</Link>
                           </li>
-                        </ul> */}
+                        </ul>
                       </li>
                       <li className={`dropdown ${isActive('/services') ? "current" : ""}`}>
                         <Link href="/services">Services</Link>
@@ -420,14 +420,14 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                       </li>
                       <li className={`dropdown ${isActive('/about') ? "current" : ""}`}>
                         <Link href="/about">About Us</Link>
-                        {/* <ul>
+                        <ul>
                           <li>
-                            <Link href="/about">About Agile Nexus Soits lutions</Link>
+                            <Link href="/about?view=all">About Agile Nexus Solutions</Link>
                           </li>
                           <li>
-                            <Link href="/about#leadership">Leadership</Link>
+                            <Link href="/about?view=team#our-teams">Our Teams</Link>
                           </li>
-                        </ul> */}
+                        </ul>
                       </li>
                       <li className={`dropdown ${isActive('/services') ? "current" : ""}`}>
                         <Link href="/services">Services</Link>

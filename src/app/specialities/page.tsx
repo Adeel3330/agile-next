@@ -91,38 +91,19 @@ export default function SpecialitiesPage() {
             )}
 
             {loading ? (
-              <div className="row clearfix">
+              <div className="row clearfix justify-content-center">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="col-lg-3 col-md-6 col-sm-12 chooseus-block">
-                    <div className="chooseus-block-one">
-                      <div className="inner-box">
-                        <div className="icon-box">
-                          <div className="icon">
-                            <div
-                              className="skeleton"
-                              style={{
-                                width: '60px',
-                                height: '60px',
-                                borderRadius: '50%',
-                                background: '#e0e0e0',
-                                animation: 'pulse 1.5s ease-in-out infinite',
-                              }}
-                            />
-                          </div>
-                          <span className="count-text">0{i}</span>
-                        </div>
-                        <div
-                          className="skeleton"
-                          style={{
-                            width: '70%',
-                            height: '20px',
-                            marginTop: '10px',
-                            borderRadius: '4px',
-                            background: '#e0e0e0',
-                          }}
-                        />
-                      </div>
-                    </div>
+                  <div key={i} className="col-lg-3 col-md-4 col-sm-6">
+                    <div
+                      className="skeleton"
+                      style={{
+                        height: '140px',
+                        margin: '0 10px 20px',
+                        borderRadius: '12px',
+                        background: '#e0e0e0',
+                        animation: 'pulse 1.5s ease-in-out infinite',
+                      }}
+                    />
                   </div>
                 ))}
               </div>
@@ -130,28 +111,42 @@ export default function SpecialitiesPage() {
               <div className="row clearfix">
                 {items.map((item) => {
                   const inner = (
-                    <div className="chooseus-block-one">
-                      <div className="inner-box">
-                        <div className="icon-box">
-                          <div className="icon">
-                            <Image
-                              src={getCloudinaryImageUrl(item.fileUrl)}
-                              alt={item.altText || item.title || 'Specialty'}
-                              width={80}
-                              height={80}
-                              style={{
-                                objectFit: 'cover',
-                                borderRadius: '50%',
-                                width: '80px',
-                                height: '80px',
-                              }}
-                            />
-                          </div>
-                        </div>
-                        <div className="text">
-                          <h3>{item.title}</h3>
-                        </div>
+                    <div
+                      className="specialty-simple-card"
+                      style={{
+                        textAlign: 'center',
+                        padding: '24px 16px',
+                        marginBottom: '20px',
+                        background: '#fff',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                        transition: 'all 0.3s ease',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '100%',
+                          maxWidth: '100px',
+                          height: '80px',
+                          position: 'relative',
+                          margin: '0 auto 12px',
+                        }}
+                      >
+                        <Image
+                          src={getCloudinaryImageUrl(item.fileUrl)}
+                          alt={item.altText || item.title || 'Specialty'}
+                          fill
+                          style={{ objectFit: 'contain' }}
+                        />
                       </div>
+                      {item.title && (
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#555' }}>{item.title}</span>
+                      )}
                     </div>
                   );
 
@@ -192,66 +187,9 @@ export default function SpecialitiesPage() {
             dangerouslySetInnerHTML={{
               __html: `
                 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-                .chooseus-block-one .inner-box {
-                  background: #fff;
-                  padding: 30px 25px;
-                  border-radius: 10px;
-                  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-                  height: 100%;
-                  transition: all 0.3s ease;
-                }
-                .chooseus-block-one .inner-box .icon-box {
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  justify-content: center;
-                  gap: 10px;
-                  margin-bottom: 10px;
-                  left: 0px !important;
-                }
-                .chooseus-block-one .inner-box .text {
-                  text-align: center;
-                  left: 0px !important;
-                  position: relative;
-                  left: 62px !important;
-                  width: 200px;
-                }
-                .chooseus-block-one .inner-box .text h3 {
-                  margin-bottom: 0;
-                  font-size: 16px;
-                  font-weight: 600;
-                }
-                .chooseus-block-one .inner-box .icon-box .icon {
-                  width: 80px;
-                  height: 80px;
-                  border-radius: 50%;
-                  overflow: hidden;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  background: #f5f8fa;
-                }
-                .chooseus-block-one .inner-box .icon-box .count-text {
-                  font-size: 18px;
-                  font-weight: 700;
-                  color: var(--theme-color);
-                  top: 5px !important;
-                  left: 1px !important;
-                }
-                .chooseus-block-one .inner-box h3 {
-                  font-size: 18px;
-                  font-weight: 700;
-                  margin-bottom: 10px;
-                }
-                .chooseus-block-one .inner-box p {
-                  margin: 0;
-                  color: #666;
-                  line-height: 26px;
-                  font-size: 14px;
-                }
-                .chooseus-block-one .inner-box:hover {
+                .specialty-simple-card:hover {
                   transform: translateY(-5px);
-                  box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;
+                  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
                 }
               `,
             }}

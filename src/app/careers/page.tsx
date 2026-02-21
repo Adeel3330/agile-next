@@ -172,18 +172,7 @@ function CareersPageContent() {
                 <p style={{ color: '#666', fontSize: '17px', lineHeight: '30px', marginBottom: '25px' }}>
                   We believe great teams build great outcomes. Join us to work with purpose, continuous learning, and a culture that values people as much as performance.
                 </p>
-                <div className="service-block-one">
-                  <div className="inner-box" style={{ padding: '28px 24px' }}>
-                    <div className="lower-content" style={{ position: 'relative', left: 'auto', bottom: 'auto' }}>
-                      <div className="inner" style={{ padding: 0 }}>
-                        <h3>Career Opportunity</h3>
-                        <p>
-                          Explore current openings below and apply for roles that match your expertise in operations, billing, coding, support, and business growth.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                
               </div>
             </div>
             <div className="row clearfix">
@@ -221,7 +210,8 @@ function CareersPageContent() {
                                       <li><i className="icon-61"></i>{career.type}</li>
                                     )}
                                   </ul>
-                                  <p>{career.description?.substring(0, 150) || 'No description available'}...</p>
+                                  {/* <p>{career.description?.substring(0, 150) || 'No description available'}...</p> */}
+                                  <div dangerouslySetInnerHTML={{ __html: career.description?.substring(0, 150) || 'No description available' }} />
                                   <div className="link">
                                     <Link href={`/careers/${career.slug}`}>View Details</Link>
                                   </div>

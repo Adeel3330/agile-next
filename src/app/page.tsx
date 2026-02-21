@@ -31,7 +31,7 @@ export default function Home() {
                 <Banner/>
 
                 <Contact_Info/>
-                    <Certifications/>
+                <Certifications/>
                 <About/>
               
                 <WhyAgileSolutions/>
