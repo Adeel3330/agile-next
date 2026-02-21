@@ -19,6 +19,11 @@ interface Career {
   updated_at: string;
 }
 
+interface Settings {
+  whatsappUrl?: string;
+  chatbotUrl?: string;
+}
+
 function CareersPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,6 +35,7 @@ function CareersPageContent() {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [settings, setSettings] = useState<Settings | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize mounted state and URL params on client side only
@@ -93,6 +99,24 @@ function CareersPageContent() {
     fetchCareers();
   }, [mounted, currentPage, debouncedSearchTerm, fetchCareers]);
 
+  useEffect(() => {
+    if (!mounted) return;
+
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/settings');
+        const data = await response.json();
+        if (data.success && data.settings) {
+          setSettings(data.settings);
+        }
+      } catch (err) {
+        console.error('Failed to fetch settings:', err);
+      }
+    };
+
+    fetchSettings();
+  }, [mounted]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
@@ -139,6 +163,29 @@ function CareersPageContent() {
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Careers">
         <section className="sidebar-page-container pt_120 pb_120">
           <div className="auto-container">
+            <div className="row clearfix mb_50">
+              <div className="col-12">
+                <div className="sec-title mb_20">
+                  <span className="sub-title mb_5">Grow With Us</span>
+                  <h2>Build a Meaningful Career With Agile Nexus Solutions</h2>
+                </div>
+                <p style={{ color: '#666', fontSize: '17px', lineHeight: '30px', marginBottom: '25px' }}>
+                  We believe great teams build great outcomes. Join us to work with purpose, continuous learning, and a culture that values people as much as performance.
+                </p>
+                <div className="service-block-one">
+                  <div className="inner-box" style={{ padding: '28px 24px' }}>
+                    <div className="lower-content" style={{ position: 'relative', left: 'auto', bottom: 'auto' }}>
+                      <div className="inner" style={{ padding: 0 }}>
+                        <h3>Career Opportunity</h3>
+                        <p>
+                          Explore current openings below and apply for roles that match your expertise in operations, billing, coding, support, and business growth.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="row clearfix">
               <div className="col-lg-8 col-md-12 col-sm-12 content-side">
                 <div className="blog-grid-content" suppressHydrationWarning>
@@ -262,8 +309,22 @@ function CareersPageContent() {
                   <div className="consulting-widget">
                     <div className="bg-layer" style={{ backgroundImage: "url(assets/images/resource/sidebar-1.jpg)" }}></div>
                     <h3>Join Our <br />Team Today!</h3>
-                    <p>We're always looking for talented individuals to join our team. Explore our open positions and find your next career opportunity.</p>
+                    <p>We&apos;re always looking for talented individuals to join our team. Explore our open positions and find your next career opportunity.</p>
                     <Link href="/contact" className="theme-btn btn-two"><span>Contact Us</span></Link>
+                    {(settings?.whatsappUrl || settings?.chatbotUrl) && (
+                      <div style={{ marginTop: '16px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        {settings?.whatsappUrl && (
+                          <Link href={settings.whatsappUrl} target="_blank" rel="noopener noreferrer" className="theme-btn btn-one">
+                            <span>WhatsApp</span>
+                          </Link>
+                        )}
+                        {settings?.chatbotUrl && (
+                          <Link href={settings.chatbotUrl} target="_blank" rel="noopener noreferrer" className="theme-btn btn-two">
+                            <span>AI Bot</span>
+                          </Link>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -23,6 +23,8 @@ interface Settings {
   socialLinkedin?: string;
   socialYoutube?: string;
   socialPinterest?: string;
+  whatsappUrl?: string;
+  chatbotUrl?: string;
   workingHours?: any;
   seoDefaultTitle?: string;
   seoDefaultDescription?: string;
@@ -30,6 +32,15 @@ interface Settings {
   seoDefaultImage?: string;
   additionalSettings?: any;
 }
+
+const DEFAULT_WHY_AGILE_KPIS = [
+  { value: '30%', label: 'Reduction in A/R' },
+  { value: '7–14', label: 'Days Turnaround Time' },
+  { value: '95%', label: 'First Pass Clean Claims Rate' },
+  { value: 'Up to 30%', label: 'Revenue Increase' },
+  { value: '90%', label: 'Collection Ratio' },
+  { value: '40+', label: 'Specialties' }
+];
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -58,6 +69,8 @@ export default function SettingsPage() {
     socialLinkedin: '',
     socialYoutube: '',
     socialPinterest: '',
+    whatsappUrl: '',
+    chatbotUrl: '',
     workingHours: {
       monday: { open: '09:00', close: '17:00', closed: false },
       tuesday: { open: '09:00', close: '17:00', closed: false },
@@ -242,6 +255,50 @@ export default function SettingsPage() {
           [field]: value
         }
       }
+    }));
+  };
+
+  const getWhyAgileKpis = () => {
+    const additional = formData.additionalSettings || {};
+
+    if (Array.isArray(additional.whyAgileKpis) && additional.whyAgileKpis.length > 0) {
+      return additional.whyAgileKpis.map((item: any, index: number) => ({
+        value: item?.value || DEFAULT_WHY_AGILE_KPIS[index]?.value || '',
+        label: item?.label || DEFAULT_WHY_AGILE_KPIS[index]?.label || ''
+      }));
+    }
+
+    return DEFAULT_WHY_AGILE_KPIS.map((item, index) => ({
+      value: additional[`whyAgileKpi${index + 1}Value`] || item.value,
+      label: additional[`whyAgileKpi${index + 1}Label`] || item.label
+    }));
+  };
+
+  const updateWhyAgileKpi = (index: number, field: 'value' | 'label', fieldValue: string) => {
+    const nextKpis = getWhyAgileKpis().map((item: any, itemIndex: number) =>
+      itemIndex === index ? { ...item, [field]: fieldValue } : item
+    );
+
+    const nextAdditional = {
+      ...(formData.additionalSettings || {}),
+      whyAgileKpis: nextKpis,
+      whyAgileKpi1Value: nextKpis[0]?.value || '',
+      whyAgileKpi1Label: nextKpis[0]?.label || '',
+      whyAgileKpi2Value: nextKpis[1]?.value || '',
+      whyAgileKpi2Label: nextKpis[1]?.label || '',
+      whyAgileKpi3Value: nextKpis[2]?.value || '',
+      whyAgileKpi3Label: nextKpis[2]?.label || '',
+      whyAgileKpi4Value: nextKpis[3]?.value || '',
+      whyAgileKpi4Label: nextKpis[3]?.label || '',
+      whyAgileKpi5Value: nextKpis[4]?.value || '',
+      whyAgileKpi5Label: nextKpis[4]?.label || '',
+      whyAgileKpi6Value: nextKpis[5]?.value || '',
+      whyAgileKpi6Label: nextKpis[5]?.label || ''
+    };
+
+    setFormData((prev) => ({
+      ...prev,
+      additionalSettings: nextAdditional
     }));
   };
 
@@ -468,13 +525,13 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label">Twitter</label>
+                    <label className="form-label">X (Twitter)</label>
                     <input
                       type="url"
                       className="form-control"
                       value={formData.socialTwitter || ''}
                       onChange={(e) => setFormData({ ...formData, socialTwitter: e.target.value })}
-                      placeholder="https://twitter.com/yourhandle"
+                      placeholder="https://x.com/yourhandle"
                     />
                   </div>
                 </div>
@@ -522,6 +579,28 @@ export default function SettingsPage() {
                     />
                   </div>
                 </div>
+                <div className="row mb-3">
+                  <div className="col-md-6">
+                    <label className="form-label">WhatsApp Direct Link</label>
+                    <input
+                      type="url"
+                      className="form-control"
+                      value={formData.whatsappUrl || ''}
+                      onChange={(e) => setFormData({ ...formData, whatsappUrl: e.target.value })}
+                      placeholder="https://wa.me/15551234567"
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">AI Chatbot URL</label>
+                    <input
+                      type="url"
+                      className="form-control"
+                      value={formData.chatbotUrl || ''}
+                      onChange={(e) => setFormData({ ...formData, chatbotUrl: e.target.value })}
+                      placeholder="https://example.com/chatbot"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Working Hours Section */}
@@ -565,6 +644,38 @@ export default function SettingsPage() {
                         </div>
                       </>
                     )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Why Agile KPI Section */}
+              <div className="mb-4 pb-3 border-bottom">
+                <h5 className="mb-3">Why Agile KPI Counters</h5>
+                <p className="text-muted mb-3" style={{ fontSize: '14px' }}>
+                  These values are used in Home → Why Agile Nexus Solutions → Our Key Performance Indicators.
+                </p>
+                {getWhyAgileKpis().map((kpi: any, index: number) => (
+                  <div key={`kpi-${index}`} className="row mb-3">
+                    <div className="col-md-3">
+                      <label className="form-label">Value {index + 1}</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={kpi.value || ''}
+                        onChange={(e) => updateWhyAgileKpi(index, 'value', e.target.value)}
+                        placeholder="e.g. 30%"
+                      />
+                    </div>
+                    <div className="col-md-9">
+                      <label className="form-label">Label {index + 1}</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={kpi.label || ''}
+                        onChange={(e) => updateWhyAgileKpi(index, 'label', e.target.value)}
+                        placeholder="e.g. Reduction in A/R"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>

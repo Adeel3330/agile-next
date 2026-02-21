@@ -8,6 +8,7 @@ interface Booking {
   id: string;
   service_id?: string;
   service_name?: string;
+  service_names?: string[];
   name: string;
   email: string;
   phone: string;
@@ -225,6 +226,13 @@ export default function BookingsPage() {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
+  const formatServices = (booking: Booking) => {
+    if (booking.service_names && booking.service_names.length > 0) {
+      return booking.service_names.join(', ');
+    }
+    return booking.service_name || '-';
+  };
+
   if (!mounted) {
     return null;
   }
@@ -319,7 +327,7 @@ export default function BookingsPage() {
                           <td>{booking.name}</td>
                           <td>{booking.email}</td>
                           <td>{booking.phone}</td>
-                          <td>{booking.service_name || '-'}</td>
+                          <td>{formatServices(booking)}</td>
                           <td>{formatAppointmentDate(booking.appointment_date)}</td>
                           <td>{booking.appointment_time || '-'}</td>
                           <td>
@@ -482,7 +490,7 @@ export default function BookingsPage() {
                               <strong>Phone:</strong> {selectedBooking.phone}
                             </div>
                             <div style={{ marginBottom: '1rem' }}>
-                              <strong>Service:</strong> {selectedBooking.service_name || 'Not specified'}
+                              <strong>Service:</strong> {formatServices(selectedBooking) || 'Not specified'}
                             </div>
                             <div style={{ marginBottom: '1rem' }}>
                               <strong>Appointment Date:</strong> {formatAppointmentDate(selectedBooking.appointment_date)}

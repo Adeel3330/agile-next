@@ -1,15 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import CountUp from 'react-countup';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import Layout from '../../../components/layout/Layout';
-import ContactForm from '../../../components/elements/ContactForm';
-import Clients from '../../../components/sections/home3/Clients';
 import Team from '../../../components/sections/home1/Team';
 import Cta from '../../../components/sections/home2/Cta';
-import Service from '../../../components/sections/home1/Service';
 import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
 
 interface MediaItem {
@@ -22,408 +17,227 @@ interface MediaItem {
 interface PageData {
   id: string;
   title: string;
-  slug: string;
   content?: string;
   description?: string;
-  sections?: any[];
-  seoTitle?: string;
-  seoDescription?: string;
-  seoKeywords?: string;
-  seoImage?: string;
-}
-
-interface Settings {
-  contactPhone?: string;
-  contactEmail?: string;
-  contactAddress?: string;
-  mapLocation?: string;
-  mapEmbedUrl?: string;
+  sections?: any[] | string;
 }
 
 export default function AboutPage() {
   const [mounted, setMounted] = useState(false);
-  const [pageData, setPageData] = useState<PageData | null>(null);
-  const [aboutImage, setAboutImage] = useState<MediaItem | null>(null);
-  const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [pageLoading, setPageLoading] = useState(true);
-  const [mediaLoading, setMediaLoading] = useState(true);
-  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [pageData, setPageData] = useState<PageData | null>(null);
+  const [aboutMedia, setAboutMedia] = useState<MediaItem[]>([]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (mounted) {
-      fetchPageData();
-      fetchAboutMedia();
-      fetchSettings();
-    }
+    if (!mounted) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [pageRes, mediaRes] = await Promise.all([
+          fetch('/api/pages?template=about-us'),
+          fetch('/api/media?position=about')
+        ]);
+
+        const pagePayload = await pageRes.json();
+        const mediaPayload = await mediaRes.json();
+
+        if (pagePayload.success && pagePayload.page) {
+          setPageData(pagePayload.page);
+        }
+
+        if (mediaPayload.success && Array.isArray(mediaPayload.media) && mediaPayload.media.length > 0) {
+          setAboutMedia(mediaPayload.media);
+        }
+      } catch (err) {
+        console.error('Failed to fetch about page data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [mounted]);
 
-  const fetchPageData = useCallback(async () => {
-    setPageLoading(true);
-    try {
-      const response = await fetch('/api/pages?template=about-us');
-      const data = await response.json();
-
-      console.log('About page - API response:', data);
-
-      if (data.success && data.page) {
-        setPageData(data.page);
-        console.log('About page - Page data set:', data.page);
-      } else {
-        console.warn('About page - No page data received:', data.message || 'Unknown error');
-        // Try alternative template formats
-        const altResponse = await fetch('/api/pages?template=about us');
-        const altData = await altResponse.json();
-        if (altData.success && altData.page) {
-          console.log('About page - Found page with alternative template format');
-          setPageData(altData.page);
-        }
+  const parsedSections = useMemo(() => {
+    if (!pageData?.sections) return [] as any[];
+    if (Array.isArray(pageData.sections)) return pageData.sections;
+    if (typeof pageData.sections === 'string') {
+      try {
+        const parsed = JSON.parse(pageData.sections);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
       }
-    } catch (err) {
-      console.error('Failed to fetch page data:', err);
-    } finally {
-      setPageLoading(false);
-      setLoading(false);
     }
-  }, []);
+    return [] as any[];
+  }, [pageData?.sections]);
 
-  const fetchAboutMedia = useCallback(async () => {
-    setMediaLoading(true);
-    try {
-      const response = await fetch('/api/media?position=about');
-      const data = await response.json();
+  const sectionText = (keyword: string, fallback: string) => {
+    const section = parsedSections.find((entry: any) => {
+      const title = (entry?.title || entry?.heading || '').toLowerCase();
+      return title.includes(keyword.toLowerCase());
+    });
 
-      if (data.success && data.media && data.media.length > 0) {
-        setAboutImage(data.media[0]);
-      }
-    } catch (err) {
-      console.error('Failed to fetch about media:', err);
-    } finally {
-      setMediaLoading(false);
-    }
-  }, []);
+    return (
+      section?.text ||
+      section?.description ||
+      section?.content ||
+      fallback
+    );
+  };
 
-  const fetchSettings = useCallback(async () => {
-    setSettingsLoading(true);
-    try {
-      const response = await fetch('/api/settings');
-      const data = await response.json();
+  const overviewText =
+    pageData?.description ||
+    'Agile Nexus Solutions delivers secure, cost-effective medical billing, coding, and revenue cycle management solutions that help healthcare providers optimize reimbursements and streamline operations.';
 
-      if (data.success && data.settings) {
-        setSettings(data.settings);
-      }
-    } catch (err) {
-      console.error('Failed to fetch settings:', err);
-    } finally {
-      setSettingsLoading(false);
-    }
-  }, []);
+  const whoWeAreText = sectionText(
+    'who we are',
+    'We are a trusted partner for healthcare organizations, combining experienced teams and smart workflows to reduce complexity, improve collections, and support long-term financial growth.'
+  );
 
-  // Update SEO metadata
-  useEffect(() => {
-    if (pageData && typeof window !== 'undefined') {
-      const title = pageData.seoTitle || pageData.title || 'About Us - Agile Nexus Solution';
-      const description = pageData.seoDescription || pageData.description || 'Learn about Agile Nexus Solutions, a trusted medical billing and coding services provider in the United States.';
-      const keywords = pageData.seoKeywords || 'about us, medical billing, revenue cycle management, Agile Nexus Solutions';
-      const image = pageData.seoImage || aboutImage?.fileUrl || '';
+  const missionText = sectionText(
+    'mission',
+    'Our mission is to improve the financial and operational health of medical practices through accurate, compliant, and transparent revenue cycle services that allow providers to focus on patient care.'
+  );
 
-      document.title = title;
+  const supportText = sectionText(
+    'support',
+    'Healthcare runs around the clock. Our team is available to support urgent billing and operational needs so your revenue workflows stay uninterrupted.'
+  );
 
-      const updateMetaTag = (name: string, content: string, attribute: string = 'name') => {
-        if (!content) return;
-        let meta = document.querySelector(`meta[${attribute}="${name}"]`);
-        if (!meta) {
-          meta = document.createElement('meta');
-          meta.setAttribute(attribute, name);
-          document.head.appendChild(meta);
-        }
-        meta.setAttribute('content', content);
-      };
-
-      updateMetaTag('description', description);
-      updateMetaTag('keywords', keywords);
-      updateMetaTag('og:title', title, 'property');
-      updateMetaTag('og:description', description, 'property');
-      if (image) updateMetaTag('og:image', image, 'property');
-      updateMetaTag('og:url', window.location.href, 'property');
-      updateMetaTag('og:type', 'website', 'property');
-      updateMetaTag('twitter:card', 'summary_large_image');
-      updateMetaTag('twitter:title', title);
-      updateMetaTag('twitter:description', description);
-      if (image) updateMetaTag('twitter:image', image);
-    }
-  }, [pageData, aboutImage]);
+  const supportHighlights = [
+    'Healthcare is continuous and your billing support should be too.',
+    'Real-time assistance across time zones and provider locations.',
+    'Fast response for urgent denials, eligibility, and claim issues.',
+  ];
 
   if (!mounted) {
     return null;
   }
 
-    return (
-        <div className="boxed_wrapper">
+  return (
+    <div className="boxed_wrapper">
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={pageData?.title || 'About Us'}>
-        {/* First Section - About Content */}
-                <section className="about-section about-page p_relative pb_50">
-                    <div className="auto-container">
-                        <div className="upper-content mb_80">
-                            <div className="row clearfix">
-                                <div className="col-lg-6 col-md-12 col-sm-12 content-column">
-                                    <div className="content-block-one">
-                                        <div className="content-box">
-                      {pageLoading ? (
-                        <div className="skeleton-content">
-                          <div className="skeleton skeleton-text" style={{ width: '60%', height: '24px', marginBottom: '15px' }}></div>
-                          <div className="skeleton skeleton-text" style={{ width: '100%', height: '16px', marginBottom: '10px' }}></div>
-                          <div className="skeleton skeleton-text" style={{ width: '90%', height: '16px' }}></div>
-                        </div>
-                      ) : (
-                        <>
-                                            <div className="sec-title mb_15">
-                                                <span className="sub-title mb_5">About the company</span>
-                            <h2>{pageData?.title || 'About Agile Nexus Solutions'}</h2>
-                                            </div>
-                                            <div className="text-box mb_30 pb_30">
-                            {pageData?.content ? (
-                              <div dangerouslySetInnerHTML={{ __html: pageData.content }}></div>
-                            ) : pageData?.description ? (
-                              <p>{pageData.description}</p>
-                            ) : (
-                              <p>Agile Nexus Solutions provides medical billing and coding services to healthcare providers in the United States. Agile Nexus Solutions's mission is to be a trusted and valued healthcare partner offering advanced revenue cycle management services with dedication and integrity.</p>
-                            )}
-                                            </div>
-                        </>
-                      )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-lg-6 col-md-12 col-sm-12 image-column">
-                                    <div className="image-block-one">
-                                        <div className="image-box">
-                                            <div className="shape">
-                        <div className="shape-2" style={{ backgroundImage: 'url(assets/images/shape/shape-10.png)' }}></div>
-                                            </div>
-                      {mediaLoading ? (
-                        <div className="skeleton-image" style={{ width: '523px', height: '399px', background: '#e0e0e0', borderRadius: '8px' }}></div>
-                      ) : (
-                        <figure className="image">
-                          <Image 
-                            src={aboutImage?.fileUrl ? getCloudinaryImageUrl(aboutImage.fileUrl) : '/assets/images/resource/about-1.jpg'} 
-                            alt={aboutImage?.altText || aboutImage?.title || 'About Us'} 
-                            width={523} 
-                            height={399} 
-                            priority 
-                          />
-                        </figure>
-                      )}
-                                            <div className="text-box">
-                        <div className="image-shape" style={{ backgroundImage: 'url(assets/images/shape/shape-7.png)' }}></div>
-                                              
-                                                <h2>{new Date().getFullYear() - 2018}</h2>
-                                                <span>Years of Experience (Since 2018)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-        {/* Second Section - Services (same as home page) */}
-                <Service />
-
-        {/* Contact Section - Replacing Appointment */}
-        <section className="contact-section about-page p_relative pt_120 pb_120">
-          <div className="pattern-layer" style={{ backgroundImage: 'url(assets/images/shape/shape-17.png)' }}></div>
+        <section className="about-section about-page p_relative pt_120 pb_90" style={{ background: '#f8fbff' }}>
           <div className="auto-container">
-            <div className="row clearfix">
-              <div className="col-lg-6 col-md-12 col-sm-12 content-column">
-                <div className="content-box">
-                  <div className="sec-title mb_30">
-                    <span className="sub-title mb_5">Get in Touch</span>
-                    <h2>Contact Us</h2>
-                    <p>Have questions or need assistance? We're here to help you with all your medical billing needs.</p>
-                                        </div>
-                  {settingsLoading ? (
-                    <div className="skeleton-content">
-                      <div className="skeleton skeleton-text" style={{ width: '80%', height: '20px', marginBottom: '15px' }}></div>
-                      <div className="skeleton skeleton-text" style={{ width: '60%', height: '20px' }}></div>
-                                    </div>
-                  ) : (
-                    <div className="contact-info">
-                      {settings?.contactPhone && (
-                        <div className="info-item mb_20" style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
-                          <div className="icon-box" style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'var(--theme-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '20px' }}>
-                            <i className="icon-2"></i>
-                          </div>
-                          <div>
-                            <h4 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: '600' }}>Phone</h4>
-                            <span>
-                              <Link href={`tel:${settings.contactPhone.replace(/\s/g, '')}`} style={{ color: 'var(--text-color)', fontSize: '16px' }}>
-                                {settings.contactPhone}
-                              </Link>
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                      {settings?.contactEmail && (
-                        <div className="info-item mb_20" style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
-                          <div className="icon-box" style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'var(--theme-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '20px' }}>
-                            <i className="icon-46"></i>
-                          </div>
-                          <div>
-                            <h4 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: '600' }}>Email</h4>
-                            <span>
-                              <Link href={`mailto:${settings.contactEmail}`} style={{ color: 'var(--text-color)', fontSize: '16px' }}>
-                                {settings.contactEmail}
-                              </Link>
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                      {settings?.contactAddress && (
-                        <div className="info-item mb_20" style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
-                          <div className="icon-box" style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'var(--theme-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '20px' }}>
-                            <i className="icon-10"></i>
-                          </div>
-                          <div>
-                            <h4 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: '600' }}>Address</h4>
-                            <span style={{ color: 'var(--text-color)', fontSize: '16px' }}>{settings.contactAddress}</span>
-                          </div>
-                        </div>
-                      )}
-                                    </div>
-                  )}
-                                    </div>
-                                    </div>
-              <div className="col-lg-6 col-md-12 col-sm-12 form-column">
-                <div className="form-inner" style={{ background: '#fff', padding: '40px', borderRadius: '10px', boxShadow: '0px 4px 30px rgba(205, 192, 192, 0.25)' }}>
-                  <div className="shape" style={{ backgroundImage: 'url(assets/images/shape/shape-16.png)' }}></div>
-                  <h3 style={{ marginBottom: '30px', fontSize: '24px', fontWeight: '700' }}>Send us a Message</h3>
-                  <ContactForm />
-                                    </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+            <div className="sec-title centred mb_60">
+              <span className="sub-title mb_5">Company Overview</span>
+              <h2>{pageData?.title || 'About Agile Nexus Solutions'}</h2>
+              <p style={{ maxWidth: '860px', margin: '14px auto 0' }}>{overviewText}</p>
+            </div>
 
-        {/* Funfact Section */}
-                <section className="funfact-section">
-                <div className="pattern-layer">
-                    <div className="pattern-1">
-                    <svg
-                        width="318"
-                        height="131"
-                        viewBox="0 0 318 131"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                        d="M0 69.0468L74.0685 69.0468L98.2276 40.7213L125.459 121L164.762 10L191.919 105.268L208.417 57.4162L233.167 87.0291L249.076 69.0468L308 69.0468"
-                        stroke="#BDBDBD"
-                        strokeOpacity="0.15"
-                        strokeWidth="20"
-                        strokeMiterlimit="10"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        />
-                    </svg>
-                    </div>
+            <div className="row clearfix align-items-center mb_70">
+              <div className="col-lg-6 col-md-12 col-sm-12 image-column mb_30">
+                <figure className="about-feature-image">
+                  <Image
+                    src={getCloudinaryImageUrl(aboutMedia[0]?.fileUrl || '/assets/images/resource/about-1.jpg')}
+                    alt={aboutMedia[0]?.altText || aboutMedia[0]?.title || 'Who we are'}
+                    width={640}
+                    height={460}
+                    style={{ objectFit: 'cover', borderRadius: '16px' }}
+                    priority
+                  />
+                </figure>
+              </div>
+
+              <div className="col-lg-6 col-md-12 col-sm-12 content-column mb_30">
+                <div className="about-card">
+                  <h3>Who We Are</h3>
+                  <p>{whoWeAreText}</p>
+
+                  {loading ? (
+                    <p>Loading details...</p>
+                  ) : pageData?.content ? (
+                    <div className="about-content-html" dangerouslySetInnerHTML={{ __html: pageData.content }} />
+                  ) : null}
                 </div>
+              </div>
+            </div>
 
-                {/* <div className="auto-container">
-                    <div className="inner-container">
-                    <div
-                        className="shape"
-                style={{ backgroundImage: 'url(/assets/images/shape/shape-34.png)' }}
-                    ></div>
+            <div className="row clearfix mb_30">
+              <div className="col-lg-6 col-md-12 col-sm-12 mb_30">
+                <div className="about-card h-100">
+                  <h3>Our Mission</h3>
+                  <p>{missionText}</p>
+                </div>
+              </div>
 
-                    <div className="row clearfix">
-                        <div className="col-lg-3 col-md-6 col-sm-12 funfact-block">
-                        <div className="funfact-block-two">
-                            <div className="inner-box">
-                            <div className="icon-box">
-                                <i className="icon-37"></i>
-                            </div>
-                            <div className="count-outer count-box">
-                                <CountUp end={180} duration={1.5} />
-                                <span>+</span>
-                            </div>
-                            <p>Expert Doctors</p>
-                            </div>
-                        </div>
-                        </div>
+              <div className="col-lg-6 col-md-12 col-sm-12 mb_30">
+                <div className="about-card h-100">
+                  <h3>24/7 Support: Anytime, Anywhere Services</h3>
+                  <p>{supportText}</p>
+                  <ul className="list-style-one clearfix mt_20">
+                    {supportHighlights.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
 
-                        <div className="col-lg-3 col-md-6 col-sm-12 funfact-block">
-                        <div className="funfact-block-two">
-                            <div className="inner-box">
-                            <div className="icon-box">
-                                <i className="icon-38"></i>
-                            </div>
-                            <div className="count-outer count-box">
-                                <CountUp end={12.2} duration={1.5} decimals={1} />
-                                <span>+</span>
-                            </div>
-                            <p>Different Services</p>
-                            </div>
-                        </div>
-                        </div>
+            <div className="row clearfix">
+              <div className="col-lg-12 col-md-12 col-sm-12">
+                <figure className="about-feature-image">
+                  <Image
+                    src={getCloudinaryImageUrl(aboutMedia[1]?.fileUrl || aboutMedia[0]?.fileUrl || '/assets/images/resource/about-1.jpg')}
+                    alt={aboutMedia[1]?.altText || aboutMedia[1]?.title || 'About operations'}
+                    width={1280}
+                    height={420}
+                    style={{ objectFit: 'cover', borderRadius: '16px', width: '100%', height: '420px' }}
+                  />
+                </figure>
+              </div>
+            </div>
+          </div>
 
-                        <div className="col-lg-3 col-md-6 col-sm-12 funfact-block">
-                        <div className="funfact-block-two">
-                            <div className="inner-box">
-                            <div className="icon-box">
-                                <i className="icon-39"></i>
-                            </div>
-                            <div className="count-outer count-box">
-                                <CountUp end={200} duration={1.5} />
-                                <span>+</span>
-                            </div>
-                            <p>Multi Services</p>
-                            </div>
-                        </div>
-                        </div>
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+                .about-card {
+                  background: #fff;
+                  border-radius: 16px;
+                  padding: 30px;
+                  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+                }
+                .about-card h3 {
+                  margin-bottom: 14px;
+                }
+                .about-card p {
+                  color: #555;
+                  line-height: 1.8;
+                  margin-bottom: 0;
+                }
+                .about-content-html {
+                  margin-top: 16px;
+                  color: #555;
+                }
+                .about-feature-image {
+                  border-radius: 16px;
+                  overflow: hidden;
+                  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+                }
+              `,
+            }}
+          />
+        </section>
 
-                        <div className="col-lg-3 col-md-6 col-sm-12 funfact-block">
-                        <div className="funfact-block-two">
-                            <div className="inner-box">
-                            <div className="icon-box">
-                                <i className="icon-40"></i>
-                            </div>
-                            <div className="count-outer count-box">
-                                <CountUp end={8} duration={1.5} />
-                            </div>
-                            <p>Awards Win</p>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                    </div>
-                </div> */}
-                </section>
+        <section className="team-section p_relative pt_30 pb_80" id="meet-our-team">
+          <div className="auto-container">
+            <div className="sec-title centred mb_50">
+              <span className="sub-title mb_5">Meet Our Team</span>
+              <h2>Our Leadership and Operations Team</h2>
+            </div>
+          </div>
+          <Team />
+        </section>
 
-        {/* <Clients /> */}
-        <Team />
         <Cta />
-            </Layout>
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-        .skeleton {
-          display: inline-block;
-          background: #e0e0e0;
-          border-radius: 4px;
-          animation: pulse 1.5s ease-in-out infinite;
-        }
-        .skeleton-text { margin-bottom: 8px; }
-        .skeleton-content { padding: 20px 0; }
-        .skeleton-image { animation: pulse 1.5s ease-in-out infinite; }
-      `}} />
-        </div>
+      </Layout>
+    </div>
   );
 }

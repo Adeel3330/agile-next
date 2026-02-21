@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Select, { MultiValue } from 'react-select';
 import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
 
 interface AboutData {
@@ -16,12 +17,17 @@ interface Service {
   slug: string;
 }
 
+interface ServiceOption {
+    value: string;
+    label: string;
+}
+
 export default function About() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [date, setDate] = useState("");
     const [phone, setPhone] = useState("");
-    const [selectedService, setSelectedService] = useState("");
+    const [selectedServices, setSelectedServices] = useState<string[]>([]);
     const [submitting, setSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [mounted, setMounted] = useState(false);
@@ -33,6 +39,7 @@ export default function About() {
 
     useEffect(() => {
         setMounted(true);
+        setDate(new Date().toISOString().split('T')[0]);
         fetchAboutData();
         fetchServices();
     }, []);
@@ -92,7 +99,7 @@ export default function About() {
         setSubmitMessage(null);
 
         try {
-            const selectedServiceObj = services.find(s => s.id === selectedService);
+            const selectedServiceObjs = services.filter((service) => selectedServices.includes(service.id));
             
             const response = await fetch('/api/bookings', {
                 method: 'POST',
@@ -100,8 +107,10 @@ export default function About() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    serviceId: selectedService || null,
-                    serviceName: selectedServiceObj?.title || selectedService || null,
+                    serviceId: selectedServices[0] || null,
+                    serviceName: selectedServiceObjs.map((service) => service.title).join(', ') || null,
+                    serviceIds: selectedServices,
+                    serviceNames: selectedServiceObjs.map((service) => service.title),
                     name: name.trim(),
                     email: email.trim(),
                     phone: phone.trim(),
@@ -118,9 +127,9 @@ export default function About() {
                 // Reset form
                 setName('');
                 setEmail('');
-                setDate('');
+                setDate(new Date().toISOString().split('T')[0]);
                 setPhone('');
-                setSelectedService('');
+                setSelectedServices([]);
             } else {
                 setSubmitMessage({ type: 'error', text: data.message || 'Failed to submit booking. Please try again.' });
             }
@@ -161,6 +170,11 @@ export default function About() {
     const aboutTitle = getAboutTitle();
     const aboutDescription = getAboutDescription();
     const imageUrl = aboutImage || '/assets/images/resource/about-1.jpg';
+    const serviceOptions: ServiceOption[] = services.map((service) => ({
+        value: service.id,
+        label: service.title,
+    }));
+    const selectedServiceOptions = serviceOptions.filter((option) => selectedServices.includes(option.value));
 
   return (
         <section className="about-section p_relative">
@@ -264,24 +278,33 @@ export default function About() {
                     <h4>Book an Appointment</h4>
                     <div className="form-inner">
                         <form onSubmit={handleSubmit} className="clearfix">
-                            <div className="form-group mt-5">
+                            <div className="form-group mt-5 ps-0">
                                 <div className="icon-box"><i className="icon-15"></i></div>
-                                <span>Choose services</span>
-                                <div className="select-box">
-                                    <select 
-                                        className="selectmenu"
-                                        value={selectedService}
-                                        onChange={(e) => setSelectedService(e.target.value)}
-                                        required
+                                {/* <span className="ps-5">Choose services (multiple)</span> */}
+                                <div className="select-box" style={{ position: 'relative',width:'280px',marginTop:'50px' }}>
+                                    <Select
+                                        isMulti
+                                        options={serviceOptions}
+                                        value={selectedServiceOptions}
+                                        onChange={(selected: MultiValue<ServiceOption>) => {
+                                            setSelectedServices(selected.map((option) => option.value));
+                                        }}
+                                        classNamePrefix="booking-service-select"
+                                        placeholder={servicesLoading ? 'Loading services...' : 'Search and select services'}
+                                        isDisabled={servicesLoading || submitting}
+                                        closeMenuOnSelect={false}
+                                        noOptionsMessage={() => 'No services found'}
+                                    />
+                                    <input
+                                        type="text"
+                                        tabIndex={-1}
+                                        autoComplete="off"
+                                        style={{ opacity: 0, height: 0, position: 'absolute', pointerEvents: 'none' }}
+                                        value={selectedServices.join(',')}
+                                        readOnly
                                         disabled={servicesLoading || submitting}
-                                    >
-                                        <option value="">Select a service</option>
-                                        {services.map((service) => (
-                                            <option key={service.id} value={service.id}>
-                                                {service.title}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        required
+                                    />
                                 </div>
                             </div>
                             <div className="form-group mt-5">
@@ -355,7 +378,7 @@ export default function About() {
                                 <button 
                                     type="submit" 
                                     className="theme-btn btn-one"
-                                    disabled={submitting || !date || !phone || !selectedService || !name || !email}
+                                    disabled={submitting || !date || !phone || selectedServices.length === 0 || !name || !email}
                                     style={{ position: 'relative', opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
                                 >
                                     {submitting && (

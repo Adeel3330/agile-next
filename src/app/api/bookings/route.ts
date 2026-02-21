@@ -9,6 +9,8 @@ export async function POST(req: NextRequest) {
     const {
       serviceId,
       serviceName,
+      serviceIds,
+      serviceNames,
       name,
       email,
       phone,
@@ -58,36 +60,57 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify service exists if serviceId is provided
-    if (serviceId) {
-      const { data: service, error: serviceError } = await supabaseAdmin
-        .from('services')
-        .select('id, title, status')
-        .eq('id', serviceId)
-        .is('deleted_at', null)
-        .maybeSingle();
+    const requestedServiceIds = Array.isArray(serviceIds)
+      ? serviceIds.filter((id) => typeof id === 'string' && id.trim().length > 0)
+      : serviceId && typeof serviceId === 'string'
+        ? [serviceId]
+        : [];
 
-      if (serviceError || !service) {
-        return NextResponse.json(
-          { success: false, message: 'Selected service not found' },
-          { status: 404 }
-        );
-      }
-
-      if (service.status !== 'active') {
-        return NextResponse.json(
-          { success: false, message: 'Selected service is not available' },
-          { status: 400 }
-        );
-      }
+    if (requestedServiceIds.length === 0) {
+      return NextResponse.json(
+        { success: false, message: 'Please select at least one service' },
+        { status: 400 }
+      );
     }
+
+    const { data: foundServices, error: servicesError } = await supabaseAdmin
+      .from('services')
+      .select('id, title, status')
+      .in('id', requestedServiceIds)
+      .is('deleted_at', null);
+
+    if (servicesError || !foundServices || foundServices.length !== requestedServiceIds.length) {
+      return NextResponse.json(
+        { success: false, message: 'One or more selected services were not found' },
+        { status: 404 }
+      );
+    }
+
+    const inactiveService = foundServices.find((service) => service.status !== 'active');
+    if (inactiveService) {
+      return NextResponse.json(
+        { success: false, message: `Selected service is not available: ${inactiveService.title}` },
+        { status: 400 }
+      );
+    }
+
+    const serviceTitleById = new Map(foundServices.map((service) => [service.id, service.title]));
+    const orderedSelectedServices = requestedServiceIds.map((id) => ({
+      id,
+      title: serviceTitleById.get(id) || 'Service'
+    }));
+
+    const legacyServiceName = orderedSelectedServices.map((service) => service.title).join(', ');
 
     // Insert booking
     const { data: booking, error: insertError } = await supabaseAdmin
       .from('bookings')
       .insert({
-        service_id: serviceId || null,
-        service_name: serviceName?.trim() || null,
+        service_id: orderedSelectedServices[0]?.id || null,
+        service_name:
+          legacyServiceName ||
+          (Array.isArray(serviceNames) ? serviceNames.join(', ').trim() : serviceName?.trim()) ||
+          null,
         name: name.trim(),
         email: email.toLowerCase().trim(),
         phone: phone.trim(),
@@ -109,6 +132,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const bookingServiceRows = orderedSelectedServices.map((service) => ({
+      booking_id: booking.id,
+      service_id: service.id,
+      service_name: service.title
+    }));
+
+    if (bookingServiceRows.length > 0) {
+      const { error: bookingServicesError } = await supabaseAdmin
+        .from('booking_services')
+        .insert(bookingServiceRows);
+
+      if (bookingServicesError && bookingServicesError.code !== '42P01') {
+        console.error('Insert booking_services error:', bookingServicesError);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Booking submitted successfully! We will contact you soon.',
@@ -116,7 +155,8 @@ export async function POST(req: NextRequest) {
         id: booking.id,
         name: booking.name,
         email: booking.email,
-        appointmentDate: booking.appointment_date
+        appointmentDate: booking.appointment_date,
+        services: orderedSelectedServices
       }
     });
   } catch (error) {

@@ -17,11 +17,21 @@ interface Settings {
   socialInstagram?: string;
   socialLinkedin?: string;
   socialYoutube?: string;
+  whatsappUrl?: string;
+  chatbotUrl?: string;
   logoUrl?: string;
+}
+
+interface CertificationMedia {
+  id: string;
+  fileUrl: string;
+  altText?: string;
+  title?: string;
 }
 
 export default function Footer1() {
   const [settings, setSettings] = useState<Settings | null>(null);
+  const [certifications, setCertifications] = useState<CertificationMedia[]>([]);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -39,6 +49,17 @@ export default function Footer1() {
       .catch(err => {
         console.error('Failed to fetch settings footer:', err);
         setLoading(false);
+      });
+
+    fetch('/api/media?position=certifications')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.media)) {
+          setCertifications(data.media.slice(0, 6));
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch certifications footer:', err);
       });
   }, []);
 
@@ -94,7 +115,7 @@ export default function Footer1() {
                         <li><Link href={settings.socialFacebook} target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook-f"></i></Link></li>
                       )}
                       {settings?.socialTwitter && (
-                        <li><Link href={settings.socialTwitter} target="_blank" rel="noopener noreferrer"><i className="fab fa-twitter"></i></Link></li>
+                        <li><Link href={settings.socialTwitter} target="_blank" rel="noopener noreferrer" aria-label="X"><i className="fab fa-x-twitter"></i></Link></li>
                       )}
                       {settings?.socialInstagram && (
                         <li><Link href={settings.socialInstagram} target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram"></i></Link></li>
@@ -105,7 +126,30 @@ export default function Footer1() {
                       {settings?.socialYoutube && (
                         <li><Link href={settings.socialYoutube} target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube"></i></Link></li>
                       )}
+                      {settings?.whatsappUrl && (
+                        <li><Link href={settings.whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i className="fab fa-whatsapp"></i></Link></li>
+                      )}
+                      {settings?.chatbotUrl && (
+                        <li><Link href={settings.chatbotUrl} target="_blank" rel="noopener noreferrer" aria-label="AI Chatbot"><i className="fa fa-robot"></i></Link></li>
+                      )}
                     </ul>
+                    {certifications.length > 0 && (
+                      <div className="mt-3">
+                        <h6 className="mb-2">CPC & CPB Certificates</h6>
+                        <div className="d-flex flex-wrap gap-2">
+                          {certifications.map((item) => (
+                            <Image
+                              key={item.id}
+                              src={item.fileUrl}
+                              alt={item.altText || item.title || 'Certification'}
+                              width={70}
+                              height={70}
+                              style={{ objectFit: 'cover', borderRadius: '6px' }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

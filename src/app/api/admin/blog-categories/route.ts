@@ -48,14 +48,26 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Create a map of all categories by id for quick lookup
-    const categoryMap = new Map((categories || []).map((cat: any) => [cat.id, cat]));
+    const parentIds = Array.from(
+      new Set((categories || []).map((cat: any) => cat.parent_id).filter(Boolean))
+    );
+
+    let parentMap = new Map<string, any>();
+    if (parentIds.length > 0) {
+      const { data: parentCategories } = await supabaseAdmin
+        .from('blog_categories')
+        .select('id, name, slug')
+        .in('id', parentIds)
+        .is('deleted_at', null);
+
+      parentMap = new Map((parentCategories || []).map((cat: any) => [cat.id, cat]));
+    }
 
     // Map Supabase column names to frontend expected names and resolve parents
     const mappedCategories = (categories || []).map((cat: any) => {
       let parent = null;
       if (cat.parent_id) {
-        const parentCat = categoryMap.get(cat.parent_id);
+        const parentCat = parentMap.get(cat.parent_id);
         if (parentCat) {
           parent = {
             id: parentCat.id,

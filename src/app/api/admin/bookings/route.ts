@@ -52,9 +52,46 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    const bookingList = bookings || [];
+    const bookingIds = bookingList.map((booking) => booking.id).filter(Boolean);
+
+    let bookingServicesMap: Record<string, string[]> = {};
+    if (bookingIds.length > 0) {
+      const { data: bookingServices, error: bookingServicesError } = await supabaseAdmin
+        .from('booking_services')
+        .select('booking_id, service_name')
+        .in('booking_id', bookingIds);
+
+      if (bookingServicesError && bookingServicesError.code !== '42P01') {
+        console.error('Fetch booking_services error:', bookingServicesError);
+      }
+
+      if (bookingServices && bookingServices.length > 0) {
+        bookingServicesMap = bookingServices.reduce((acc: Record<string, string[]>, row) => {
+          if (!acc[row.booking_id]) {
+            acc[row.booking_id] = [];
+          }
+          if (row.service_name) {
+            acc[row.booking_id].push(row.service_name);
+          }
+          return acc;
+        }, {});
+      }
+    }
+
+    const enrichedBookings = bookingList.map((booking) => ({
+      ...booking,
+      service_names:
+        bookingServicesMap[booking.id] && bookingServicesMap[booking.id].length > 0
+          ? bookingServicesMap[booking.id]
+          : booking.service_name
+            ? booking.service_name.split(',').map((item: string) => item.trim()).filter(Boolean)
+            : []
+    }));
+
     return NextResponse.json({
       success: true,
-      bookings: bookings || [],
+      bookings: enrichedBookings,
       total: count || 0,
       page: pageNumber,
       limit: pageSize,

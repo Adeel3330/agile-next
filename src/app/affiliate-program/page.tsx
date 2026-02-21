@@ -207,6 +207,41 @@ export default function AffiliateProgramPage() {
           </section>
         )}
 
+        {allMedia.length > 1 && (
+          <section className="about-section p_relative pt_90 pb_90" style={{ background: '#f5f8fa' }}>
+            <div className="auto-container">
+              <div className="sec-title mb_55 centred">
+                <span className="sub-title mb_5">Affiliate Highlights</span>
+                <h2>Why Partners Choose Our Program</h2>
+                <p style={{ maxWidth: '760px', margin: '15px auto 0', color: '#666' }}>
+                  Explore snapshots from our affiliate journey, partner growth moments, and collaboration highlights.
+                </p>
+              </div>
+              <div className="row clearfix">
+                {allMedia.slice(0, 6).map((item) => (
+                  <div key={item.id} className="col-lg-4 col-md-6 col-sm-12 mb-4">
+                    <div className="inner-box" style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 5px 20px rgba(0,0,0,0.06)' }}>
+                      <figure className="image-box" style={{ margin: 0 }}>
+                        <Image
+                          src={getCloudinaryImageUrl(item.fileUrl)}
+                          alt={item.altText || item.title || 'Affiliate highlight'}
+                          width={416}
+                          height={280}
+                          style={{ objectFit: 'cover', width: '100%', height: '240px' }}
+                        />
+                      </figure>
+                      <div style={{ padding: '18px 20px' }}>
+                        <h4 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>{item.title || 'Affiliate Program'}</h4>
+                        {item.description && <p style={{ margin: 0, color: '#666', lineHeight: '26px' }}>{item.description}</p>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
        
 
         {/* Program cards - from admin */}

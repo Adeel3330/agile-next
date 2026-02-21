@@ -38,7 +38,7 @@
 .testimonial-block-one .inner-box .author-box{
   position: relative;
   display: block;
-  padding: 3px 0px 0px 110px;
+  padding: 3px 0px 0px 140px;
   margin-bottom: 25px;
 }
 
@@ -46,8 +46,8 @@
   position: absolute;
   left: 0px;
   top: 0px;
-  width: 90px;
-  height: 90px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
 }
 
@@ -110,7 +110,7 @@
 
 .rtl .testimonial-block-one .inner-box .author-box{
   padding-left: 0px;
-  padding-right: 110px;
+  padding-right: 140px;
 }
 
 .rtl .testimonial-block-one .inner-box .author-box .author-thumb{

@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS settings (
   social_linkedin VARCHAR(500),
   social_youtube VARCHAR(500),
   social_pinterest VARCHAR(500),
+  whatsapp_url VARCHAR(500),
+  chatbot_url VARCHAR(500),
   
   -- Working Hours (JSON format for flexibility)
   working_hours JSONB DEFAULT '{}'::jsonb,

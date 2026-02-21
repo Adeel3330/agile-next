@@ -9,7 +9,7 @@ export default function Contact_Info() {
                         <div className="inner-box">
                             <div className="icon-box"><i className="icon-10"></i></div>
                             <span>Get your Appointments</span>
-                            <h4>Request Appointment</h4>
+                            <h4>Schedule a Meeting</h4>
                         </div>
                     </div>
                 </div>

@@ -81,6 +81,31 @@ async function seedPages() {
       updated_at: now,
       deleted_at: null,
     },
+    {
+      title: 'Dedicated Account Managers & Certified Medical Billers for Your Practice',
+      slug: 'dedicated-team-billers-coders',
+      content: `
+        <ul>
+          <li>Dedicated billers and coders aligned to your specialty and workflow.</li>
+          <li>Proactive claim follow-up to reduce denials and improve collections.</li>
+          <li>Transparent communication and reporting from assigned account managers.</li>
+          <li>HIPAA-compliant processes built for consistency and scale.</li>
+        </ul>
+      `.trim(),
+      seo_title: 'Dedicated Medical Billing Team for Your Practice | Medivantek',
+      seo_description:
+        'Get a dedicated team of certified billers, coders, and account managers to support your medical practice and improve reimbursement performance.',
+      seo_keywords:
+        'dedicated billing team, certified medical coders, account managers, practice billing support',
+      seo_image: getPlaceholderImage(),
+      file_url: getPlaceholderImage(),
+      status: 'published',
+      template: 'home',
+      published_at: now,
+      created_at: now,
+      updated_at: now,
+      deleted_at: null,
+    },
   ];
 
   try {
@@ -152,6 +177,22 @@ async function seedMedia() {
       status: 'active',
       display_order: 1,
       alt_text: 'Illustration of benefits of medical billing outsourcing',
+      link_url: null as string | null,
+      created_at: now,
+      updated_at: now,
+      deleted_at: null as string | null,
+    },
+    {
+      title: 'Dedicated Team of Billers and Coders',
+      description: 'Visual representing a dedicated billing and coding team for medical practices.',
+      file_url: getPlaceholderImage(),
+      file_name: 'dedicated-team-billers-coders.jpg',
+      file_size: 0,
+      file_type: 'image/jpeg',
+      position: 'dedicated-team-billers-coders',
+      status: 'active',
+      display_order: 1,
+      alt_text: 'Dedicated team of medical billers and coders supporting your practice',
       link_url: null as string | null,
       created_at: now,
       updated_at: now,

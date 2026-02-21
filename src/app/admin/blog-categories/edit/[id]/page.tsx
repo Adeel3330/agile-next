@@ -54,25 +54,14 @@ export default function EditBlogCategoryPage() {
 
   const fetchCategories = async () => {
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
-      if (!token) return;
-
-      const response = await fetch(`/api/admin/blog-categories?limit=100`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await fetch('/api/categories');
 
       const data = await response.json();
       if (data.success && data.categories) {
-        // Only show parent categories (categories without a parent) and exclude current category
         setCategories(data.categories
-          .filter((cat: any) => 
-            (cat._id || cat.id) !== id && // Exclude current category to prevent circular references
-            !cat.parentId && !cat.parent_id // Only show parent categories
-          )
+          .filter((cat: any) => cat.id !== id && !cat.parentId)
           .map((cat: any) => ({
-            id: cat._id || cat.id,
+            id: cat.id,
             name: cat.name,
             slug: cat.slug
           })));

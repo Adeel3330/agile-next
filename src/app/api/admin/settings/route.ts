@@ -41,6 +41,8 @@ export async function GET(req: NextRequest) {
             socialLinkedin: null,
             socialYoutube: null,
             socialPinterest: null,
+            whatsappUrl: null,
+            chatbotUrl: null,
             workingHours: {},
             seoDefaultTitle: null,
             seoDefaultDescription: null,
@@ -76,6 +78,8 @@ export async function GET(req: NextRequest) {
       socialLinkedin: settings.social_linkedin,
       socialYoutube: settings.social_youtube,
       socialPinterest: settings.social_pinterest,
+      whatsappUrl: settings.whatsapp_url,
+      chatbotUrl: settings.chatbot_url,
       workingHours: settings.working_hours || {},
       seoDefaultTitle: settings.seo_default_title,
       seoDefaultDescription: settings.seo_default_description,
@@ -127,6 +131,8 @@ export async function PUT(req: NextRequest) {
       socialLinkedin,
       socialYoutube,
       socialPinterest,
+      whatsappUrl,
+      chatbotUrl,
       workingHours,
       seoDefaultTitle,
       seoDefaultDescription,
@@ -161,6 +167,8 @@ export async function PUT(req: NextRequest) {
     if (socialLinkedin !== undefined) updateData.social_linkedin = socialLinkedin?.trim() || null;
     if (socialYoutube !== undefined) updateData.social_youtube = socialYoutube?.trim() || null;
     if (socialPinterest !== undefined) updateData.social_pinterest = socialPinterest?.trim() || null;
+    if (whatsappUrl !== undefined) updateData.whatsapp_url = whatsappUrl?.trim() || null;
+    if (chatbotUrl !== undefined) updateData.chatbot_url = chatbotUrl?.trim() || null;
     if (workingHours !== undefined) updateData.working_hours = workingHours || {};
     if (seoDefaultTitle !== undefined) updateData.seo_default_title = seoDefaultTitle?.trim() || null;
     if (seoDefaultDescription !== undefined) updateData.seo_default_description = seoDefaultDescription?.trim() || null;
@@ -222,6 +230,8 @@ export async function PUT(req: NextRequest) {
       socialLinkedin: result.social_linkedin,
       socialYoutube: result.social_youtube,
       socialPinterest: result.social_pinterest,
+      whatsappUrl: result.whatsapp_url,
+      chatbotUrl: result.chatbot_url,
       workingHours: result.working_hours || {},
       seoDefaultTitle: result.seo_default_title,
       seoDefaultDescription: result.seo_default_description,

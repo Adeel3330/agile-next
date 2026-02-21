@@ -114,9 +114,9 @@ export default function Testimonial() {
                           <Image
                             src={getCloudinaryImageUrl(item.fileUrl)}
                             alt={item.altText || item.title || 'Testimonial author'}
-                            width={120}
-                            height={120}
-                            style={{ objectFit: 'cover', borderRadius: '50%',height:'100%' }}
+                            width={140}
+                            height={140}
+                            style={{ objectFit: 'cover', borderRadius: '50%', width: '100%', height: '100%' }}
                           />
                         </figure>
                       ) : null}
