@@ -41,8 +41,6 @@ interface Settings {
   seoDefaultDescription?: string;
   seoDefaultKeywords?: string;
   seoDefaultImage?: string;
-  whatsappUrl?: string;
-  chatbotUrl?: string;
 }
 
 export default function ContactPage() {
@@ -395,20 +393,7 @@ export default function ContactPage() {
                 <>
                   <h2>{pageData?.title || 'Leave a Comment'}</h2>
                   
-                  {(settings?.whatsappUrl || settings?.chatbotUrl) && (
-                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px' }}>
-                      {settings?.whatsappUrl && (
-                        <Link href={settings.whatsappUrl} target="_blank" rel="noopener noreferrer" className="theme-btn btn-one">
-                          <span>WhatsApp Direct</span>
-                        </Link>
-                      )}
-                      {settings?.chatbotUrl && (
-                        <Link href={settings.chatbotUrl} target="_blank" rel="noopener noreferrer" className="theme-btn btn-two">
-                          <span>AI Bot</span>
-                        </Link>
-                      )}
-                    </div>
-                  )}
+                 
                 </>
               )}
               <ContactForm />

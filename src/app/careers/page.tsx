@@ -20,8 +20,7 @@ interface Career {
 }
 
 interface Settings {
-  whatsappUrl?: string;
-  chatbotUrl?: string;
+  // whatsappUrl?: string;
 }
 
 function CareersPageContent() {
@@ -301,20 +300,7 @@ function CareersPageContent() {
                     <h3>Join Our <br />Team Today!</h3>
                     <p>We&apos;re always looking for talented individuals to join our team. Explore our open positions and find your next career opportunity.</p>
                     <Link href="/contact" className="theme-btn btn-two"><span>Contact Us</span></Link>
-                    {(settings?.whatsappUrl || settings?.chatbotUrl) && (
-                      <div style={{ marginTop: '16px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                        {settings?.whatsappUrl && (
-                          <Link href={settings.whatsappUrl} target="_blank" rel="noopener noreferrer" className="theme-btn btn-one">
-                            <span>WhatsApp</span>
-                          </Link>
-                        )}
-                        {settings?.chatbotUrl && (
-                          <Link href={settings.chatbotUrl} target="_blank" rel="noopener noreferrer" className="theme-btn btn-two">
-                            <span>AI Bot</span>
-                          </Link>
-                        )}
-                      </div>
-                    )}
+                    
                   </div>
                 </div>
               </div>
