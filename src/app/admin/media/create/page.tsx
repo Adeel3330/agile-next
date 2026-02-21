@@ -14,6 +14,7 @@ export default function CreateMediaPage() {
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [uploadedFileData, setUploadedFileData] = useState<any>(null);
   const [availablePositions, setAvailablePositions] = useState<string[]>([]);
+  const [customPosition, setCustomPosition] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -130,6 +131,13 @@ export default function CreateMediaPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    const normalizedPosition = formData.position === 'other' ? customPosition.trim() : formData.position;
+
+    if (!normalizedPosition) {
+      setError('Please provide a position');
+      return;
+    }
     
     if (!uploadedFileData) {
       setError('Please upload an image first');
@@ -147,6 +155,7 @@ export default function CreateMediaPage() {
 
       const submitData = {
         ...formData,
+        position: normalizedPosition,
         fileUrl: uploadedFileData.url,
         fileName: uploadedFileData.fileName,
         fileSize: uploadedFileData.fileSize,
@@ -224,18 +233,31 @@ export default function CreateMediaPage() {
                 <div className="col-md-4">
                   <label className="form-label">Position *</label>
                   <select
-            className="form-select"
-            value={formData.position}
-            onChange={(e) => setFormData({ ...formData, position: e.target.value as any })}
-            required
-          >
-            <option value="">All Positions</option>
-            {availablePositions.map((position) => (
-              <option key={position} value={position}>
-                {position.charAt(0).toUpperCase() + position.slice(1)}
-              </option>
-            ))}
-          </select>
+                    className="form-select"
+                    value={formData.position}
+                    onChange={(e) => setFormData({ ...formData, position: e.target.value as any })}
+                    required
+                  >
+                    <option value="">Select Position</option>
+                    {availablePositions
+                      .filter((position) => position !== 'other')
+                      .map((position) => (
+                        <option key={position} value={position}>
+                          {position.charAt(0).toUpperCase() + position.slice(1)}
+                        </option>
+                      ))}
+                    <option value="other">Other</option>
+                  </select>
+                  {formData.position === 'other' && (
+                    <input
+                      type="text"
+                      className="form-control mt-2"
+                      value={customPosition}
+                      onChange={(e) => setCustomPosition(e.target.value)}
+                      placeholder="Enter custom position"
+                      required
+                    />
+                  )}
                 </div>
 
                 <div className="col-md-4">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -34,6 +34,8 @@ export default function EditMediaPage() {
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [uploadedFileData, setUploadedFileData] = useState<any>(null);
   const [hasNewFile, setHasNewFile] = useState(false);
+  const [availablePositions, setAvailablePositions] = useState<string[]>([]);
+  const [customPosition, setCustomPosition] = useState('');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -57,9 +59,31 @@ export default function EditMediaPage() {
         return;
       }
 
+      fetchPositions();
       fetchMedia();
     }
   }, [router, id]);
+
+  const fetchPositions = useCallback(async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
+      if (!token) return;
+
+      const response = await fetch('/api/admin/media/positions', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.positions) {
+        setAvailablePositions(data.positions);
+      }
+    } catch (err) {
+      console.error('Fetch positions error:', err);
+    }
+  }, []);
 
   const fetchMedia = async () => {
     try {
@@ -92,15 +116,19 @@ export default function EditMediaPage() {
       }
 
       const media: Media = data.media;
+      const normalizedPosition = media.position || 'home';
+      const isKnownPosition = ['home', 'services', 'about', 'contact', 'cta', 'testimonials'].includes(normalizedPosition);
+
       setFormData({
         title: media.title,
         description: media.description || '',
-        position: media.position,
+        position: isKnownPosition ? (normalizedPosition as any) : 'other',
         status: media.status,
         displayOrder: media.displayOrder,
         altText: media.altText || '',
         linkUrl: media.linkUrl || ''
       });
+      setCustomPosition(isKnownPosition ? '' : normalizedPosition);
       
       // Set existing image as preview
       if (media.fileUrl) {
@@ -192,6 +220,14 @@ export default function EditMediaPage() {
     setError('');
     setSaving(true);
 
+    const normalizedPosition = formData.position === 'other' ? customPosition.trim() : formData.position;
+
+    if (!normalizedPosition) {
+      setError('Please provide a position');
+      setSaving(false);
+      return;
+    }
+
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
       if (!token) {
@@ -200,7 +236,8 @@ export default function EditMediaPage() {
       }
 
       const submitData: any = {
-        ...formData
+        ...formData,
+        position: normalizedPosition
       };
 
       // Only include file data if a new file was uploaded
@@ -301,18 +338,31 @@ export default function EditMediaPage() {
                 <div className="col-md-4">
                   <label className="form-label">Position *</label>
                   <select
-            className="form-select"
-            value={formData.position}
-            onChange={(e) => setFormData({ ...formData, position: e.target.value as any })}
-            required
-          >
-            <option value="">All Positions</option>
-            {availablePositions.map((position) => (
-              <option key={position} value={position}>
-                {position.charAt(0).toUpperCase() + position.slice(1)}
-              </option>
-            ))}
-          </select>
+                    className="form-select"
+                    value={formData.position}
+                    onChange={(e) => setFormData({ ...formData, position: e.target.value as any })}
+                    required
+                  >
+                    <option value="">Select Position</option>
+                    {availablePositions
+                      .filter((position) => position !== 'other')
+                      .map((position) => (
+                        <option key={position} value={position}>
+                          {position.charAt(0).toUpperCase() + position.slice(1)}
+                        </option>
+                      ))}
+                    <option value="other">Other</option>
+                  </select>
+                  {formData.position === 'other' && (
+                    <input
+                      type="text"
+                      className="form-control mt-2"
+                      value={customPosition}
+                      onChange={(e) => setCustomPosition(e.target.value)}
+                      placeholder="Enter custom position"
+                      required
+                    />
+                  )}
                 </div>
 
                 <div className="col-md-4">

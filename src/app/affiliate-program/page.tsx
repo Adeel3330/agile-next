@@ -207,41 +207,6 @@ export default function AffiliateProgramPage() {
           </section>
         )}
 
-        {allMedia.length > 1 && (
-          <section className="about-section p_relative pt_90 pb_90" style={{ background: '#f5f8fa' }}>
-            <div className="auto-container">
-              <div className="sec-title mb_55 centred">
-                <span className="sub-title mb_5">Affiliate Highlights</span>
-                <h2>Why Partners Choose Our Program</h2>
-                <p style={{ maxWidth: '760px', margin: '15px auto 0', color: '#666' }}>
-                  Explore snapshots from our affiliate journey, partner growth moments, and collaboration highlights.
-                </p>
-              </div>
-              <div className="row clearfix">
-                {allMedia.slice(0, 6).map((item) => (
-                  <div key={item.id} className="col-lg-4 col-md-6 col-sm-12 mb-4">
-                    <div className="inner-box" style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 5px 20px rgba(0,0,0,0.06)' }}>
-                      <figure className="image-box" style={{ margin: 0 }}>
-                        <Image
-                          src={getCloudinaryImageUrl(item.fileUrl)}
-                          alt={item.altText || item.title || 'Affiliate highlight'}
-                          width={416}
-                          height={280}
-                          style={{ objectFit: 'cover', width: '100%', height: '240px' }}
-                        />
-                      </figure>
-                      <div style={{ padding: '18px 20px' }}>
-                        <h4 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>{item.title || 'Affiliate Program'}</h4>
-                        {item.description && <p style={{ margin: 0, color: '#666', lineHeight: '26px' }}>{item.description}</p>}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
        
 
         {/* Program cards - from admin */}
@@ -329,8 +294,8 @@ export default function AffiliateProgramPage() {
                   {allMedia.length > 0 && (
                     <div className="image-box" style={{ borderRadius: '12px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
                       <Image
-                        src={getCloudinaryImageUrl(allMedia[0]?.fileUrl)}
-                        alt={allMedia[1]?.altText || allMedia[0]?.title || 'Affiliate Program'}
+                        src={getCloudinaryImageUrl(allMedia[1]?.fileUrl)}
+                        alt={allMedia[1]?.altText || allMedia[1]?.title || 'Affiliate Program'}
                         width={560}
                         height={400}
                         style={{ objectFit: 'cover', width: '100%', height: '100%' }}
@@ -343,28 +308,7 @@ export default function AffiliateProgramPage() {
           </section>
         )}
 
-        {/* Commission - from admin */}
-        {commissionSection && (commissionSection.title || commissionSection.content || (commissionSection.bullets?.length > 0)) && (
-          <section className="funfact-section p_relative pt_120 pb_90">
-            <div className="auto-container">
-              <div className="sec-title mb_60 centred">
-                {(commissionSection.subTitle || (commissionSection as any).sub_title) && <span className="sub-title mb_5">{commissionSection.subTitle || (commissionSection as any).sub_title}</span>}
-                <h2>{commissionSection.title}</h2>
-                {commissionSection.subtitle && <p style={{ maxWidth: '700px', margin: '15px auto 0', color: '#666' }}>{commissionSection.subtitle}</p>}
-              </div>
-              <div className="inner-container" style={{ background: 'linear-gradient(135deg, var(--theme-color) 0%, #1a5f7a 100%)', padding: '50px 40px', borderRadius: '12px', color: '#fff' }}>
-                {commissionSection.content && <div className="text-box mb_30" dangerouslySetInnerHTML={{ __html: commissionSection.content }} />}
-                {commissionSection.bullets?.length > 0 && (
-                  <ul className="list-style-one clearfix" style={{ color: 'rgba(255,255,255,0.95)' }}>
-                    {commissionSection.bullets.map((b: string, i: number) => (
-                      <li key={i} style={{ marginBottom: '10px' }}>{b}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          </section>
-        )}
+        
 
         {/* FAQ - from FAQs API (admin) or CMS fallback */}
         {((apiFaqs.length > 0) || (faqSection?.items?.length > 0)) && (
@@ -417,14 +361,7 @@ export default function AffiliateProgramPage() {
           </section>
         )}
 
-        {/* CMS Content - from admin */}
-        {pageData?.content && (
-          <section className="about-section p_relative pt_90 pb_60">
-            <div className="auto-container">
-              <div className="text-box" dangerouslySetInnerHTML={{ __html: pageData.content }} />
-            </div>
-          </section>
-        )}
+        
 
         {/* Contact Form - title/description from admin form section */}
         <section className="contact-section sec-pad p_relative pt_120 pb_120" id="contact-form">
