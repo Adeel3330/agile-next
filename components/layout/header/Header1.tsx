@@ -201,20 +201,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                     <Link href={settings.socialLinkedin} target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></Link>
                   </li>
                 )}
-                {settings?.whatsappUrl && (
-                  <li>
-                    <Link href={settings.whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-                      <i className="fab fa-whatsapp"></i>
-                    </Link>
-                  </li>
-                )}
-                {settings?.chatbotUrl && (
-                  <li>
-                    <Link href={settings.chatbotUrl} target="_blank" rel="noopener noreferrer" aria-label="AI Chatbot">
-                      <i className="fa fa-robot"></i>
-                    </Link>
-                  </li>
-                )}
+                
               </ul>
             </div>
           </div>
