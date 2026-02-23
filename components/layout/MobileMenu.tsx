@@ -81,9 +81,30 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
                 <Link href="/" onClick={handleMobileMenu}>Home</Link>
               </li>
 
-              <li>
-                <Link href="/about" onClick={handleMobileMenu}>About Us</Link>
+              <li className={`dropdown ${openKeys.has("about") ? "current" : ""}`}>
+                <span
+                  className="mobile-menu-trigger"
+                  onClick={() => toggle("about")}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle("about"); } }}
+                  style={{ display: "block", padding: "10px 45px 10px 25px", lineHeight: "24px", fontSize: "15px", fontWeight: 500, color: "#fff", textTransform: "uppercase", cursor: "pointer" }}
+                >
+                  About Us
+                </span>
+                <ul style={{ display: openKeys.has("about") ? "block" : "none" }}>
+                  <li>
+                    <Link href="/about?view=all" onClick={handleMobileMenu}>About Agile Nexus Solutions</Link>
+                  </li>
+                  <li>
+                    <Link href="/about?view=team#our-teams" onClick={handleMobileMenu}>Our Teams</Link>
+                  </li>
+                </ul>
+                <div className={`dropdown-btn ${openKeys.has("about") ? "open" : ""}`} onClick={(e) => { e.stopPropagation(); toggle("about"); }}>
+                  <span className="fa fa-angle-right" />
+                </div>
               </li>
+              
 
               {/* Services - same structure as Header1 */}
               <li className={`${categories.length > 0 || hasOtherServices ? "dropdown " : ""}${openKeys.has("services") ? "current" : ""}`}>
@@ -178,25 +199,26 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
 
               {/* Resources - same as Header1 */}
               <li className={`dropdown ${openKeys.has("resources") ? "current" : ""}`}>
-                <span
-                  className="mobile-menu-trigger"
-                  onClick={() => toggle("resources")}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle("resources"); } }}
+                <Link
+                  href="/resources"
+                  onClick={handleMobileMenu}
                   style={{ display: "block", padding: "10px 45px 10px 25px", lineHeight: "24px", fontSize: "15px", fontWeight: 500, color: "#fff", textTransform: "uppercase", cursor: "pointer" }}
                 >
                   Resources
-                </span>
+                </Link>
                 <ul style={{ display: openKeys.has("resources") ? "block" : "none" }}>
                   <li><Link href="/compliance" onClick={handleMobileMenu}>Compliance</Link></li>
                   <li><Link href="/software" onClick={handleMobileMenu}>Software</Link></li>
-                  <li><Link href="/affiliate-program" onClick={handleMobileMenu}>Affiliate Program</Link></li>
+                  <li><Link href="/specialities" onClick={handleMobileMenu}>Specialities</Link></li>
                   <li><Link href="/blog" onClick={handleMobileMenu}>Blog</Link></li>
                 </ul>
                 <div className={`dropdown-btn ${openKeys.has("resources") ? "open" : ""}`} onClick={(e) => { e.stopPropagation(); toggle("resources"); }}>
                   <span className="fa fa-angle-right" />
                 </div>
+              </li>
+
+              <li>
+                <Link href="/affiliate-program" onClick={handleMobileMenu}>Affiliate Program</Link>
               </li>
 
               <li>
