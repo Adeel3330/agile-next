@@ -275,7 +275,7 @@ export default function About() {
                     </div>
                 </div>
                 <div className="appointment-box">
-                    <h4>Book an Appointment</h4>
+                    <h4>Let's Schedule a Meeting</h4>
                     <div className="form-inner">
                         <form onSubmit={handleSubmit} className="clearfix">
                             <div className="form-group mt-5 ps-0">

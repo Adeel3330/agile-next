@@ -129,7 +129,7 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
                     <Link href="/about?view=all" onClick={handleMobileMenu}>About Agile Nexus Solutions</Link>
                   </li>
                   <li>
-                    <Link href="/about?view=team#our-teams" onClick={handleMobileMenu}>Our Teams</Link>
+                    <Link href="/about?view=team#our-teams" onClick={handleMobileMenu}>Meet Our Teams</Link>
                   </li>
                 </ul>
                 <div className={`dropdown-btn ${openKeys.has("about") ? "open" : ""}`} onClick={(e) => { e.stopPropagation(); toggle("about"); }}>

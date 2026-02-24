@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
 
@@ -70,26 +70,6 @@ export default function DedicatedTeamPractice() {
   const heading =
     pageData?.title || 'Dedicated Account Managers & Certified Medical Billers for Your Practice';
 
-  const parsedListItems = useMemo(() => {
-    if (!pageData?.content) return [] as string[];
-    const matches = Array.from(pageData.content.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi));
-    return matches
-      .map((match) => match[1].replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim())
-      .filter(Boolean);
-  }, [pageData?.content]);
-
-  const fallbackText =
-    pageData?.description ||
-    'At Agile Nexus Solutions, we bring together certified medical coders, experienced account managers, and claims specialists who act as an extension of your in-house team.';
-
-  const fallbackList = [
-    'Dedicated billers and coders aligned to your specialty and workflow.',
-    'Proactive claim follow-up to reduce denials and improve collections.',
-    'Transparent communication and reporting from assigned account managers.',
-    'HIPAA-compliant processes built for consistency and scale.',
-  ];
-
-  const listItems = parsedListItems.length > 0 ? parsedListItems : fallbackList;
   const heroImage = mediaItems[0]?.fileUrl;
   const heroAlt = mediaItems[0]?.altText || mediaItems[0]?.title || pageData?.seoTitle || heading;
 
@@ -130,12 +110,13 @@ export default function DedicatedTeamPractice() {
               </div>
             ) : (
               <>
-                <p style={{ color: '#555', lineHeight: 1.8, marginBottom: '18px' }}>{fallbackText}</p>
-                <ul className="list-style-one clearfix dedicated-list">
-                  {listItems.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+                {pageData?.content ? (
+                  <div
+                    style={{ color: '#555', lineHeight: 1.8 }}
+                    className="list-style-one dedicated-list"
+                    dangerouslySetInnerHTML={{ __html: pageData.content }}
+                  />
+                ) : null}
               </>
             )}
           </div>
