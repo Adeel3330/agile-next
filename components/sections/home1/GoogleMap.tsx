@@ -21,6 +21,12 @@ interface Settings {
   };
 }
 
+interface WorkingHour {
+  open?: string | null;
+  close?: string | null;
+  closed?: boolean;
+}
+
 interface GoogleMapSectionProps {
   settings?: Settings | null;
   loading?: boolean;
@@ -59,55 +65,97 @@ export default function GoogleMapSection({ settings, loading = false }: GoogleMa
       }
     }
   }, [settings]);
+const formatTime = (time: string | null) => {
+  if (!time) return null;
 
-  const formatWorkingHours = () => {
-    if (loading || !settings?.workingHours) {
-      return (
-        <>
-          <li>Mon - Wed: <span>8:00AM - 7:00PM</span></li>
-          <li>Thu: <span>8:00AM - 7:00PM</span></li>
-          <li>Fri: <span>8:00AM - 7:00PM</span></li>
-          <li>Sat - Sun: <span>8:00AM - 7:00PM</span></li>
-        </>
-      );
-    }
+  const [hour, minute] = time.split(':');
+  const h = parseInt(hour);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const formattedHour = h % 12 || 12;
 
-    const hours = settings.workingHours;
-    const daysMap: { [key: string]: string } = {
-      monday: 'Mon',
-      tuesday: 'Tue',
-      wednesday: 'Wed',
-      thursday: 'Thu',
-      friday: 'Fri',
-      saturday: 'Sat',
-      sunday: 'Sun'
-    };
+  return `${formattedHour}:${minute}${ampm}`;
+};
 
-    const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-    const weekend = ['saturday', 'sunday'];
-
-    const weekdayData = weekdays.map(day => hours[day]).find(h => h && !h.closed);
-    const weekendData = weekend.map(day => hours[day]).find(h => h && !h.closed);
-
+const formatWorkingHours = () => {
+  if (loading || !settings?.workingHours) {
     return (
       <>
-        {weekdayData && (
-          <li>Mon - Fri: <span>{weekdayData.open || '8:00AM'} - {weekdayData.close || '7:00PM'}</span></li>
-        )}
-        {weekendData && (
-          <li>Sat - Sun: <span>{weekendData.open || '8:00AM'} - {weekendData.close || '7:00PM'}</span></li>
-        )}
-        {!weekdayData && !weekendData && (
-          <>
-            <li>Mon - Wed: <span>8:00AM - 7:00PM</span></li>
-            <li>Thu: <span>8:00AM - 7:00PM</span></li>
-            <li>Fri: <span>8:00AM - 7:00PM</span></li>
-            <li>Sat - Sun: <span>8:00AM - 7:00PM</span></li>
-          </>
-        )}
+        <li>Mon - Fri: <span>8:00AM - 7:00PM</span></li>
+        <li>Sat - Sun: <span>Closed</span></li>
       </>
     );
-  };
+  }
+
+  const hours = settings.workingHours;
+
+  const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+  const weekend = ['saturday', 'sunday'];
+
+  const weekdayValues = weekdays.map(day => hours[day]);
+  const weekendValues = weekend.map(day => hours[day]);
+
+  // ✅ Check if all weekdays are open and same timing
+  const firstWeekday = weekdayValues[0];
+
+  const allWeekdaysSame = weekdayValues.every(day =>
+    day &&
+    !day.closed &&
+    day.open === firstWeekday.open &&
+    day.close === firstWeekday.close
+  );
+
+  // ✅ Check if weekend all closed
+  const weekendClosed = weekendValues.every(day => day?.closed);
+
+  return (
+    <>
+      {/* Weekdays */}
+      {allWeekdaysSame ? (
+        <li>
+          Mon - Fri:{' '}
+          <span>
+            {formatTime(firstWeekday.open)} - {formatTime(firstWeekday.close)}
+          </span>
+        </li>
+      ) : (
+        weekdayValues.map((day, index) =>
+          day?.closed ? (
+            <li key={weekdays[index]}>
+              {weekdays[index].slice(0, 3)}: <span>Closed</span>
+            </li>
+          ) : (
+            <li key={weekdays[index]}>
+              {weekdays[index].slice(0, 3)}:{' '}
+              <span>
+                {formatTime(day.open)} - {formatTime(day.close)}
+              </span>
+            </li>
+          )
+        )
+      )}
+
+      {/* Weekend */}
+      {weekendClosed ? (
+        <li>Sat - Sun: <span>Closed</span></li>
+      ) : (
+        weekendValues.map((day, index) =>
+          day?.closed ? (
+            <li key={weekend[index]}>
+              {weekend[index].slice(0, 3)}: <span>Closed</span>
+            </li>
+          ) : (
+            <li key={weekend[index]}>
+              {weekend[index].slice(0, 3)}:{' '}
+              <span>
+                {formatTime(day.open)} - {formatTime(day.close)}
+              </span>
+            </li>
+          )
+        )
+      )}
+    </>
+  );
+};
 
   return (
     <section className="google-map-section">

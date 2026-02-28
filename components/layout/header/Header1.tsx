@@ -25,6 +25,12 @@ interface Settings {
   logoUrl?: string;
 }
 
+interface WorkingHour {
+  open?: string | null;
+  close?: string | null;
+  closed?: boolean;
+}
+
 interface Category {
   id: string;
   name: string;
@@ -105,12 +111,43 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
 
   const formatWorkingHours = () => {
     if (!settings?.workingHours) return 'Mon - Fri: 9:00am to 6:00pm';
-    const hours = settings.workingHours;
+    const hours = settings.workingHours as Record<string, WorkingHour | undefined>;
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-    const firstDay = hours[days[0]];
-    if (firstDay && !firstDay.closed) {
-      return `Mon - Fri: ${firstDay.open || '9:00'}am to ${firstDay.close || '6:00'}pm`;
+
+    const getTime = (value: string | null | undefined, fallback: string) => {
+      if (typeof value !== 'string') return fallback;
+      const trimmed = value.trim();
+      return trimmed || fallback;
+    };
+
+    const mondayData = hours.monday;
+    const hasGroupedWeekdayHours =
+      mondayData &&
+      !mondayData.closed &&
+      days.every((day) => {
+        const current = hours[day];
+        return (
+          current &&
+          !current.closed &&
+          getTime(current.open, '09:00') === getTime(mondayData.open, '09:00') &&
+          getTime(current.close, '18:00') === getTime(mondayData.close, '18:00')
+        );
+      });
+
+    if (hasGroupedWeekdayHours) {
+      return `Mon - Fri: ${getTime(mondayData?.open, '09:00')} to ${getTime(mondayData?.close, '18:00')}`;
     }
+
+    const firstOpenWeekday = days.find((day) => {
+      const dayData = hours[day];
+      return dayData && !dayData.closed;
+    });
+
+    if (firstOpenWeekday) {
+      const firstDayData = hours[firstOpenWeekday];
+      return `Mon - Fri: ${getTime(firstDayData?.open, '09:00')} to ${getTime(firstDayData?.close, '18:00')}`;
+    }
+
     return 'Mon - Fri: 9:00am to 6:00pm';
   };
 
@@ -187,13 +224,13 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                 {settings?.socialTwitter && (
                   <li>
                     <Link href={settings.socialTwitter} target="_blank" rel="noopener noreferrer" aria-label="X">
-                      <i className="fab fa-x-twitter"></i>
+                      <i className="fab fa-twitter"></i>
                     </Link>
                   </li>
                 )}
                 {settings?.socialInstagram && (
                   <li>
-                    <Link href={settings.socialInstagram} target="_blank" rel="noopener noreferrer"><i className="icon-6"></i></Link>
+                    <Link href={settings.socialInstagram} target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram"></i></Link>
                   </li>
                 )}
                 {settings?.socialLinkedin && (
