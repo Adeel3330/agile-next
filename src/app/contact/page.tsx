@@ -183,53 +183,6 @@ export default function ContactPage() {
     );
   };
 
-  const formatWorkingHours = () => {
-    if (!settings?.workingHours) {
-      return (
-        <>
-          <li>Mon - Wed: <span>8:00AM - 7:00PM</span></li>
-          <li>Thu: <span>8:00AM - 7:00PM</span></li>
-          <li>Fri: <span>8:00AM - 7:00PM</span></li>
-          <li>Sat - Sun: <span>8:00AM - 7:00PM</span></li>
-        </>
-      );
-    }
-
-    const hours = settings.workingHours;
-    const daysMap: { [key: string]: string } = {
-      monday: 'Mon',
-      tuesday: 'Tue',
-      wednesday: 'Wed',
-      thursday: 'Thu',
-      friday: 'Fri',
-      saturday: 'Sat',
-      sunday: 'Sun'
-    };
-
-    const formatDay = (day: string, dayData: any) => {
-      if (dayData.closed) return null;
-      const open = dayData.open || '8:00AM';
-      const close = dayData.close || '7:00PM';
-      return `${daysMap[day]}: <span>${open} - ${close}</span>`;
-    };
-
-    const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-    const weekend = ['saturday', 'sunday'];
-
-    const weekdayHours = weekdays.map(day => formatDay(day, hours[day])).filter(Boolean);
-    const weekendHours = weekend.map(day => formatDay(day, hours[day])).filter(Boolean);
-
-    return (
-      <>
-        {weekdayHours.length > 0 && (
-          <li dangerouslySetInnerHTML={{ __html: `Mon - Fri: <span>${hours.monday?.open || '8:00AM'} - ${hours.monday?.close || '7:00PM'}</span>` }} />
-        )}
-        {weekendHours.length > 0 && (
-          <li dangerouslySetInnerHTML={{ __html: `Sat - Sun: <span>${hours.saturday?.open || '8:00AM'} - ${hours.saturday?.close || '7:00PM'}</span>` }} />
-        )}
-      </>
-    );
-  };
 
   if (!mounted) {
     return null;

@@ -25,6 +25,12 @@ interface Settings {
   logoUrl?: string;
 }
 
+interface WorkingHour {
+  open?: string | null;
+  close?: string | null;
+  closed?: boolean;
+}
+
 interface Category {
   id: string;
   name: string;
@@ -104,15 +110,77 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
     categories.filter((category) => category.parentId === parentId);
 
   const formatWorkingHours = () => {
-    if (!settings?.workingHours) return 'Mon - Fri: 9:00am to 6:00pm';
-    const hours = settings.workingHours;
-    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-    const firstDay = hours[days[0]];
-    if (firstDay && !firstDay.closed) {
-      return `Mon - Fri: ${firstDay.open || '9:00'}am to ${firstDay.close || '6:00'}pm`;
-    }
-    return 'Mon - Fri: 9:00am to 6:00pm';
+  if (!settings?.workingHours) return 'Mon - Fri: 9:00am to 6:00pm';
+
+  const hours = settings.workingHours as Record<string, WorkingHour | undefined>;
+  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+
+  const getTime = (value: string | null | undefined, fallback: string) => {
+    if (typeof value !== 'string') return fallback;
+    const trimmed = value.trim();
+    return trimmed || fallback;
   };
+
+  const formatTo12Hour = (time: string | null | undefined, fallback: string) => {
+    if (!time || typeof time !== 'string') return fallback;
+
+    const trimmed = time.trim();
+    if (!trimmed) return fallback;
+
+    const [hourStr, minute] = trimmed.split(':');
+    const hour = parseInt(hourStr, 10);
+
+    if (isNaN(hour)) return fallback;
+
+    const ampm = hour >= 12 ? 'pm' : 'am';
+    const convertedHour = hour % 12 || 12;
+
+    return `${convertedHour}:${minute}${ampm}`;
+  };
+
+  const mondayData = hours.monday;
+
+  const hasGroupedWeekdayHours =
+    mondayData &&
+    !mondayData.closed &&
+    days.every((day) => {
+      const current = hours[day];
+      return (
+        current &&
+        !current.closed &&
+        getTime(current.open, '09:00') === getTime(mondayData.open, '09:00') &&
+        getTime(current.close, '18:00') === getTime(mondayData.close, '18:00')
+      );
+    });
+
+  if (hasGroupedWeekdayHours) {
+    return `Mon - Fri: ${formatTo12Hour(
+      getTime(mondayData?.open, '09:00'),
+      '9:00am'
+    )} to ${formatTo12Hour(
+      getTime(mondayData?.close, '18:00'),
+      '6:00pm'
+    )}`;
+  }
+
+  const firstOpenWeekday = days.find((day) => {
+    const dayData = hours[day];
+    return dayData && !dayData.closed;
+  });
+
+  if (firstOpenWeekday) {
+    const firstDayData = hours[firstOpenWeekday];
+    return `Mon - Fri: ${formatTo12Hour(
+      getTime(firstDayData?.open, '09:00'),
+      '9:00am'
+    )} to ${formatTo12Hour(
+      getTime(firstDayData?.close, '18:00'),
+      '6:00pm'
+    )}`;
+  }
+
+  return 'Mon - Fri: 9:00am to 6:00pm';
+};
 
   if (!mounted) {
     return null;
@@ -187,13 +255,13 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                 {settings?.socialTwitter && (
                   <li>
                     <Link href={settings.socialTwitter} target="_blank" rel="noopener noreferrer" aria-label="X">
-                      <i className="fab fa-x-twitter"></i>
+                      <i className="fab fa-twitter"></i>
                     </Link>
                   </li>
                 )}
                 {settings?.socialInstagram && (
                   <li>
-                    <Link href={settings.socialInstagram} target="_blank" rel="noopener noreferrer"><i className="icon-6"></i></Link>
+                    <Link href={settings.socialInstagram} target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram"></i></Link>
                   </li>
                 )}
                 {settings?.socialLinkedin && (
