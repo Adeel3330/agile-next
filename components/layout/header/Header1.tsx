@@ -110,77 +110,77 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
     categories.filter((category) => category.parentId === parentId);
 
   const formatWorkingHours = () => {
-  if (!settings?.workingHours) return 'Mon - Fri: 9:00am to 6:00pm';
+    if (!settings?.workingHours) return 'Mon - Fri: 9:00am to 6:00pm';
 
-  const hours = settings.workingHours as Record<string, WorkingHour | undefined>;
-  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+    const hours = settings.workingHours as Record<string, WorkingHour | undefined>;
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
-  const getTime = (value: string | null | undefined, fallback: string) => {
-    if (typeof value !== 'string') return fallback;
-    const trimmed = value.trim();
-    return trimmed || fallback;
-  };
+    const getTime = (value: string | null | undefined, fallback: string) => {
+      if (typeof value !== 'string') return fallback;
+      const trimmed = value.trim();
+      return trimmed || fallback;
+    };
 
-  const formatTo12Hour = (time: string | null | undefined, fallback: string) => {
-    if (!time || typeof time !== 'string') return fallback;
+    const formatTo12Hour = (time: string | null | undefined, fallback: string) => {
+      if (!time || typeof time !== 'string') return fallback;
 
-    const trimmed = time.trim();
-    if (!trimmed) return fallback;
+      const trimmed = time.trim();
+      if (!trimmed) return fallback;
 
-    const [hourStr, minute] = trimmed.split(':');
-    const hour = parseInt(hourStr, 10);
+      const [hourStr, minute] = trimmed.split(':');
+      const hour = parseInt(hourStr, 10);
 
-    if (isNaN(hour)) return fallback;
+      if (isNaN(hour)) return fallback;
 
-    const ampm = hour >= 12 ? 'pm' : 'am';
-    const convertedHour = hour % 12 || 12;
+      const ampm = hour >= 12 ? 'pm' : 'am';
+      const convertedHour = hour % 12 || 12;
 
-    return `${convertedHour}:${minute}${ampm}`;
-  };
+      return `${convertedHour}:${minute}${ampm}`;
+    };
 
-  const mondayData = hours.monday;
+    const mondayData = hours.monday;
 
-  const hasGroupedWeekdayHours =
-    mondayData &&
-    !mondayData.closed &&
-    days.every((day) => {
-      const current = hours[day];
-      return (
-        current &&
-        !current.closed &&
-        getTime(current.open, '09:00') === getTime(mondayData.open, '09:00') &&
-        getTime(current.close, '18:00') === getTime(mondayData.close, '18:00')
-      );
+    const hasGroupedWeekdayHours =
+      mondayData &&
+      !mondayData.closed &&
+      days.every((day) => {
+        const current = hours[day];
+        return (
+          current &&
+          !current.closed &&
+          getTime(current.open, '09:00') === getTime(mondayData.open, '09:00') &&
+          getTime(current.close, '18:00') === getTime(mondayData.close, '18:00')
+        );
+      });
+
+    if (hasGroupedWeekdayHours) {
+      return `Mon - Fri: ${formatTo12Hour(
+        getTime(mondayData?.open, '09:00'),
+        '9:00am'
+      )} to ${formatTo12Hour(
+        getTime(mondayData?.close, '18:00'),
+        '6:00pm'
+      )}`;
+    }
+
+    const firstOpenWeekday = days.find((day) => {
+      const dayData = hours[day];
+      return dayData && !dayData.closed;
     });
 
-  if (hasGroupedWeekdayHours) {
-    return `Mon - Fri: ${formatTo12Hour(
-      getTime(mondayData?.open, '09:00'),
-      '9:00am'
-    )} to ${formatTo12Hour(
-      getTime(mondayData?.close, '18:00'),
-      '6:00pm'
-    )}`;
-  }
+    if (firstOpenWeekday) {
+      const firstDayData = hours[firstOpenWeekday];
+      return `Mon - Fri: ${formatTo12Hour(
+        getTime(firstDayData?.open, '09:00'),
+        '9:00am'
+      )} to ${formatTo12Hour(
+        getTime(firstDayData?.close, '18:00'),
+        '6:00pm'
+      )}`;
+    }
 
-  const firstOpenWeekday = days.find((day) => {
-    const dayData = hours[day];
-    return dayData && !dayData.closed;
-  });
-
-  if (firstOpenWeekday) {
-    const firstDayData = hours[firstOpenWeekday];
-    return `Mon - Fri: ${formatTo12Hour(
-      getTime(firstDayData?.open, '09:00'),
-      '9:00am'
-    )} to ${formatTo12Hour(
-      getTime(firstDayData?.close, '18:00'),
-      '6:00pm'
-    )}`;
-  }
-
-  return 'Mon - Fri: 9:00am to 6:00pm';
-};
+    return 'Mon - Fri: 9:00am to 6:00pm';
+  };
 
   if (!mounted) {
     return null;
@@ -269,7 +269,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                     <Link href={settings.socialLinkedin} target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></Link>
                   </li>
                 )}
-                
+
               </ul>
             </div>
           </div>
@@ -351,7 +351,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                                       <ul className="submenu">
                                         {subcategories.map((subcategory) => (
                                           <li key={subcategory.id}>
-                                            <Link href={`/services?category=${subcategory.slug}`}>
+                                            <Link href={`/services?sub-category=${subcategory.slug}`}>
                                               {subcategory.name}
                                             </Link>
                                           </li>
@@ -501,7 +501,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                                       <ul className="submenu">
                                         {subcategories.map((subcategory) => (
                                           <li key={subcategory.id}>
-                                            <Link href={`/services?category=${subcategory.slug}`}>
+                                            <Link href={`/services?sub-category=${subcategory.slug}`}>
                                               {subcategory.name}
                                             </Link>
                                           </li>
