@@ -276,13 +276,16 @@ export default function ServicesPage() {
                             <h3>
                               <Link href={`/services/${service.slug}`}>{service.title}</Link>
                             </h3>
-                            <p>
-                              {service.description
-                                ? service.description.length > 120
-                                  ? `${service.description.slice(0, 120)}...`
-                                  : service.description
-                                : 'Professional service module with detailed backend-managed content.'}
-                            </p>
+
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: service.description
+                                  ? service.description.length > 120
+                                    ? `${service.description.slice(0, 300)}...`
+                                    : service.description
+                                  : 'Professional service module with detailed backend-managed content.'
+                              }}
+                            />
                           </div>
                         </div>
                       </div>
