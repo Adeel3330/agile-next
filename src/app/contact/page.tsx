@@ -49,7 +49,7 @@ export default function ContactPage() {
   const [mediaLoading, setMediaLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);
   const [settingsLoading, setSettingsLoading] = useState(true);
-  
+
   const [contactImage, setContactImage] = useState<MediaItem | null>(null);
   const [pageData, setPageData] = useState<PageData | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -64,9 +64,9 @@ export default function ContactPage() {
     if (pageData || settings) {
       // Use page SEO first, then fallback to settings default SEO
       const title = pageData?.seoTitle || settings?.seoDefaultTitle || pageData?.title || 'Contact Us - Agile Nexus Solution';
-      const description = pageData?.seoDescription || settings?.seoDefaultDescription || 
+      const description = pageData?.seoDescription || settings?.seoDefaultDescription ||
         'Get in touch with Agile Nexus Solution. Contact us for medical billing services, support, or inquiries. We are here to help you.';
-      const keywords = pageData?.seoKeywords || settings?.seoDefaultKeywords || 
+      const keywords = pageData?.seoKeywords || settings?.seoDefaultKeywords ||
         'contact, medical billing, healthcare, support, inquiry, Agile Nexus Solution';
       const image = pageData?.seoImage || contactImage?.fileUrl || settings?.seoDefaultImage || '';
 
@@ -104,7 +104,7 @@ export default function ContactPage() {
 
   const fetchContactData = useCallback(async () => {
     setLoading(true);
-    
+
     // Fetch media (contact image)
     try {
       const mediaRes = await fetch('/api/media?position=contact');
@@ -190,7 +190,8 @@ export default function ContactPage() {
 
   return (
     <div className="boxed_wrapper">
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes pulse {
           0%, 100% {
             opacity: 1;
@@ -220,31 +221,38 @@ export default function ContactPage() {
           height: 200px;
           border-radius: 8px;
         }
+          .default-form .form-group input[type="text"],
+.default-form .form-group input[type="email"],
+.default-form .form-group textarea,
+.default-form .form-group select,
+.default-form .form-group .nice-select {
+  color: #000 !important;
+}
       `}} />
-      
+
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Contact Us">
         <section className="contact-info-two centred">
-          <div 
-            className="pattern-layer" 
-            style={{ 
-              backgroundImage: mediaLoading || !contactImage 
-                ? 'none' 
-                : `url(${contactImage.fileUrl})` 
+          {/* <div
+            className="pattern-layer"
+            style={{
+              backgroundImage: mediaLoading || !contactImage
+                ? 'none'
+                : `url(${contactImage.fileUrl})`
             }}
           >
             {mediaLoading && (
               <div className="skeleton skeleton-image" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}></div>
             )}
-          </div>
+          </div> */}
           <div className="auto-container">
             <div className="row clearfix">
-              <div className="col-md-8">
+              <div className="col-md-6 m-auto">
                 {pageData?.content && (
-                    <div
-                      style={{ color: '#666', fontSize: '16px', lineHeight: '28px', marginBottom: '22px' }}
-                      dangerouslySetInnerHTML={{ __html: pageData.content }}
-                    />
-                  )}
+                  <div
+                    style={{ color: '#666', fontSize: '16px', lineHeight: '28px', marginBottom: '22px' }}
+                    dangerouslySetInnerHTML={{ __html: pageData.content }}
+                  />
+                )}
               </div>
             </div>
             <div className="row clearfix">
@@ -330,7 +338,7 @@ export default function ContactPage() {
             </div>
           </div>
         </section>
-        
+
         <section className="contact-section sec-pad">
           <div className="pattern-layer" style={{ backgroundImage: "url(assets/images/shape/shape-42.png)" }}></div>
           <div className="auto-container">
@@ -345,8 +353,8 @@ export default function ContactPage() {
               ) : (
                 <>
                   <h2>{pageData?.title || 'Leave a Comment'}</h2>
-                  
-                 
+
+
                 </>
               )}
               <ContactForm />

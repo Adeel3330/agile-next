@@ -329,7 +329,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                             <Link href="/about?view=all">About Agile Nexus Solutions</Link>
                           </li>
                           <li>
-                            <Link href="/about?view=team#our-teams">Meet Our Teams</Link>
+                            <Link href="/about?view=team#our-teams">Meet Our Team</Link>
                           </li>
                         </ul>
                       </li>
@@ -480,7 +480,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                             <Link href="/about?view=all">About Agile Nexus Solutions</Link>
                           </li>
                           <li>
-                            <Link href="/about?view=team#our-teams">Meet Our Teams</Link>
+                            <Link href="/about?view=team#our-teams">Meet Our Team</Link>
                           </li>
                         </ul>
                       </li>

@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     const selectedDate = new Date(appointmentDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (selectedDate < today) {
       return NextResponse.json(
         { success: false, message: 'Appointment date cannot be in the past' },
@@ -66,32 +66,40 @@ export async function POST(req: NextRequest) {
         ? [serviceId]
         : [];
 
-    if (requestedServiceIds.length === 0) {
+    const requestedServiceNames = Array.isArray(serviceNames)
+      ? serviceNames.filter((name) => typeof name === 'string' && name.trim().length > 0)
+      : [];
+
+    if (requestedServiceIds.length === 0 && requestedServiceNames.length === 0) {
       return NextResponse.json(
-        { success: false, message: 'Please select at least one service' },
+        { success: false, message: 'Please select at least one service or provide a service name' },
         { status: 400 }
       );
     }
 
-    const { data: foundServices, error: servicesError } = await supabaseAdmin
-      .from('services')
-      .select('id, title, status')
-      .in('id', requestedServiceIds)
-      .is('deleted_at', null);
+    let foundServices: any[] = [];
+    if (requestedServiceIds.length > 0) {
+      const { data, error: servicesError } = await supabaseAdmin
+        .from('services')
+        .select('id, title, status')
+        .in('id', requestedServiceIds)
+        .is('deleted_at', null);
 
-    if (servicesError || !foundServices || foundServices.length !== requestedServiceIds.length) {
-      return NextResponse.json(
-        { success: false, message: 'One or more selected services were not found' },
-        { status: 404 }
-      );
-    }
+      if (servicesError || !data || data.length !== requestedServiceIds.length) {
+        return NextResponse.json(
+          { success: false, message: 'One or more selected services were not found' },
+          { status: 404 }
+        );
+      }
 
-    const inactiveService = foundServices.find((service) => service.status !== 'active');
-    if (inactiveService) {
-      return NextResponse.json(
-        { success: false, message: `Selected service is not available: ${inactiveService.title}` },
-        { status: 400 }
-      );
+      const inactiveService = data.find((service) => service.status !== 'active');
+      if (inactiveService) {
+        return NextResponse.json(
+          { success: false, message: `Selected service is not available: ${inactiveService.title}` },
+          { status: 400 }
+        );
+      }
+      foundServices = data;
     }
 
     const serviceTitleById = new Map(foundServices.map((service) => [service.id, service.title]));
@@ -109,7 +117,7 @@ export async function POST(req: NextRequest) {
         service_id: orderedSelectedServices[0]?.id || null,
         service_name:
           legacyServiceName ||
-          (Array.isArray(serviceNames) ? serviceNames.join(', ').trim() : serviceName?.trim()) ||
+          (requestedServiceNames.length > 0 ? requestedServiceNames.join(', ').trim() : serviceName?.trim()) ||
           null,
         name: name.trim(),
         email: email.toLowerCase().trim(),
