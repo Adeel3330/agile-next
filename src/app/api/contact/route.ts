@@ -52,12 +52,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (existingContact) {
-      return NextResponse.json(
-        { success: false, message: 'You have already submitted a contact form. Each user can only submit one contact at a time.' },
-        { status: 400 }
-      );
-    }
+    // if (existingContact) {
+    //   return NextResponse.json(
+    //     { success: false, message: 'You have already submitted a contact form. Each user can only submit one contact at a time.' },
+    //     { status: 400 }
+    //   );
+    // }
 
     // Insert contact submission
     const { data: contact, error: insertError } = await supabaseAdmin
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
 
     if (insertError) {
       console.error('Insert contact error:', insertError);
-      
+
       // Check if it's a unique constraint violation (email already exists)
       if (insertError.code === '23505') {
         return NextResponse.json(

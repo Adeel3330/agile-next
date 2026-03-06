@@ -93,15 +93,20 @@ export default function RevenueChallenges() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/contact', {
+      const today = new Date();
+      // Format as YYYY-MM-DD
+      const formattedDate = today.toISOString().split('T')[0];
+
+      const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: name.trim(),
           email: email.trim(),
           phone: phone.trim(),
-          subject: 'Revenue Challenges Consultation',
-          message: `Selected revenue challenges:\n- ${selectedChallenges.join('\n- ')}`,
+          serviceNames: selectedChallenges,
+          appointmentDate: formattedDate,
+          message: `Consultation regarding revenue challenges.`,
         }),
       });
 

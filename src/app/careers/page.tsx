@@ -23,10 +23,18 @@ interface Settings {
   // whatsappUrl?: string;
 }
 
+interface MediaItem {
+  id: string;
+  fileUrl: string;
+  title?: string;
+  altText?: string;
+  description?: string;
+}
+
 function CareersPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [mounted, setMounted] = useState(false);
   const [careers, setCareers] = useState<Career[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,6 +43,7 @@ function CareersPageContent() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [settings, setSettings] = useState<Settings | null>(null);
+  const [careersMedia, setCareersMedia] = useState<MediaItem | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize mounted state and URL params on client side only
@@ -43,7 +52,7 @@ function CareersPageContent() {
     if (typeof window !== 'undefined') {
       const page = parseInt(searchParams.get('page') || '1', 10);
       const search = searchParams.get('search') || '';
-      
+
       setCurrentPage(page);
       setSearchTerm(search);
       setDebouncedSearchTerm(search);
@@ -84,6 +93,12 @@ function CareersPageContent() {
       if (data.success) {
         setCareers(data.careers || []);
         setTotalPages(data.totalPages || 1);
+      }
+
+      const mediaRes = await fetch('/api/media?position=careers');
+      const mediaData = await mediaRes.json();
+      if (mediaData.success && mediaData.media?.length > 0) {
+        setCareersMedia(mediaData.media[0]);
       }
     } catch (err) {
       console.error('Failed to fetch careers:', err);
@@ -166,12 +181,15 @@ function CareersPageContent() {
               <div className="col-12">
                 <div className="sec-title mb_20">
                   <span className="sub-title mb_5">Grow With Us</span>
-                  <h2>Build a Meaningful Career With Agile Nexus Solutions</h2>
+                  <h2>{careersMedia?.title || 'Build a Meaningful Career With Agile Nexus Solutions'}</h2>
                 </div>
-                <p style={{ color: '#666', fontSize: '17px', lineHeight: '30px', marginBottom: '25px' }}>
-                  We believe great teams build great outcomes. Join us to work with purpose, continuous learning, and a culture that values people as much as performance.
-                </p>
-                
+                <div
+                  style={{ color: '#666', fontSize: '17px', lineHeight: '30px', marginBottom: '25px' }}
+                  dangerouslySetInnerHTML={{
+                    __html: careersMedia?.description || 'We believe great teams build great outcomes. Join us to work with purpose, continuous learning, and a culture that values people as much as performance.'
+                  }}
+                />
+
               </div>
             </div>
             <div className="row clearfix">
@@ -224,8 +242,8 @@ function CareersPageContent() {
                         <div className="pagination-wrapper centred" suppressHydrationWarning>
                           <ul className="pagination clearfix">
                             <li>
-                              <Link 
-                                href="#" 
+                              <Link
+                                href="#"
                                 onClick={(e) => {
                                   e.preventDefault();
                                   if (currentPage > 1) handlePageChange(currentPage - 1);
@@ -280,10 +298,10 @@ function CareersPageContent() {
                     <h3>Search Here</h3>
                     <form method="post" onSubmit={handleSearch}>
                       <div className="form-group">
-                        <input 
-                          type="search" 
-                          name="search-field" 
-                          placeholder="keywords" 
+                        <input
+                          type="search"
+                          name="search-field"
+                          placeholder="keywords"
                           value={mounted ? searchTerm : ''}
                           onChange={(e) => setSearchTerm(e.target.value)}
                           required
@@ -300,14 +318,14 @@ function CareersPageContent() {
                     <h3>Join Our <br />Team Today!</h3>
                     <p>We&apos;re always looking for talented individuals to join our team. Explore our open positions and find your next career opportunity.</p>
                     <Link href="/contact" className="theme-btn btn-two"><span>Contact Us</span></Link>
-                    
+
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
-        <Cta/>
+        <Cta />
       </Layout>
     </div>
   );

@@ -1,18 +1,17 @@
-
 /** google-map-section **/
 
-.google-map-section{
+.google-map-section {
   position: relative;
 }
 
-.google-map-section #contact-google-map{
+.google-map-section #contact-google-map {
   position: relative;
   display: block;
   width: 100%;
   height: 600px;
 }
 
-.google-map-section .content-box{
+.google-map-section .content-box {
   position: absolute;
   left: 0px;
   top: 87px;
@@ -22,7 +21,7 @@
   margin: 0 auto;
 }
 
-.google-map-section .content-box .inner-box{
+.google-map-section .content-box .inner-box {
   position: relative;
   display: block;
   max-width: 310px;
@@ -31,7 +30,7 @@
   overflow: hidden;
 }
 
-.google-map-section .content-box .inner-box h3{
+.google-map-section .content-box .inner-box h3 {
   position: relative;
   display: block;
   font-size: 24px;
@@ -42,13 +41,13 @@
   background: var(--theme-color);
 }
 
-.google-map-section .content-box .content-inner{
+.google-map-section .content-box .content-inner {
   position: relative;
   display: block;
   padding: 28px 30px 48px 30px;
 }
 
-.google-map-section .content-box .schedule-list li{
+.google-map-section .content-box .schedule-list li {
   position: relative;
   display: block;
   font-size: 16px;
@@ -56,19 +55,19 @@
   font-weight: 700;
 }
 
-.google-map-section .content-box .schedule-list li span{
+.google-map-section .content-box .schedule-list li span {
   font-weight: 400;
   float: right;
 }
 
-.google-map-section .content-box .schedule-list{
+.google-map-section .content-box .schedule-list {
   position: relative;
   padding-bottom: 20px;
   margin-bottom: 20px;
   border-bottom: 1px solid rgba(189, 189, 189, 0.2);
 }
 
-.google-map-section .content-box h4{
+.google-map-section .content-box h4 {
   display: block;
   font-size: 24px;
   line-height: 34px;
@@ -77,7 +76,7 @@
   margin-bottom: 8px;
 }
 
-.google-map-section .content-box .info-list li{
+.google-map-section .content-box .info-list li {
   position: relative;
   display: block;
   font-size: 14px;
@@ -86,16 +85,16 @@
   padding-left: 37px;
 }
 
-.google-map-section .content-box .info-list li a{
+.google-map-section .content-box .info-list li a {
   display: inline-block;
   color: #fff;
 }
 
-.google-map-section .content-box .info-list li a:hover{
+.google-map-section .content-box .info-list li a:hover {
   text-decoration: underline;
 }
 
-.google-map-section .content-box .info-list li i{
+.google-map-section .content-box .info-list li i {
   position: absolute;
   left: 0px;
   top: 4px;
@@ -104,11 +103,11 @@
 }
 
 
-.contact-section{
+.contact-section {
   position: relative;
 }
 
-.contact-section h2{
+.contact-section h2 {
   position: relative;
   display: block;
   font-size: 32px;
@@ -119,15 +118,15 @@
 }
 
 .contact-section input,
-.contact-section textarea{
+.contact-section textarea {
   padding: 10px 20px !important;
 }
 
-.contact-section textarea{
+.contact-section textarea {
   height: 182px;
 }
 
-.contact-section .pattern-layer{
+.contact-section .pattern-layer {
   position: absolute;
   left: 0px;
   bottom: 0px;
@@ -140,100 +139,40 @@
 
 /** RTL-CSS **/
 
-.rtl .google-map-section .content-box .schedule-list li span{
+.rtl .google-map-section .content-box .schedule-list li span {
   float: left;
 }
 
-.rtl .google-map-section .content-box .info-list li{
+.rtl .google-map-section .content-box .info-list li {
   padding-left: 0px;
   padding-right: 37px;
 }
 
-.rtl .google-map-section .content-box .info-list li i{
+.rtl .google-map-section .content-box .info-list li i {
   left: inherit;
   right: 0px;
 }
 
+.default-form .form-group input[type="text"],
+.default-form .form-group input[type="email"],
+.default-form .form-group textarea,
+.default-form .form-group select,
+.default-form .form-group .nice-select {
+  color: #000;
+}
 
 
 /** RESPONSIVE-CSS **/
 
-@media only screen and (max-width: 1599px){
-  
+@media only screen and (max-width: 1599px) {}
 
-}
 
+@media only screen and (max-width: 1200px) {}
 
-@media only screen and (max-width: 1200px){
+@media only screen and (max-width: 991px) {}
 
+@media only screen and (max-width: 767px) {}
 
+@media only screen and (max-width: 599px) {}
 
-}
-
-@media only screen and (max-width: 991px){
-
-
-
-}
-
-@media only screen and (max-width: 767px){
-
-
-
-}
-
-@media only screen and (max-width: 599px){
-
-  
-
-}
-
-@media only screen and (max-width: 499px){
-
-  
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@media only screen and (max-width: 499px) {}

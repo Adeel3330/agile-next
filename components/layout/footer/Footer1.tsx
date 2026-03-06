@@ -115,7 +115,7 @@ export default function Footer1() {
                         <li><Link href={settings.socialFacebook} target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook-f"></i></Link></li>
                       )}
                       {settings?.socialTwitter && (
-                        <li><Link href={settings.socialTwitter} target="_blank" rel="noopener noreferrer" aria-label="X"><i className="fab fa-x-twitter"></i></Link></li>
+                        <li><Link href={settings.socialTwitter} target="_blank" rel="noopener noreferrer" aria-label="X"><i className="fab fa-twitter"></i></Link></li>
                       )}
                       {settings?.socialInstagram && (
                         <li><Link href={settings.socialInstagram} target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram"></i></Link></li>
@@ -126,12 +126,7 @@ export default function Footer1() {
                       {settings?.socialYoutube && (
                         <li><Link href={settings.socialYoutube} target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube"></i></Link></li>
                       )}
-                      {settings?.whatsappUrl && (
-                        <li><Link href={settings.whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i className="fab fa-whatsapp"></i></Link></li>
-                      )}
-                      {settings?.chatbotUrl && (
-                        <li><Link href={settings.chatbotUrl} target="_blank" rel="noopener noreferrer" aria-label="AI Chatbot"><i className="fa fa-robot"></i></Link></li>
-                      )}
+
                     </ul>
                     {certifications.length > 0 && (
                       <div className="mt-3">
@@ -231,12 +226,12 @@ export default function Footer1() {
                   {loading ? (
                     <div style={{ width: '203px', height: '40px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></div>
                   ) : (
-                    <Image 
-                      src={settings?.logoUrl || '/assets/images/logo.png'} 
-                      alt="Footer Logo" 
-                      width={203} 
-                      height={40} 
-                      priority 
+                    <Image
+                      src={settings?.logoUrl || '/assets/images/logo.png'}
+                      alt="Footer Logo"
+                      width={203}
+                      height={40}
+                      priority
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/assets/images/logo.png';
                       }}
