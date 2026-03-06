@@ -28,17 +28,26 @@ export async function GET(req: NextRequest) {
         .select('id, slug, parent_id')
         .is('deleted_at', null);
 
-      const selectedCategory = (allCategories || []).find(
-        (item: any) => item.slug === category.trim()
+      const matchedCategories = (allCategories || []).filter(
+        (item: any) => item.slug.toLowerCase() === category.trim().toLowerCase()
       );
+      console.log(matchedCategories, "categories")
 
-      if (selectedCategory) {
-        const categoryIds = new Set<string>([selectedCategory.id]);
-        const queue = [selectedCategory.id];
+      if (matchedCategories.length > 0) {
+        const categoryIds = new Set<string>();
+        const queue: string[] = [];
+
+        for (const selected of matchedCategories) {
+          categoryIds.add(selected.id);
+          queue.push(selected.id);
+        }
 
         while (queue.length > 0) {
           const currentId = queue.shift() as string;
-          const children = (allCategories || []).filter((item: any) => item.parent_id === currentId);
+          // const children = (allCategories || []).filter((item: any) => item.parent_id === currentId);
+          const children = (allCategories || []).filter(
+            (item: any) => String(item.parent_id) === String(currentId)
+          );
 
           for (const child of children) {
             if (!categoryIds.has(child.id)) {
@@ -86,7 +95,7 @@ export async function GET(req: NextRequest) {
 
     const mappedServices = (services || []).map((service: any) => {
       const category = service.category_id ? categoryMap.get(service.category_id) : null;
-      
+
       return {
         id: service.id,
         title: service.title,

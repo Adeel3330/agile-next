@@ -47,7 +47,9 @@ const coreOfferings = [
 export default function ServicesPage() {
   const searchParams = useSearchParams();
   const categorySlug = searchParams.get('category');
-  const hasCategoryParam = Boolean(categorySlug);
+  const subCategorySlug = searchParams.get('sub-category');
+  console.log(subCategorySlug)
+  const hasCategoryParam = Boolean(categorySlug) || Boolean(subCategorySlug);
 
   const [mounted, setMounted] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
@@ -74,7 +76,13 @@ export default function ServicesPage() {
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
-      const apiUrl = '/api/services?limit=100';
+      let apiUrl = '/api/services?limit=100';
+      console.log(subCategorySlug, "test")
+      if (subCategorySlug) {
+        apiUrl += `&category=${subCategorySlug}`;
+      } else if (categorySlug) {
+        apiUrl += `&category=${categorySlug}`;
+      }
 
       const response = await fetch(apiUrl);
       const data = await response.json();
@@ -110,7 +118,7 @@ export default function ServicesPage() {
       fetchServices();
       fetchCategories();
     }
-  }, [mounted, fetchPageData, fetchServices, fetchCategories]);
+  }, [mounted, fetchPageData, fetchServices, fetchCategories, categorySlug, subCategorySlug]);
 
   const serviceRoot = categories.find((category) => category.slug === 'service-categories');
   const serviceCategories = serviceRoot
@@ -196,13 +204,13 @@ export default function ServicesPage() {
             <div className="sec-title centred mb_55">
               <span className="sub-title mb_5">Our Services</span>
               <h2>{pageData?.title || 'Medical Billing Services for All Healthcare Organizations'}</h2>
-             
-                 <div
-                            dangerouslySetInnerHTML={{ __html: pageData?.content || 'We begin with a focused introduction and service strategy, then deliver the same high-impact service capabilities across new providers, established groups, and facilities.' }}
-                          />
+
+              <div
+                dangerouslySetInnerHTML={{ __html: pageData?.content || 'We begin with a focused introduction and service strategy, then deliver the same high-impact service capabilities across new providers, established groups, and facilities.' }}
+              />
             </div>
 
-          
+
 
             <div className="sec-title mb_30">
               <span className="sub-title mb_5">Core Offerings</span>
