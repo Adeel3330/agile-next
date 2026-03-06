@@ -13,6 +13,7 @@ interface MediaItem {
   fileUrl: string;
   title?: string;
   altText?: string;
+  description?: string;
 }
 
 interface PageData {
@@ -41,6 +42,7 @@ export default function AboutPage() {
   const [loading, setLoading] = useState(true);
   const [pageData, setPageData] = useState<PageData | null>(null);
   const [aboutMedia, setAboutMedia] = useState<MediaItem[]>([]);
+  const [teamMedia, setTeamMedia] = useState<MediaItem[]>([]);
   const [teamLoading, setTeamLoading] = useState(true);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
@@ -54,13 +56,15 @@ export default function AboutPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [pageRes, mediaRes] = await Promise.all([
+        const [pageRes, mediaRes, teamMediaRes] = await Promise.all([
           fetch('/api/pages?template=about-us'),
-          fetch('/api/media?position=about')
+          fetch('/api/media?position=about'),
+          fetch('/api/media?position=team')
         ]);
 
         const pagePayload = await pageRes.json();
         const mediaPayload = await mediaRes.json();
+        const teamMediaPayload = await teamMediaRes.json();
 
         if (pagePayload.success && pagePayload.page) {
           setPageData(pagePayload.page);
@@ -68,6 +72,10 @@ export default function AboutPage() {
 
         if (mediaPayload.success && Array.isArray(mediaPayload.media) && mediaPayload.media.length > 0) {
           setAboutMedia(mediaPayload.media);
+        }
+
+        if (teamMediaPayload.success && Array.isArray(teamMediaPayload.media) && teamMediaPayload.media.length > 0) {
+          setTeamMedia(teamMediaPayload.media);
         }
 
         try {
@@ -263,11 +271,18 @@ export default function AboutPage() {
 
         {showTeamOnly && (
           <section className="team-section sec-pad centred" id="our-teams">
-            <div className="bg-layer" style={{ backgroundImage: 'url(assets/images/background/team-bg.jpg)' }}></div>
+            <div className="bg-layer" style={{
+              backgroundImage: teamMedia[0]?.fileUrl ? `url(${teamMedia[0].fileUrl})` : 'url(assets/images/background/team-bg.jpg)'
+            }}></div>
             <div className="auto-container">
               <div className="sec-title mb_60">
                 <span className="sub-title mb_5">Our Team</span>
-                <h2>Our Leadership and Operations Team</h2>
+                <h2>{teamMedia[0]?.title || 'Our Leadership and Operations Team'}</h2>
+                {teamMedia[0]?.description && (
+                  <p style={{ maxWidth: '860px', margin: '14px auto 0', color: '#555' }}>
+                    {teamMedia[0].description}
+                  </p>
+                )}
               </div>
 
               {teamLoading ? (
