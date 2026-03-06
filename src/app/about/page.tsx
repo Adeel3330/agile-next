@@ -151,7 +151,11 @@ export default function AboutPage() {
 
   return (
     <div className="boxed_wrapper">
-      <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={pageData?.title || 'About Us'}>
+      <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={
+        viewMode === 'team'
+          ? 'Meet Our Team'
+          : (pageData?.title || 'About Us')
+      }>
         {!showTeamOnly && (
           <section className="about-section about-page p_relative pt_120 pb_90" style={{ background: '#f8fbff' }}>
             <div className="auto-container">

@@ -60,20 +60,20 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
       .then(data => {
         if (data.success && data.settings) setSettings(data.settings);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     fetch('/api/categories/service-categories')
       .then(res => res.json())
       .then(data => {
         if (data.success && data.categories) setCategories(data.categories);
       })
-      .catch(() => {});
+      .catch(() => { });
     fetch('/api/services?limit=100')
       .then(res => res.json())
       .then(data => {
         if (data.success && data.services) setServices(data.services);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const uncategorizedServices = services.filter(s => !s.categoryId && !s.category?.id);
@@ -129,14 +129,14 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
                     <Link href="/about?view=all" onClick={handleMobileMenu}>About Agile Nexus Solutions</Link>
                   </li>
                   <li>
-                    <Link href="/about?view=team#our-teams" onClick={handleMobileMenu}>Meet Our Teams</Link>
+                    <Link href="/about?view=team#our-teams" onClick={handleMobileMenu}>Meet Our Team</Link>
                   </li>
                 </ul>
                 <div className={`dropdown-btn ${openKeys.has("about") ? "open" : ""}`} onClick={(e) => { e.stopPropagation(); toggle("about"); }}>
                   <span className="fa fa-angle-right" />
                 </div>
               </li>
-              
+
 
               {/* Services - same structure as Header1 */}
               <li className={`${categories.length > 0 || hasOtherServices ? "dropdown " : ""}${openKeys.has("services") ? "current" : ""}`}>
