@@ -192,13 +192,35 @@ export default function ServicesPage() {
     ];
   })();
 
+  const breadcrumbTitle = (() => {
+    const formatSlug = (slug: string) => {
+      return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    };
+
+    const selectedSubCat = subCategorySlug
+      ? categories.find(c => c.slug === subCategorySlug)
+      : null;
+
+    if (subCategorySlug) {
+      const catName = selectedSubCat?.name || formatSlug(subCategorySlug);
+      // const subCatName = selectedSubCat?.name || formatSlug(subCategorySlug);
+      return `${catName}`;
+    }
+
+    if (categorySlug) {
+      return selectedCategory?.name || formatSlug(categorySlug);
+    }
+
+    return "Our Services";
+  })();
+
   if (!mounted) {
     return null;
   }
 
   return (
     <div className="boxed_wrapper">
-      <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Our Services">
+      <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={breadcrumbTitle}>
         <section className="service-page-section p_relative pt_100 pb_70 services-safe-grid">
           <div className="auto-container">
             <div className="sec-title centred mb_55">
