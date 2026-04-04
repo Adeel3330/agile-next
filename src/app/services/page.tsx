@@ -63,7 +63,8 @@ export default function ServicesPage() {
 
   const fetchPageData = useCallback(async () => {
     try {
-      const response = await fetch('/api/pages?template=services');
+      const template = categorySlug?.trim() || 'services';
+      const response = await fetch(`/api/pages?template=${encodeURIComponent(template)}`);
       const data = await response.json();
       if (data.success && data.page) {
         setPageData(data.page);
@@ -71,13 +72,12 @@ export default function ServicesPage() {
     } catch (err) {
       console.error('Failed to fetch services page data:', err);
     }
-  }, []);
+  }, [categorySlug]);
 
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
       let apiUrl = '/api/services?limit=100';
-      console.log(subCategorySlug, "test")
       if (subCategorySlug) {
         apiUrl += `&category=${subCategorySlug}`;
       } else if (categorySlug) {
