@@ -64,13 +64,15 @@ export default function ServicesPage() {
   const fetchPageData = useCallback(async () => {
     try {
       const template = categorySlug?.trim() || 'services';
-      const response = await fetch(`/api/pages?template=${encodeURIComponent(template)}`);
+      setPageData(null);
+      const response = await fetch(`/api/pages?template=${encodeURIComponent(template)}`, {
+        cache: 'no-store'
+      });
       const data = await response.json();
-      if (data.success && data.page) {
-        setPageData(data.page);
-      }
+      setPageData(data.success && data.page ? data.page : null);
     } catch (err) {
       console.error('Failed to fetch services page data:', err);
+      setPageData(null);
     }
   }, [categorySlug]);
 
