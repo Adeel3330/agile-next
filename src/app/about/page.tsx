@@ -142,6 +142,9 @@ export default function AboutPage() {
     'Our mission is to improve the financial and operational health of medical practices through accurate, compliant, and transparent revenue cycle services that allow providers to focus on patient care.'
   );
 
+  const WeCare = sectionText('wecare', 'Agile Nexus Solutions services exceed customer expectations, and we are proud of our history, but more importantly, we are focused on the future. We have grown in recent years by continuing to invest in technology and people while maintaining a commitment to excellent service and innovation. We have the best customer service and one of the highest success rates for reimbursement, so you know your money will be going where it belongs - back into your pocket.');
+  const BestInIndustry = sectionText('industry', 'From electronic health records, billing services and practice management tools – Agile Nexus Solutions has you covered! In addition to being an industry leader when it comes to pricing, we also provide personalized support for every client.');
+
   const supportText = sectionText(
     'support',
     'Healthcare runs around the clock. Our team is available to support urgent billing and operational needs so your revenue workflows stay uninterrupted.'
@@ -204,6 +207,18 @@ export default function AboutPage() {
               <div className="row clearfix mb_30">
                 <div className="col-lg-6 col-md-12 col-sm-12 mb_30">
                   <div className="about-card h-100">
+                    <h3>Best In Industry</h3>
+                    <p>{BestInIndustry}</p>
+                  </div>
+                </div>
+                <div className="col-lg-6 col-md-12 col-sm-12 mb_30">
+                  <div className="about-card h-100">
+                    <h3>WeCare</h3>
+                    <p>{WeCare}</p>
+                  </div>
+                </div>
+                <div className="col-lg-6 col-md-12 col-sm-12 mb_30">
+                  <div className="about-card h-100">
                     <h3>Our Mission</h3>
                     <p>{missionText}</p>
                   </div>
@@ -222,7 +237,7 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              <div className="row clearfix">
+              {/* <div className="row clearfix">
                 <div className="col-lg-12 col-md-12 col-sm-12">
                   <figure className="about-feature-image">
                     <Image
@@ -234,7 +249,7 @@ export default function AboutPage() {
                     />
                   </figure>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <style
