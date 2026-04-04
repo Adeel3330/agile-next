@@ -86,7 +86,9 @@ export default function ServicesPage() {
         apiUrl += `&category=${categorySlug}`;
       }
 
-      const response = await fetch(apiUrl);
+      const response = await fetch(apiUrl,{
+        cache: 'no-store'
+      });
       const data = await response.json();
 
       if (data.success && data.services) {
