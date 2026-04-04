@@ -48,7 +48,6 @@ export default function ServicesPage() {
   const searchParams = useSearchParams();
   const categorySlug = searchParams.get('category');
   const subCategorySlug = searchParams.get('sub-category');
-  console.log(subCategorySlug)
   const hasCategoryParam = Boolean(categorySlug) || Boolean(subCategorySlug);
 
   const [mounted, setMounted] = useState(false);
@@ -81,9 +80,12 @@ export default function ServicesPage() {
     try {
       let apiUrl = '/api/services?limit=100';
       if (subCategorySlug) {
-        apiUrl += `&category=${subCategorySlug}`;
+        if (categorySlug) {
+          apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
+        }
+        apiUrl += `&subCategory=${encodeURIComponent(subCategorySlug)}`;
       } else if (categorySlug) {
-        apiUrl += `&category=${categorySlug}`;
+        apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
       }
 
       const response = await fetch(apiUrl,{
@@ -102,7 +104,7 @@ export default function ServicesPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [categorySlug, subCategorySlug]);
 
   const fetchCategories = useCallback(async () => {
     try {

@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
-// GET /api/services?search=&page=&limit=&category=
+// GET /api/services?search=&page=&limit=&category=&subCategory=
 // Public API - no authentication required
 export async function GET(req: NextRequest) {
   try {
-    const { search, page = '1', limit = '12', category } = Object.fromEntries(
+    const { search, page = '1', limit = '12', category, subCategory } = Object.fromEntries(
       req.nextUrl.searchParams
     );
+
+    const subCategoryParam =
+      (typeof subCategory === 'string' && subCategory.trim().length > 0
+        ? subCategory
+        : req.nextUrl.searchParams.get('sub-category')) || '';
 
     const pageNumber = Math.max(parseInt(page as string, 10) || 1, 1);
     const pageSize = Math.min(
@@ -21,43 +26,66 @@ export async function GET(req: NextRequest) {
       .eq('status', 'active')
       .is('deleted_at', null);
 
-    // Filter by category if provided
+    // Filter by category/subcategory using IDs to avoid same-slug collisions across trees.
     if (category && typeof category === 'string' && category.trim().length > 0) {
       const { data: allCategories } = await supabaseAdmin
         .from('blog_categories')
         .select('id, slug, parent_id')
         .is('deleted_at', null);
 
+      const normalizedCategory = category.trim().toLowerCase();
       const matchedCategories = (allCategories || []).filter(
         (item: any) => item.slug.toLowerCase() === category.trim().toLowerCase()
       );
-      console.log(matchedCategories, "categories")
 
       if (matchedCategories.length > 0) {
-        const categoryIds = new Set<string>();
-        const queue: string[] = [];
+        const matchedCategoryIds = new Set<string>(matchedCategories.map((item: any) => item.id));
 
-        for (const selected of matchedCategories) {
-          categoryIds.add(selected.id);
-          queue.push(selected.id);
-        }
-
-        while (queue.length > 0) {
-          const currentId = queue.shift() as string;
-          // const children = (allCategories || []).filter((item: any) => item.parent_id === currentId);
-          const children = (allCategories || []).filter(
-            (item: any) => String(item.parent_id) === String(currentId)
+        if (subCategoryParam && subCategoryParam.trim().length > 0) {
+          const normalizedSubCategory = subCategoryParam.trim().toLowerCase();
+          const matchedSubCategories = (allCategories || []).filter(
+            (item: any) =>
+              item.slug.toLowerCase() === normalizedSubCategory &&
+              item.parent_id &&
+              matchedCategoryIds.has(String(item.parent_id))
           );
 
-          for (const child of children) {
-            if (!categoryIds.has(child.id)) {
-              categoryIds.add(child.id);
-              queue.push(child.id);
+          if (matchedSubCategories.length > 0) {
+            query = query.in(
+              'category_id',
+              matchedSubCategories.map((item: any) => item.id)
+            );
+          } else {
+            // If parent+child pair does not match, return empty result intentionally.
+            query = query.in('category_id', ['00000000-0000-0000-0000-000000000000']);
+          }
+        } else {
+          const categoryIds = new Set<string>();
+          const queue: string[] = [];
+
+          for (const selected of matchedCategories) {
+            categoryIds.add(selected.id);
+            queue.push(selected.id);
+          }
+
+          while (queue.length > 0) {
+            const currentId = queue.shift() as string;
+            const children = (allCategories || []).filter(
+              (item: any) => String(item.parent_id) === String(currentId)
+            );
+
+            for (const child of children) {
+              if (!categoryIds.has(child.id)) {
+                categoryIds.add(child.id);
+                queue.push(child.id);
+              }
             }
           }
-        }
 
-        query = query.in('category_id', Array.from(categoryIds));
+          query = query.in('category_id', Array.from(categoryIds));
+        }
+      } else {
+        query = query.in('category_id', ['00000000-0000-0000-0000-000000000000']);
       }
     }
 
