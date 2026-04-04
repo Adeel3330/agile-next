@@ -2770,3 +2770,6 @@ button.ltr {
   overflow: hidden;
  
 }
+.homepage-service-text:hover{
+  color: white !important;
+}

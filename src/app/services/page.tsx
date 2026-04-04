@@ -48,7 +48,6 @@ export default function ServicesPage() {
   const searchParams = useSearchParams();
   const categorySlug = searchParams.get('category');
   const subCategorySlug = searchParams.get('sub-category');
-  console.log(subCategorySlug)
   const hasCategoryParam = Boolean(categorySlug) || Boolean(subCategorySlug);
 
   const [mounted, setMounted] = useState(false);
@@ -63,28 +62,35 @@ export default function ServicesPage() {
 
   const fetchPageData = useCallback(async () => {
     try {
-      const response = await fetch('/api/pages?template=services');
+      const template = categorySlug?.trim() || 'services';
+      setPageData(null);
+      const response = await fetch(`/api/pages?template=${encodeURIComponent(template)}`, {
+        cache: 'no-store'
+      });
       const data = await response.json();
-      if (data.success && data.page) {
-        setPageData(data.page);
-      }
+      setPageData(data.success && data.page ? data.page : null);
     } catch (err) {
       console.error('Failed to fetch services page data:', err);
+      setPageData(null);
     }
-  }, []);
+  }, [categorySlug]);
 
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
       let apiUrl = '/api/services?limit=100';
-      console.log(subCategorySlug, "test")
       if (subCategorySlug) {
-        apiUrl += `&category=${subCategorySlug}`;
+        if (categorySlug) {
+          apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
+        }
+        apiUrl += `&subCategory=${encodeURIComponent(subCategorySlug)}`;
       } else if (categorySlug) {
-        apiUrl += `&category=${categorySlug}`;
+        apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
       }
 
-      const response = await fetch(apiUrl);
+      const response = await fetch(apiUrl,{
+        cache: 'no-store'
+      });
       const data = await response.json();
 
       if (data.success && data.services) {
@@ -98,7 +104,7 @@ export default function ServicesPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [categorySlug, subCategorySlug]);
 
   const fetchCategories = useCallback(async () => {
     try {

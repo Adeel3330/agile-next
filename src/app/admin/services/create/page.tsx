@@ -99,14 +99,36 @@ export default function CreateServicePage() {
         };
 
         const options = allCategories
-          .filter((cat) => selectedIds.has(cat.id))
+          .filter((cat) => selectedIds.has(cat.id));
+
+        const childrenByParent = new Map<string, any[]>();
+        for (const cat of options) {
+          const parentKey = String(cat.parentId || '');
+          if (!childrenByParent.has(parentKey)) {
+            childrenByParent.set(parentKey, []);
+          }
+          childrenByParent.get(parentKey)?.push(cat);
+        }
+
+        const orderedCategories: any[] = [];
+        const appendChildren = (parentId: string) => {
+          const children = childrenByParent.get(String(parentId)) || [];
+          for (const child of children) {
+            orderedCategories.push(child);
+            appendChildren(child.id);
+          }
+        };
+
+        appendChildren(serviceRoot.id);
+
+        const orderedOptions = orderedCategories
           .map((cat) => ({
             _id: cat.id,
             name: `${'— '.repeat(getDepth(cat))}${cat.name}`,
             parentId: cat.parentId || null,
           }));
 
-        setCategories(options);
+        setCategories(orderedOptions);
       }
     } catch (err) {
       console.error('Failed to fetch categories:', err);

@@ -132,7 +132,11 @@ export default function Service() {
                         {loading ? (
                           <div className="skeleton-text desc" />
                         ) : (
-                          <p>{service.description}</p>
+                          
+                           <div
+                              className='homepage-service-text'
+                              dangerouslySetInnerHTML={{ __html: (service?.description || 'test').slice(0, 100) + '...' }}
+                            />
                         )}
                       </div>
                     </div>
@@ -156,6 +160,7 @@ export default function Service() {
         </div>
       </div>
     </section>
+      
   );
 }
 

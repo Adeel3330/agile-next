@@ -110,7 +110,7 @@ export default function Specialties() {
                     className="specialty-simple-card"
                     style={{
                       textAlign: 'center',
-                      padding: '24px 16px',
+                      padding: '12px 24px',
                       marginBottom: '20px',
                       background: '#fff',
                       borderRadius: '12px',
@@ -121,13 +121,14 @@ export default function Specialties() {
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      width:'240px',
                     }}
                   >
                     <div
                       style={{
                         width: '100%',
-                        maxWidth: '100px',
-                        height: '80px',
+                        maxWidth: '240px',
+                        height: '150px',
                         position: 'relative',
                         margin: '0 auto 12px',
                       }}
@@ -185,6 +186,9 @@ export default function Specialties() {
           transform: translateY(-5px);
           box-shadow: 0 10px 30px rgba(0,0,0,0.12);
         }
+          .specialties-carousel .swiper-slide{
+            width: 240px !important;
+          },
       `}} />
     </section>
   );
