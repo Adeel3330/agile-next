@@ -29,6 +29,11 @@ interface Settings {
   logoUrl?: string | null;
   contactEmail?: string | null;
   contactPhone?: string | null;
+  contactAddress?: string | null;
+  contactCity?: string | null;
+  contactState?: string | null;
+  contactZip?: string | null;
+  contactCountry?: string | null;
   socialFacebook?: string | null;
   socialTwitter?: string | null;
   socialInstagram?: string | null;
@@ -76,6 +81,18 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
       .catch(() => { });
   }, []);
 
+    const formatAddress = () => {
+    if (!settings) return '7901 4th St N, St. Petersburg, FL 33702, USA';
+    const parts = [
+      settings.contactAddress,
+      settings.contactCity,
+      settings.contactState,
+      settings.contactZip,
+      settings.contactCountry
+    ].filter(Boolean);
+    return parts.join(', ') || '7901 4th St N, St. Petersburg, FL 33702, USA';
+  };
+
   const uncategorizedServices = services.filter(s => !s.categoryId && !s.category?.id);
   const allCategoryIds = new Set(categories.map(c => c.id));
   const servicesNotInCategories = services.filter(s => {
@@ -95,11 +112,12 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
           <div className="nav-logo">
             <Link href="/">
               <Image
+              style={{ background: 'white' }}
                 src={settings?.logoUrl || "/assets/images/logo-2.png"}
                 alt="Logo Image"
                 width={203}
-                height={40}
-                priority
+                  height={40}
+                  priority
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/assets/images/logo-2.png';
                 }}
@@ -273,7 +291,7 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
           <div className="contact-info">
             <h4>Contact Info</h4>
             <ul>
-              <li>Chicago 12, Melborne City, USA</li>
+              <li>{formatAddress()}</li>
               <li><Link href={settings?.contactPhone ? `tel:${settings.contactPhone}` : "tel:+8801682648101"}>{settings?.contactPhone || '+88 01682648101'}</Link></li>
               <li><Link href={settings?.contactEmail ? `mailto:${settings.contactEmail}` : "mailto:info@example.com"}>{settings?.contactEmail || 'info@example.com'}</Link></li>
             </ul>
