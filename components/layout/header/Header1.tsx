@@ -351,7 +351,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                                       <ul className="submenu">
                                         {subcategories.map((subcategory) => (
                                           <li key={subcategory.id}>
-                                            <Link href={`/services?sub-category=${subcategory.slug}`}>
+                                            <Link href={`/services?category=${category.slug}&sub-category=${subcategory.slug}`}>
                                               {subcategory.name}
                                             </Link>
                                           </li>
@@ -501,7 +501,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                                       <ul className="submenu">
                                         {subcategories.map((subcategory) => (
                                           <li key={subcategory.id}>
-                                            <Link href={`/services?sub-category=${subcategory.slug}`}>
+                                            <Link href={`/services?category=${category.slug}&sub-category=${subcategory.slug}`}>
                                               {subcategory.name}
                                             </Link>
                                           </li>
