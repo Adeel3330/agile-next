@@ -84,33 +84,34 @@ export default function Specialties() {
           <>
             <Swiper
               modules={[Autoplay, Navigation]}
-              slidesPerView={2}
+
               spaceBetween={20}
               autoplay={{
                 delay: 2500,
                 disableOnInteraction: false,
                 pauseOnMouseEnter: true,
               }}
-              loop={items.length > 3}
+              loop={items.length > 4}
               navigation={{
                 nextEl: '#specialties .swiper-next',
                 prevEl: '#specialties .swiper-prev',
               }}
               breakpoints={{
-                320: { slidesPerView: 1 },
-                575: { slidesPerView: 2 },
-                991: { slidesPerView: 3 },
-                1200: { slidesPerView: 4 },
+                320: { slidesPerView: 2 },
+                575: { slidesPerView: 3 },
+                991: { slidesPerView: 4 },
+                1200: { slidesPerView:5 },
               }}
               className="specialties-carousel"
             >
               {items.map((item) => {
                 const inner = (
+                  <SwiperSlide key={item.id}>
                   <div
                     className="specialty-simple-card"
                     style={{
-                      textAlign: 'center',
-                      padding: '12px 24px',
+                       textAlign: 'center',
+                      padding: '24px 16px',
                       marginBottom: '20px',
                       background: '#fff',
                       borderRadius: '12px',
@@ -121,14 +122,14 @@ export default function Specialties() {
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      width:'240px',
+                    
                     }}
                   >
                     <div
                       style={{
                         width: '100%',
-                        maxWidth: '240px',
-                        height: '150px',
+                        maxWidth: '120px',
+                        height: '80px',
                         position: 'relative',
                         margin: '0 auto 12px',
                       }}
@@ -144,6 +145,7 @@ export default function Specialties() {
                       <span style={{ fontSize: '14px', fontWeight: 600, color: '#555' }}>{item.title}</span>
                     )}
                   </div>
+                  </SwiperSlide>
                 );
 
                 return (
@@ -182,13 +184,9 @@ export default function Specialties() {
       </div>
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .specialties-carousel .specialty-simple-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-        }
-          .specialties-carousel .swiper-slide{
-            width: 240px !important;
-          },
+        .specialties-carousel .specialty-simple-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,0.1); }
+
+          
       `}} />
     </section>
   );
