@@ -193,7 +193,7 @@ export default function About() {
             </div>
             <div className="auto-container">
                 <div className="upper-content mb_80">
-                    <div className="row clearfix">
+                    <div className="row clearfix flex-column-reverse">
                         <div className="col-lg-6 col-md-12 col-sm-12 content-column">
                             <div className="content-block-one">
                                 <div className="content-box">
