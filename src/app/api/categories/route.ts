@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
       .from('blog_categories')
       .select('*')
       .is('deleted_at', null)
+      .order('display_order', { ascending: true })
       .order('name', { ascending: true });
 
     if (error) {
@@ -42,6 +43,7 @@ export async function GET(req: NextRequest) {
         name: cat.name,
         slug: cat.slug,
         description: cat.description,
+        displayOrder: cat.display_order ?? 0,
         parentId: cat.parent_id,
         parent: parent,
         created_at: cat.created_at,

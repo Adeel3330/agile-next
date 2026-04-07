@@ -15,14 +15,7 @@ interface Category {
   id: string;
   name: string;
   slug: string;
-}
-
-interface Service {
-  id: string;
-  title: string;
-  slug: string;
-  categoryId?: string;
-  category?: { id: string; name: string; slug: string } | null;
+  parentId?: string | null;
 }
 
 interface Settings {
@@ -46,7 +39,6 @@ interface Settings {
 export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar }: MobileMenuProps) {
   const pathname = usePathname();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [openKeys, setOpenKeys] = useState<Set<string>>(new Set());
 
@@ -67,16 +59,10 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
       })
       .catch(() => { });
 
-    fetch('/api/categories/service-categories')
+    fetch('/api/categories')
       .then(res => res.json())
       .then(data => {
         if (data.success && data.categories) setCategories(data.categories);
-      })
-      .catch(() => { });
-    fetch('/api/services?limit=100')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.services) setServices(data.services);
       })
       .catch(() => { });
   }, []);
@@ -93,13 +79,13 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
     return parts.join(', ') || '7901 4th St N, St. Petersburg, FL 33702, USA';
   };
 
-  const uncategorizedServices = services.filter(s => !s.categoryId && !s.category?.id);
-  const allCategoryIds = new Set(categories.map(c => c.id));
-  const servicesNotInCategories = services.filter(s => {
-    const id = s.categoryId || s.category?.id;
-    return id && !allCategoryIds.has(id);
-  });
-  const hasOtherServices = uncategorizedServices.length > 0 || servicesNotInCategories.length > 0;
+  const serviceRoot = categories.find((category) => category.slug === 'service-categories');
+  const serviceCategories = serviceRoot
+    ? categories.filter((category) => category.parentId === serviceRoot.id)
+    : [];
+
+  const getSubcategories = (parentId: string) =>
+    categories.filter((category) => category.parentId === parentId);
 
   return (
     <>
@@ -157,8 +143,8 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
 
 
               {/* Services - same structure as Header1 */}
-              <li className={`${categories.length > 0 || hasOtherServices ? "dropdown " : ""}${openKeys.has("services") ? "current" : ""}`}>
-                {categories.length > 0 || hasOtherServices ? (
+              <li className={`${serviceCategories.length > 0 ? "dropdown " : ""}${openKeys.has("services") ? "current" : ""}`}>
+                {serviceCategories.length > 0 ? (
                   <>
                     <span
                       className="mobile-menu-trigger"
@@ -171,15 +157,13 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
                       Services
                     </span>
                     <ul style={{ display: openKeys.has("services") ? "block" : "none" }}>
-                      {categories.map((category) => {
-                        const categoryServices = services.filter(
-                          s => s.categoryId === category.id || s.category?.id === category.id
-                        );
+                      {serviceCategories.map((category) => {
+                        const subcategories = getSubcategories(category.id);
                         const catKey = `cat-${category.id}`;
                         const isCatOpen = openKeys.has(catKey);
                         return (
-                          <li key={category.id} className={`${categoryServices.length > 0 ? "dropdown " : ""}${isCatOpen ? "current" : ""}`}>
-                            {categoryServices.length > 0 ? (
+                          <li key={category.id} className={`${subcategories.length > 0 ? "dropdown " : ""}${isCatOpen ? "current" : ""}`}>
+                            {subcategories.length > 0 ? (
                               <>
                                 <span
                                   className="mobile-menu-trigger"
@@ -192,9 +176,9 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
                                   {category.name}
                                 </span>
                                 <ul className="submenu" style={{ display: isCatOpen ? "block" : "none" }}>
-                                  {categoryServices.map((service) => (
-                                    <li key={service.id}>
-                                      <Link href={`/services/${service.slug}`} onClick={handleMobileMenu}>{service.title}</Link>
+                                  {subcategories.map((subcategory) => (
+                                    <li key={subcategory.id}>
+                                      <Link href={`/services?category=${category.slug}&sub-category=${subcategory.slug}`} onClick={handleMobileMenu}>{subcategory.name}</Link>
                                     </li>
                                   ))}
                                 </ul>
@@ -208,35 +192,6 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
                           </li>
                         );
                       })}
-                      {hasOtherServices && (
-                        <li className={`dropdown ${openKeys.has("other-services") ? "current" : ""}`}>
-                          <span
-                            className="mobile-menu-trigger"
-                            onClick={() => toggle("other-services")}
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle("other-services"); } }}
-                            style={{ display: "block", padding: "10px 45px 10px 20px", lineHeight: "24px", fontSize: "16px", color: "#fff", cursor: "pointer", marginLeft: "20px" }}
-                          >
-                            Other Services
-                          </span>
-                          <ul className="submenu" style={{ display: openKeys.has("other-services") ? "block" : "none" }}>
-                            {uncategorizedServices.map((service) => (
-                              <li key={service.id}>
-                                <Link href={`/services/${service.slug}`} onClick={handleMobileMenu}>{service.title}</Link>
-                              </li>
-                            ))}
-                            {servicesNotInCategories.map((service) => (
-                              <li key={service.id}>
-                                <Link href={`/services/${service.slug}`} onClick={handleMobileMenu}>{service.title}</Link>
-                              </li>
-                            ))}
-                          </ul>
-                          <div className={`dropdown-btn ${openKeys.has("other-services") ? "open" : ""}`} onClick={(e) => { e.stopPropagation(); toggle("other-services"); }}>
-                            <span className="fa fa-angle-right" />
-                          </div>
-                        </li>
-                      )}
                     </ul>
                     <div className={`dropdown-btn ${openKeys.has("services") ? "open" : ""}`} onClick={(e) => { e.stopPropagation(); toggle("services"); }}>
                       <span className="fa fa-angle-right" />

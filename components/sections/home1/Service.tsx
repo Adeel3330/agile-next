@@ -31,7 +31,7 @@ export default function Service() {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch('/api/services?limit=20');
+      const res = await fetch('/api/services??category=for-established-providers-and-medical-groups&limit=20');
       const data = await res.json();
       if (data?.success) {
         setServices(data.services || []);

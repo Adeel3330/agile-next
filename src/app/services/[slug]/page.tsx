@@ -235,7 +235,9 @@ export default function ServiceDetailsPage() {
                     <div className="text-box">
                       <h2>{service.title || 'Service'}</h2>
                       {service.description && (
-                        <p>{service.description}</p>
+                        <div 
+                          dangerouslySetInnerHTML={{ __html: service.description || '' }} 
+                        />
                       )}
                       {service.content && (
                         <div 

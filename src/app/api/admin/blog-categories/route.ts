@@ -35,6 +35,8 @@ export async function GET(req: NextRequest) {
     }
 
     query = query
+      .order('display_order', { ascending: true })
+      .order('name', { ascending: true })
       .order('created_at', { ascending: false })
       .range((pageNumber - 1) * pageSize, pageNumber * pageSize - 1);
 
@@ -82,6 +84,7 @@ export async function GET(req: NextRequest) {
         name: cat.name,
         slug: cat.slug,
         description: cat.description,
+        displayOrder: cat.display_order ?? 0,
         parentId: cat.parent_id,
         parent: parent,
         created_at: cat.created_at,
@@ -118,7 +121,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, slug, description, parentId } = body;
+    const { name, slug, description, parentId, displayOrder } = body;
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json(
@@ -177,6 +180,7 @@ export async function POST(req: NextRequest) {
         slug: categorySlug,
         description: description?.trim() || null,
         parent_id: parentId || null,
+        display_order: Number.isFinite(Number(displayOrder)) ? Number(displayOrder) : 0,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         deleted_at: null
@@ -227,6 +231,7 @@ export async function POST(req: NextRequest) {
       name: category.name,
       slug: category.slug,
       description: category.description,
+      displayOrder: category.display_order ?? 0,
       parentId: category.parent_id,
       parent: parent,
       created_at: category.created_at,
