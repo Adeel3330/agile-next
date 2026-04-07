@@ -47,8 +47,7 @@ const coreOfferings = [
 export default function ServicesPage() {
   const searchParams = useSearchParams();
   const categorySlug = searchParams.get('category');
-  const subCategorySlug = searchParams.get('sub-category');
-  console.log(subCategorySlug)
+  const subCategorySlug = searchParams.get('sub-category') || searchParams.get('subcategory');
   const hasCategoryParam = Boolean(categorySlug) || Boolean(subCategorySlug);
 
   const [mounted, setMounted] = useState(false);
@@ -81,9 +80,12 @@ export default function ServicesPage() {
     try {
       let apiUrl = '/api/services?limit=100';
       if (subCategorySlug) {
-        apiUrl += `&category=${subCategorySlug}`;
+        if (categorySlug) {
+          apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
+        }
+        apiUrl += `&subCategory=${encodeURIComponent(subCategorySlug)}`;
       } else if (categorySlug) {
-        apiUrl += `&category=${categorySlug}`;
+        apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
       }
 
       const response = await fetch(apiUrl,{
@@ -102,7 +104,7 @@ export default function ServicesPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [categorySlug, subCategorySlug]);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -153,7 +155,7 @@ export default function ServicesPage() {
   };
 
   const groupedServices = (() => {
-    if (services.length === 0) return [] as Array<{ id: string; title: string; services: Service[] }>;
+    if (services.length === 0) return [] as Array<{ id: string; title: string; slug: string; services: Service[] }>;
 
     if (!selectedCategory) {
       return serviceCategories
@@ -182,6 +184,7 @@ export default function ServicesPage() {
           return {
             id: subcategory.id,
             title: subcategory.name,
+            slug: subcategory.slug,
             services: items
           };
         })
@@ -192,6 +195,7 @@ export default function ServicesPage() {
       {
         id: selectedCategory.id,
         title: selectedCategory.name,
+        slug: selectedCategory.slug,
         services
       }
     ];
@@ -239,7 +243,7 @@ export default function ServicesPage() {
 
 
 
-            <div className="sec-title mb_30">
+            {/* <div className="sec-title mb_30">
               <span className="sub-title mb_5">Core Offerings</span>
               <h3>Unified Service Stack for All Segments</h3>
             </div>
@@ -247,12 +251,12 @@ export default function ServicesPage() {
               {coreOfferings.map((offering) => (
                 <li key={offering}>{offering}</li>
               ))}
-            </ul>
+            </ul> */}
 
             <div className="sec-title mb_40">
-              <span className="sub-title mb_5">Detailed Service Modules</span>
+              {/* <span className="sub-title mb_5">Detailed Service Modules</span> */}
               <h3>
-                {hasCategoryParam ? 'All Services' : 'All Services by Category'}
+                Services
               </h3>
             </div>
 
@@ -272,7 +276,7 @@ export default function ServicesPage() {
               <div className="text-center py-5">
                 <p className="text-muted">No services available at the moment.</p>
               </div>
-            ) : hasCategoryParam ? (
+            ) : subCategorySlug ? (
               <div className="row clearfix">
                 {services.map((service) => (
                   <div key={service.id} className="col-lg-4 col-md-6 col-sm-12 service-block">
@@ -320,6 +324,74 @@ export default function ServicesPage() {
                   </div>
                 ))}
               </div>
+            ) : categorySlug ? (
+              groupedServices.length === 0 ? (
+                <div className="text-center py-5">
+                  <p className="text-muted">No services found for this category.</p>
+                </div>
+              ) : (
+                <>
+                  {groupedServices.map((group) => (
+                    <div key={group.id} className="mb_55">
+                      <div className="sec-title mb_25">
+                        <h3>{group.title}</h3>
+                      </div>
+
+                      {group.services.length === 0 ? (
+                        <p className="text-muted">No services found.</p>
+                      ) : (
+                        <div className="row clearfix">
+                          {group.services.map((service) => (
+                            <div key={service.id} className="col-lg-4 col-md-6 col-sm-12 service-block">
+                              <div className="service-block-one">
+                                <div className="inner-box">
+                                  <figure className="image-box">
+                                    <Link href={`/services/${service.slug}`}>
+                                      {service.imageUrl ? (
+                                        <Image
+                                          src={getCloudinaryImageUrl(service.imageUrl)}
+                                          alt={service.title}
+                                          width={416}
+                                          height={358}
+                                          style={{ objectFit: 'cover' }}
+                                        />
+                                      ) : (
+                                        <Image
+                                          src="/assets/images/service/service-1.jpg"
+                                          alt={service.title}
+                                          width={416}
+                                          height={358}
+                                        />
+                                      )}
+                                    </Link>
+                                  </figure>
+                                  <div className="lower-content">
+                                    <div className="inner">
+                                      <h3>
+                                        <Link href={`/services/${service.slug}`}>{service.title}</Link>
+                                      </h3>
+                                     
+                                      <div
+                                        dangerouslySetInnerHTML={{
+                                          __html: service.description
+                                            ? service.description.length > 120
+                                              ? `${service.description.slice(0, 300)}...`
+                                              : service.description
+                                            : 'Professional service module with detailed backend-managed content.'
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </>
+              )
             ) : groupedServices.length === 0 ? (
               <div className="text-center py-5">
                 <p className="text-muted">No services found for this category.</p>
