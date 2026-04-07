@@ -48,6 +48,7 @@ export default function ServicesPage() {
   const searchParams = useSearchParams();
   const categorySlug = searchParams.get('category');
   const subCategorySlug = searchParams.get('sub-category');
+  console.log(subCategorySlug)
   const hasCategoryParam = Boolean(categorySlug) || Boolean(subCategorySlug);
 
   const [mounted, setMounted] = useState(false);
@@ -80,12 +81,9 @@ export default function ServicesPage() {
     try {
       let apiUrl = '/api/services?limit=100';
       if (subCategorySlug) {
-        if (categorySlug) {
-          apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
-        }
-        apiUrl += `&subCategory=${encodeURIComponent(subCategorySlug)}`;
+        apiUrl += `&category=${subCategorySlug}`;
       } else if (categorySlug) {
-        apiUrl += `&category=${encodeURIComponent(categorySlug)}`;
+        apiUrl += `&category=${categorySlug}`;
       }
 
       const response = await fetch(apiUrl,{
@@ -104,7 +102,7 @@ export default function ServicesPage() {
     } finally {
       setLoading(false);
     }
-  }, [categorySlug, subCategorySlug]);
+  }, []);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -166,6 +164,7 @@ export default function ServicesPage() {
           return {
             id: category.id,
             title: category.name,
+            slug: category.slug,
             services: items
           };
         })
@@ -327,13 +326,17 @@ export default function ServicesPage() {
               </div>
             ) : (
               <>
+                <div className='row sec-card-bg clearfix p-5'>
                 {groupedServices.map((group) => (
-                  <div key={group.id} className="mb_55">
-                    <div className="sec-title mb_25">
-                      <h3>{group.title}</h3>
+                  <div key={group.id} className="col-md-4 col-sm-12">
+                    <div className="sec-card sec-title mb_25">
+                      {/* <h3>{group.title}</h3> */}
+                      <Link href={`/services?category=${group?.slug}`} className="view-all-link">
+                        {group.title}
+                      </Link>
                     </div>
 
-                    <div className="row clearfix">
+                    {/* <div className="row clearfix">
                       {group.services.map((service) => (
                         <div key={service.id} className="col-lg-4 col-md-6 col-sm-12 service-block">
                           <div className="service-block-one">
@@ -376,9 +379,10 @@ export default function ServicesPage() {
                           </div>
                         </div>
                       ))}
-                    </div>
+                    </div> */}
                   </div>
                 ))}
+                </div>
               </>
             )}
           </div>
@@ -420,6 +424,32 @@ export default function ServicesPage() {
                   color: inherit;
                   border-color: transparent;
                 }
+                  .sec-card-bg{
+                    background: #0a3366;
+                    // opacity: 0.5;
+                    border-radius: 12px;
+                    margin-bottom: 40px;
+                  }
+                .sec-card{
+                  padding: 20px;
+                  border-radius: 12px;
+                  background: #fff;
+                  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+                  transition: all 0.3s ease;
+                }
+                .sec-card:hover {
+                  transform: translateY(-4px);
+                  box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+                }
+                  .sec-card a{
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #140c0c;
+                    text-decoration: none;
+                  }
+                  .sec-card a:hover{
+                    color: #0070f3;  
+                  }
               `,
             }}
           />
