@@ -336,50 +336,7 @@ export default function ServicesPage() {
                       </Link>
                     </div>
 
-                    {/* <div className="row clearfix">
-                      {group.services.map((service) => (
-                        <div key={service.id} className="col-lg-4 col-md-6 col-sm-12 service-block">
-                          <div className="service-block-one">
-                            <div className="inner-box">
-                              <figure className="image-box">
-                                <Link href={`/services/${service.slug}`}>
-                                  {service.imageUrl ? (
-                                    <Image
-                                      src={getCloudinaryImageUrl(service.imageUrl)}
-                                      alt={service.title}
-                                      width={416}
-                                      height={358}
-                                      style={{ objectFit: 'cover' }}
-                                    />
-                                  ) : (
-                                    <Image
-                                      src="/assets/images/service/service-1.jpg"
-                                      alt={service.title}
-                                      width={416}
-                                      height={358}
-                                    />
-                                  )}
-                                </Link>
-                              </figure>
-                              <div className="lower-content">
-                                <div className="inner">
-                                  <h3>
-                                    <Link href={`/services/${service.slug}`}>{service.title}</Link>
-                                  </h3>
-                                  <p>
-                                    {service.description
-                                      ? service.description.length > 120
-                                        ? `${service.description.slice(0, 120)}...`
-                                        : service.description
-                                      : 'Professional service module with detailed backend-managed content.'}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div> */}
+                    
                   </div>
                 ))}
                 </div>
