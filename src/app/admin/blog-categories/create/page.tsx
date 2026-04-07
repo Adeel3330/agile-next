@@ -15,7 +15,8 @@ export default function CreateBlogCategoryPage() {
     name: '',
     slug: '',
     description: '',
-    parentId: ''
+    parentId: '',
+    displayOrder: 0
   });
   const [categories, setCategories] = useState<Array<{ id: string; name: string; slug: string }>>([]);
 
@@ -89,7 +90,8 @@ export default function CreateBlogCategoryPage() {
         },
         body: JSON.stringify({
           ...formData,
-          parentId: formData.parentId || null
+          parentId: formData.parentId || null,
+          displayOrder: formData.displayOrder
         })
       });
 
@@ -183,6 +185,18 @@ export default function CreateBlogCategoryPage() {
                   <small className="form-text text-muted">
                     Select a parent category to create a subcategory
                   </small>
+                </div>
+
+                <div className="col-md-4 mt-3 mt-md-0">
+                  <label className="form-label">Display Order</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    min="0"
+                    value={formData.displayOrder}
+                    onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value, 10) || 0 })}
+                    placeholder="0"
+                  />
                 </div>
               </div>
 

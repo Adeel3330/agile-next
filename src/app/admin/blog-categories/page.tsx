@@ -10,6 +10,7 @@ interface BlogCategory {
   name: string;
   slug: string;
   description?: string;
+  displayOrder?: number;
   parentId?: string;
   parent?: {
     id: string;
@@ -214,6 +215,7 @@ export default function BlogCategoriesPage() {
                 <tr>
                   <th>Name</th>
                   <th>Slug</th>
+                  <th>Order</th>
                   <th>Parent</th>
                   <th>Description</th>
                   <th>Created</th>
@@ -231,6 +233,7 @@ export default function BlogCategoriesPage() {
                         {category.slug}
                       </code>
                     </td>
+                    <td>{category.displayOrder ?? 0}</td>
                     <td>
                       {category.parent ? (
                         <span className={styles.badge} style={{ background: '#cfe2ff', color: '#084298' }}>

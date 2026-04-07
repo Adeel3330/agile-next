@@ -33,6 +33,7 @@ export async function GET(
       .select('*')
       .eq('parent_id', parentCategory.id)
       .is('deleted_at', null)
+      .order('display_order', { ascending: true })
       .order('name', { ascending: true });
 
     if (error) {
@@ -49,6 +50,7 @@ export async function GET(
       name: cat.name,
       slug: cat.slug,
       description: cat.description,
+      displayOrder: cat.display_order ?? 0,
       parentId: cat.parent_id,
       parent: {
         id: parentCategory.id,

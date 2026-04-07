@@ -58,6 +58,7 @@ export async function GET(
       name: category.name,
       slug: category.slug,
       description: category.description,
+      displayOrder: category.display_order ?? 0,
       parentId: category.parent_id,
       parent: parent,
       created_at: category.created_at,
@@ -94,7 +95,7 @@ export async function PUT(
     const resolvedParams = await Promise.resolve(params);
     const { id } = resolvedParams;
     const body = await req.json();
-    const { name, slug, description, parentId } = body;
+    const { name, slug, description, parentId, displayOrder } = body;
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json(
@@ -160,6 +161,7 @@ export async function PUT(
       slug: categorySlug,
       description: description?.trim() || null,
       parent_id: parentId || null,
+      display_order: Number.isFinite(Number(displayOrder)) ? Number(displayOrder) : 0,
       updated_at: new Date().toISOString()
     };
 
@@ -209,6 +211,7 @@ export async function PUT(
       name: category.name,
       slug: category.slug,
       description: category.description,
+      displayOrder: category.display_order ?? 0,
       parentId: category.parent_id,
       parent: parent,
       created_at: category.created_at,
