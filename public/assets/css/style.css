@@ -2845,7 +2845,7 @@
  }
 
  @media (max-width:480px) {
-   .flex-column-reverse {
+   .flex-column-reverse-mobile {
      flex-direction: column-reverse;
    }
  }

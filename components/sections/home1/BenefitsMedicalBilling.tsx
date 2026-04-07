@@ -104,7 +104,7 @@ export default function BenefitsMedicalBilling() {
           <h2>{heading}</h2>
         </div>
 
-        <div className="row clearfix align-items-center flex-column-reverse">
+        <div className="row clearfix align-items-center flex-column-reverse-mobile">
           <div className="col-lg-6 col-md-12 col-sm-12">
             <div
               className="text-box"
