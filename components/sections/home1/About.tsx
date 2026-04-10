@@ -80,7 +80,7 @@ export default function About() {
     const fetchServices = async () => {
         setServicesLoading(true);
         try {
-            const response = await fetch('/api/services?limit=50');
+            const response = await fetch('/api/services?category=for-established-providers-and-medical-groups&limit=50');
             const data = await response.json();
 
             if (data.success && data.services) {
