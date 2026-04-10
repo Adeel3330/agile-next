@@ -100,9 +100,10 @@ export default function ServiceDetailsPage() {
     }
   }, [slug]);
 
-  const fetchServices = useCallback(async () => {
+  const fetchServices = useCallback(async (categorySlug?: string) => {
     try {
-      const response = await fetch('/api/services');
+      const query = categorySlug ? `?limit=100&category=${encodeURIComponent(categorySlug)}` : '?limit=100';
+      const response = await fetch(`/api/services${query}`);
       const data = await response.json();
 
       if (data.success && data.services) {
@@ -124,9 +125,15 @@ export default function ServiceDetailsPage() {
   useEffect(() => {
     if (mounted && slug) {
       fetchService();
-      fetchServices();
     }
-  }, [mounted, slug, fetchService, fetchServices]);
+  }, [mounted, slug, fetchService]);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    const selectedCategorySlug = service?.category?.slug;
+    fetchServices(selectedCategorySlug);
+  }, [mounted, service?.category?.slug, fetchServices]);
 
   if (!mounted || !slug) {
     return null;
