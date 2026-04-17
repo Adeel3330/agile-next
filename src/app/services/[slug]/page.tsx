@@ -258,6 +258,20 @@ export default function ServiceDetailsPage() {
               </div>
             </div>
           </div>
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+                .service-details-content .text-box p {
+                  margin-bottom: 5px;
+                }
+                .service-details-content .text-box h2 {
+                  margin-top: 1.5em;
+                  margin-bottom: 0.75em;
+                }
+              
+              `,
+            }}
+          />
         </section>
         <Cta />
       </Layout>

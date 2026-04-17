@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
 
     if (search && typeof search === 'string' && search.trim().length > 0) {
       const searchTerm = `%${search.trim()}%`;
-      query = query.or(`title.ilike.${searchTerm},description.ilike.${searchTerm},content.ilike.${searchTerm}`);
+      query = query.or(`title.ilike.${searchTerm}`);
     }
 
     query = query

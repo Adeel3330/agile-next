@@ -49,7 +49,7 @@ export default function ServicesPage() {
   const [successMessage, setSuccessMessage] = useState('');
   // const [categories, setCategories] = useState<Category[]>([]);
 
-   const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await fetch('/api/categories');
 
@@ -115,9 +115,8 @@ export default function ServicesPage() {
 
         const orderedOptions = orderedCategories
           .map((cat) => ({
-            _id: cat.id,
+            id: cat.id,
             name: `${'— '.repeat(getDepth(cat))}${cat.name}`,
-            parentId: cat.parentId || null,
           }));
 
         setCategories(orderedOptions);
@@ -125,7 +124,7 @@ export default function ServicesPage() {
     } catch (err) {
       console.error('Failed to fetch categories:', err);
     }
-  };
+  }, []);
 
   const fetchServices = useCallback(async () => {
     setLoading(true);
