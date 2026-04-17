@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './services.module.css';
 
+
 interface Service {
   _id: string;
   title: string;
@@ -38,6 +39,7 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,18 +47,79 @@ export default function ServicesPage() {
   const [total, setTotal] = useState(0);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  // const [categories, setCategories] = useState<Category[]>([]);
 
   const fetchCategories = useCallback(async () => {
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
-      if (!token) return;
-
-      // Fetch service categories from unified categories API (children of "service-categories" parent)
-      const response = await fetch('/api/categories/service-categories');
+      const response = await fetch('/api/categories');
 
       const data = await response.json();
       if (data.success && data.categories) {
-        setCategories(data.categories.map((cat: any) => ({ id: cat.id, name: cat.name })));
+        const allCategories = data.categories as any[];
+        const serviceRoot = allCategories.find((cat) => cat.slug === 'service-categories');
+
+        if (!serviceRoot) {
+          setCategories([]);
+          return;
+        }
+
+        const selectedIds = new Set<string>();
+        const queue = [serviceRoot.id];
+
+        while (queue.length > 0) {
+          const currentId = queue.shift() as string;
+          const children = allCategories.filter((cat) => cat.parentId === currentId);
+          for (const child of children) {
+            if (!selectedIds.has(child.id)) {
+              selectedIds.add(child.id);
+              queue.push(child.id);
+            }
+          }
+        }
+
+        const categoryMap = new Map(allCategories.map((cat) => [cat.id, cat]));
+        const getDepth = (category: any) => {
+          let depth = 0;
+          let parentId = category.parentId;
+          while (parentId && parentId !== serviceRoot.id) {
+            const parent = categoryMap.get(parentId);
+            if (!parent) break;
+            depth += 1;
+            parentId = parent.parentId;
+          }
+          return depth;
+        };
+
+        const options = allCategories
+          .filter((cat) => selectedIds.has(cat.id));
+
+        const childrenByParent = new Map<string, any[]>();
+        for (const cat of options) {
+          const parentKey = String(cat.parentId || '');
+          if (!childrenByParent.has(parentKey)) {
+            childrenByParent.set(parentKey, []);
+          }
+          childrenByParent.get(parentKey)?.push(cat);
+        }
+
+        const orderedCategories: any[] = [];
+        const appendChildren = (parentId: string) => {
+          const children = childrenByParent.get(String(parentId)) || [];
+          for (const child of children) {
+            orderedCategories.push(child);
+            appendChildren(child.id);
+          }
+        };
+
+        appendChildren(serviceRoot.id);
+
+        const orderedOptions = orderedCategories
+          .map((cat) => ({
+            id: cat.id,
+            name: `${'— '.repeat(getDepth(cat))}${cat.name}`,
+          }));
+
+        setCategories(orderedOptions);
       }
     } catch (err) {
       console.error('Failed to fetch categories:', err);
@@ -76,7 +139,7 @@ export default function ServicesPage() {
       const queryParams = new URLSearchParams({
         page: currentPage.toString(),
         limit: '10',
-        ...(searchTerm && { search: searchTerm }),
+        ...(debouncedSearchTerm && { search: debouncedSearchTerm }),
         ...(selectedCategory && { category: selectedCategory })
       });
 
@@ -111,7 +174,15 @@ export default function ServicesPage() {
     } finally {
       setLoading(false);
     }
-  }, [router, currentPage, searchTerm, selectedCategory]);
+  }, [router, currentPage, debouncedSearchTerm, selectedCategory]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim());
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
     setMounted(true);
@@ -177,8 +248,8 @@ export default function ServicesPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setDebouncedSearchTerm(searchTerm.trim());
     setCurrentPage(1);
-    fetchServices();
   };
 
   if (!mounted) {

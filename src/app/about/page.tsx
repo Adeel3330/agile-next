@@ -286,9 +286,7 @@ export default function AboutPage() {
 
         {showTeamOnly && (
           <section className="team-section sec-pad centred" id="our-teams">
-            <div className="bg-layer" style={{
-              backgroundImage: teamMedia[0]?.fileUrl ? `url(${teamMedia[0].fileUrl})` : 'url(assets/images/background/team-bg.jpg)'
-            }}></div>
+            
             <div className="auto-container">
               <div className="sec-title mb_60">
                 <span className="sub-title mb_5">Our Team</span>
