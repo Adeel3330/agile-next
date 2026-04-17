@@ -33,6 +33,12 @@ interface ServiceListItem {
   slug: string;
 }
 
+interface CategoryNode {
+  id: string;
+  slug: string;
+  parentId?: string | null;
+}
+
 export default function ServiceDetailsPage() {
   const params = useParams();
   const slug = Array.isArray(params?.slug) ? params.slug[0] : (params?.slug as string | undefined);
@@ -100,9 +106,17 @@ export default function ServiceDetailsPage() {
     }
   }, [slug]);
 
-  const fetchServices = useCallback(async (categorySlug?: string) => {
+  const fetchServices = useCallback(async (categorySlug?: string, subCategorySlug?: string) => {
     try {
-      const query = categorySlug ? `?limit=100&category=${encodeURIComponent(categorySlug)}` : '?limit=100';
+      const queryParams = new URLSearchParams({ limit: '100' });
+      if (categorySlug) {
+        queryParams.set('category', categorySlug);
+      }
+      if (subCategorySlug) {
+        queryParams.set('subCategory', subCategorySlug);
+      }
+
+      const query = `?${queryParams.toString()}`;
       const response = await fetch(`/api/services${query}`);
       const data = await response.json();
 
@@ -131,8 +145,43 @@ export default function ServiceDetailsPage() {
   useEffect(() => {
     if (!mounted) return;
 
-    const selectedCategorySlug = service?.category?.slug;
-    fetchServices(selectedCategorySlug);
+    const loadRelatedServices = async () => {
+      const selectedCategorySlug = service?.category?.slug;
+
+      if (!selectedCategorySlug) {
+        await fetchServices();
+        return;
+      }
+
+      try {
+        const categoryResponse = await fetch('/api/categories');
+        const categoryData = await categoryResponse.json();
+
+        if (!categoryData.success || !Array.isArray(categoryData.categories)) {
+          await fetchServices(selectedCategorySlug);
+          return;
+        }
+
+        const allCategories = categoryData.categories as CategoryNode[];
+        const currentCategory = allCategories.find((cat) => cat.slug === selectedCategorySlug);
+        const parentId = currentCategory?.parentId || null;
+        const parentCategory = parentId
+          ? allCategories.find((cat) => String(cat.id) === String(parentId))
+          : null;
+
+        if (parentCategory?.slug) {
+          await fetchServices(parentCategory.slug, selectedCategorySlug);
+          return;
+        }
+
+        await fetchServices(selectedCategorySlug);
+      } catch (err) {
+        console.error('Failed to resolve category hierarchy:', err);
+        await fetchServices(selectedCategorySlug);
+      }
+    };
+
+    loadRelatedServices();
   }, [mounted, service?.category?.slug, fetchServices]);
 
   if (!mounted || !slug) {
@@ -206,22 +255,6 @@ export default function ServiceDetailsPage() {
                       </ul>
                     </div>
                   </div>
-                  {/* <div className="sidebar-widget schedule-widget">
-                    <div className="widget-title">
-                      <h2>Working Hours</h2>
-                    </div>
-                    <div className="widget-content">
-                      <ul className="schedule-list clearfix">
-                        <li>Sunday<span>02 pm to 06 pm</span></li>
-                        <li>Monday<span>03 pm to 07 pm</span></li>
-                        <li>Tuesday<span>02 pm to 06 pm</span></li>
-                        <li>Wednesday<span>02 pm to 06 pm</span></li>
-                        <li>Thursday<span>04 pm to 06 pm</span></li>
-                        <li>Friday<span>03 pm to 08 pm</span></li>
-                        <li>Saturday<span>Closed</span></li>
-                      </ul>
-                    </div>
-                  </div> */}
                 </div>
               </div>
               <div className="col-lg-8 col-md-12 col-sm-12 content-side">
