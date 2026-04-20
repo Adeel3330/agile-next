@@ -147,6 +147,7 @@ export default function ServiceDetailsPage() {
 
     const loadRelatedServices = async () => {
       const selectedCategorySlug = service?.category?.slug;
+      const selectedCategoryId = service?.category?.id;
 
       if (!selectedCategorySlug) {
         await fetchServices();
@@ -163,7 +164,10 @@ export default function ServiceDetailsPage() {
         }
 
         const allCategories = categoryData.categories as CategoryNode[];
-        const currentCategory = allCategories.find((cat) => cat.slug === selectedCategorySlug);
+        // Slugs can exist in multiple branches; prefer exact id match to resolve hierarchy.
+        const currentCategory = selectedCategoryId
+          ? allCategories.find((cat) => String(cat.id) === String(selectedCategoryId))
+          : allCategories.find((cat) => cat.slug === selectedCategorySlug);
         const parentId = currentCategory?.parentId || null;
         const parentCategory = parentId
           ? allCategories.find((cat) => String(cat.id) === String(parentId))

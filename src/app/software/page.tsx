@@ -226,44 +226,6 @@ export default function SoftwarePage() {
           </div>
         </section>
 
-        {/* Features Section */}
-        {/* {featuresSection && featuresSection.items && Array.isArray(featuresSection.items) && featuresSection.items.length > 0 && (
-          <section className="service-section p_relative pt_120 pb_90">
-            <div className="pattern-layer" style={{ backgroundImage: 'url(assets/images/shape/shape-13.png)' }}></div>
-            <div className="auto-container">
-              <div className="sec-title mb_60 centred">
-                <span className="sub-title mb_5">Our Software Solutions</span>
-                <h2>{featuresSection.title || 'Software Capabilities'}</h2>
-              </div>
-              <div className="row clearfix">
-                {featuresSection.items.slice(0, 6).map((item: any, index: number) => (
-                  <div key={index} className="col-lg-4 col-md-6 col-sm-12 service-block">
-                    <div className="service-block-one">
-                      <div className="inner-box" style={{ background: '#fff', padding: '40px 30px', borderRadius: '10px', boxShadow: '0 5px 20px rgba(0,0,0,0.08)', transition: 'all 0.3s ease', height: '100%' }}>
-                        <div className="lower-content">
-                          <div className="inner">
-                            {item.icon && (
-                              <div className="icon-box" style={{ marginBottom: '20px' }}>
-                                <i className={item.icon} style={{ fontSize: '50px', color: 'var(--theme-color)' }}></i>
-                              </div>
-                            )}
-                            <h3 style={{ marginBottom: '15px', fontSize: '22px', fontWeight: '700' }}>
-                              {item.title || `Feature ${index + 1}`}
-                            </h3>
-                            <p style={{ color: '#666', lineHeight: '26px' }}>
-                              {item.description || item.text || ''}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )} */}
-
         {/* Content Section */}
         <section className="about-section about-page p_relative pb_120 pt_90">
           <div className="auto-container">
