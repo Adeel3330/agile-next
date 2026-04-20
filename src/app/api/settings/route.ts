@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
           logoUrl: null,
           contactEmail: null,
           contactPhone: null,
+          emergencyNo: null,
           contactAddress: null,
           contactAddress2: null,
           contactCity: null,
@@ -76,6 +77,11 @@ export async function GET(req: NextRequest) {
       logoUrl: settings.logo_url,
       contactEmail: settings.contact_email,
       contactPhone: settings.contact_phone,
+      emergencyNo:
+        settings.emergency_no ||
+        settings.additional_settings?.emergencyNo ||
+        settings.additional_settings?.emergency_no ||
+        null,
       contactAddress: settings.contact_address,
       contactAddress2:
         settings.contact_address_2 ||

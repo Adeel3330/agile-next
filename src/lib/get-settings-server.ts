@@ -5,6 +5,7 @@ const DEFAULT_SETTINGS = {
   logoUrl: null as string | null,
   contactEmail: null as string | null,
   contactPhone: null as string | null,
+  emergencyNo: null as string | null,
   contactAddress: null as string | null,
   contactAddress2: null as string | null,
   contactCity: null as string | null,
@@ -57,6 +58,11 @@ export async function getSettingsForServer(): Promise<SettingsForServer> {
     logoUrl: settings.logo_url ?? null,
     contactEmail: settings.contact_email ?? null,
     contactPhone: settings.contact_phone ?? null,
+    emergencyNo:
+      settings.emergency_no ??
+      settings.additional_settings?.emergencyNo ??
+      settings.additional_settings?.emergency_no ??
+      null,
     contactAddress: settings.contact_address ?? null,
     contactAddress2:
       settings.contact_address_2 ??

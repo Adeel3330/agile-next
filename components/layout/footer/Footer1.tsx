@@ -128,7 +128,7 @@ export default function Footer1() {
                       )}
 
                     </ul>
-                    {certifications.length > 0 && (
+                    {/* {certifications.length > 0 && (
                       <div className="mt-3">
                         <h6 className="mb-2">CPC & CPB Certificates</h6>
                         <div className="d-flex flex-wrap gap-2">
@@ -144,7 +144,7 @@ export default function Footer1() {
                           ))}
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
               </div>

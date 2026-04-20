@@ -12,6 +12,7 @@ interface Settings {
   logoUrl?: string;
   contactEmail?: string;
   contactPhone?: string;
+  emergencyNo?: string;
   contactAddress?: string;
   contactAddress2?: string;
   contactCity?: string;
@@ -59,6 +60,7 @@ export default function SettingsPage() {
     logoUrl: '',
     contactEmail: '',
     contactPhone: '',
+    emergencyNo: '',
     contactAddress: '',
     contactAddress2: '',
     contactCity: '',
@@ -455,6 +457,18 @@ export default function SettingsPage() {
                       value={formData.contactPhone || ''}
                       onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
                       placeholder="+1 (123) 456-7890"
+                    />
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-md-6">
+                    <label className="form-label">Emergency Phone</label>
+                    <input
+                      type="tel"
+                      className="form-control"
+                      value={formData.emergencyNo || ''}
+                      onChange={(e) => setFormData({ ...formData, emergencyNo: e.target.value })}
+                      placeholder="+1 (123) 456-0000"
                     />
                   </div>
                 </div>

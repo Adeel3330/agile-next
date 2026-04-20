@@ -14,6 +14,7 @@ interface MediaItem {
 
 interface Settings {
   contactPhone?: string;
+  emergencyNo?: string;
 }
 
 export default function Cta() {
@@ -62,7 +63,9 @@ export default function Cta() {
   const title = ctaMedia?.title || 'Need a Doctor for Check-up? Call for an Emergency Service!';
   const imageUrl = ctaMedia?.fileUrl || '/assets/images/resource/ambulance-1.png';
   const phoneNumber = settings?.contactPhone || '+1 (123)-456-155-23';
+  const emergencyNumber = settings?.emergencyNo || phoneNumber;
   const phoneLink = phoneNumber.replace(/\s/g, '');
+  const emergencyPhoneLink = emergencyNumber.replace(/\s/g, '');
 
   return (
     <section className="cta-section">
@@ -96,7 +99,10 @@ export default function Cta() {
                   animation: 'pulse 1.5s ease-in-out infinite'
                 }}></span>
               ) : (
-                <span>Call: <Link href={`tel:${phoneLink}`}>{phoneNumber}</Link></span>
+                <span>
+                  
+                  Emergency Call: <Link href={`tel:${emergencyPhoneLink}`}>{emergencyNumber}</Link>
+                </span>
               )}
             </div>
           </div>
