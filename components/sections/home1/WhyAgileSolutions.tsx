@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface PageData {
   id: string;
@@ -49,11 +49,32 @@ export default function WhyAgileSolutions() {
   const [loading, setLoading] = useState(true);
   const [pageData, setPageData] = useState<PageData | null>(null);
   const [settingsData, setSettingsData] = useState<SettingsData | null>(null);
+  const [isInView, setIsInView] = useState(false);
+  const [animatedCounts, setAnimatedCounts] = useState<number[]>([]);
+  const sectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (!mounted || !sectionRef.current || isInView) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.35 }
+    );
+
+    observer.observe(sectionRef.current);
+
+    return () => observer.disconnect();
+  }, [mounted, isInView]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -74,8 +95,6 @@ export default function WhyAgileSolutions() {
       setLoading(false);
     }
   };
-
-  if (!mounted) return null;
 
   const heading = pageData?.title || 'Why Agile Nexus Solutions?';
 
@@ -115,8 +134,87 @@ export default function WhyAgileSolutions() {
     );
   })();
 
+  const getAnimatedValueParts = (value: string) => {
+    const raw = value.trim();
+    const numericMatches = raw.match(/\d+/g) || [];
+
+    // Animate only values with one numeric segment (e.g. 90%, Up to 30%, 40+).
+    if (numericMatches.length !== 1) {
+      return { animate: false, raw, target: 1, prefix: '', suffix: '' };
+    }
+
+    const numberText = numericMatches[0];
+    const numberIndex = raw.indexOf(numberText);
+    const target = parseInt(numberText, 10);
+
+    if (!Number.isFinite(target) || target <= 1 || target > 999) {
+      return { animate: false, raw, target: 1, prefix: '', suffix: '' };
+    }
+
+    return {
+      animate: true,
+      raw,
+      target,
+      prefix: raw.slice(0, numberIndex),
+      suffix: raw.slice(numberIndex + numberText.length),
+    };
+  };
+
+  const parsedKpis = kpiItems.map((item) => getAnimatedValueParts(item.value));
+
+  useEffect(() => {
+    setAnimatedCounts(parsedKpis.map((part) => (part.animate ? 1 : 0)));
+  }, [settingsData, pageData]);
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    const animatedIndexes = parsedKpis
+      .map((part, index) => ({ part, index }))
+      .filter((entry) => entry.part.animate);
+
+    if (animatedIndexes.length === 0) return;
+
+    const duration = 1800;
+    let rafId = 0;
+    const start = performance.now();
+
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+
+      setAnimatedCounts((prev) => {
+        const next = [...prev];
+
+        for (const { part, index } of animatedIndexes) {
+          const value = Math.round(1 + (part.target - 1) * eased);
+          next[index] = Math.min(part.target, Math.max(1, value));
+        }
+
+        return next;
+      });
+
+      if (progress < 1) {
+        rafId = window.requestAnimationFrame(tick);
+      }
+    };
+
+    rafId = window.requestAnimationFrame(tick);
+
+    return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
+  }, [isInView, settingsData, pageData]);
+
+  if (!mounted) return null;
+
   return (
-    <section className="chooseus-section p_relative pt_120 pb_90" style={{ background: '#f5f8fa' }}>
+    <section
+      ref={sectionRef}
+      className={`chooseus-section p_relative pt_120 pb_90 ${isInView ? 'kpi-animate-in' : ''}`}
+      style={{ background: '#f5f8fa' }}
+    >
       <div className="auto-container">
         <div className="sec-title mb_40 centred">
           <span className="sub-title mb_5">Why Choose Us</span>
@@ -137,12 +235,22 @@ export default function WhyAgileSolutions() {
           </div>
 
           <div className="kpi-grid">
-            {kpiItems.map((item, index) => (
+            {kpiItems.map((item, index) => {
+              const valueParts = parsedKpis[index];
+
+              return (
               <div key={`${item.value}-${item.label}-${index}`} className="kpi-card">
-                <h4 className="kpi-value">{item.value}</h4>
+                {valueParts.animate ? (
+                  <h4 className="kpi-value" aria-label={item.value}>
+                    {`${valueParts.prefix}${isInView ? animatedCounts[index] || 1 : 1}${valueParts.suffix}`}
+                  </h4>
+                ) : (
+                  <h4 className="kpi-value">{item.value}</h4>
+                )}
                 <p className="kpi-label">{item.label}</p>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {loading && kpiItems.length === 0 && (
