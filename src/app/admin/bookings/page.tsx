@@ -9,6 +9,9 @@ interface Booking {
   service_id?: string;
   service_name?: string;
   service_names?: string[];
+  subcategory_id?: string;
+  subcategory_name?: string;
+  subcategory_names?: string[];
   name: string;
   email: string;
   phone: string;
@@ -226,7 +229,13 @@ export default function BookingsPage() {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
-  const formatServices = (booking: Booking) => {
+  const formatSubCategories = (booking: Booking) => {
+    if (booking.subcategory_names && booking.subcategory_names.length > 0) {
+      return booking.subcategory_names.join(', ');
+    }
+    if (booking.subcategory_name) {
+      return booking.subcategory_name;
+    }
     if (booking.service_names && booking.service_names.length > 0) {
       return booking.service_names.join(', ');
     }
@@ -266,7 +275,7 @@ export default function BookingsPage() {
                   <input
                     type="text"
                     className="form-control me-2"
-                    placeholder="Search by name, email, phone, or service..."
+                    placeholder="Search by name, email, phone, or subcategory..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -313,7 +322,7 @@ export default function BookingsPage() {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Service</th>
+                        <th>Subcategory</th>
                         <th>Appointment Date</th>
                         <th>Time</th>
                         <th>Status</th>
@@ -327,7 +336,7 @@ export default function BookingsPage() {
                           <td>{booking.name}</td>
                           <td>{booking.email}</td>
                           <td>{booking.phone}</td>
-                          <td>{formatServices(booking)}</td>
+                          <td>{formatSubCategories(booking)}</td>
                           <td>{formatAppointmentDate(booking.appointment_date)}</td>
                           <td>{booking.appointment_time || '-'}</td>
                           <td>
@@ -490,7 +499,7 @@ export default function BookingsPage() {
                               <strong>Phone:</strong> {selectedBooking.phone}
                             </div>
                             <div style={{ marginBottom: '1rem' }}>
-                              <strong>Service:</strong> {formatServices(selectedBooking) || 'Not specified'}
+                              <strong>Subcategory:</strong> {formatSubCategories(selectedBooking) || 'Not specified'}
                             </div>
                             <div style={{ marginBottom: '1rem' }}>
                               <strong>Appointment Date:</strong> {formatAppointmentDate(selectedBooking.appointment_date)}

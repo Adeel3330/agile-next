@@ -22,12 +22,19 @@ interface ServiceOption {
     label: string;
 }
 
+interface CategoryNode {
+    id: string;
+    name: string;
+    slug: string;
+    parentId?: string | null;
+}
+
 export default function About() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [date, setDate] = useState("");
     const [phone, setPhone] = useState("");
-    const [selectedServices, setSelectedServices] = useState<string[]>([]);
+    const [selectedSubCategories, setSelectedSubCategories] = useState<string[]>([]);
     const [submitting, setSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [mounted, setMounted] = useState(false);
@@ -35,13 +42,13 @@ export default function About() {
     const [servicesLoading, setServicesLoading] = useState(true);
     const [aboutData, setAboutData] = useState<AboutData | null>(null);
     const [aboutImage, setAboutImage] = useState<string | null>(null);
-    const [services, setServices] = useState<Service[]>([]);
+    const [subCategories, setSubCategories] = useState<CategoryNode[]>([]);
 
     useEffect(() => {
         setMounted(true);
         setDate(new Date().toISOString().split('T')[0]);
         fetchAboutData();
-        fetchServices();
+        fetchSubCategories();
     }, []);
 
     const fetchAboutData = async () => {
@@ -77,17 +84,53 @@ export default function About() {
         }
     };
 
-    const fetchServices = async () => {
+    const fetchSubCategories = async () => {
         setServicesLoading(true);
         try {
-            const response = await fetch('/api/services?category=for-established-providers-and-medical-groups&limit=50');
-            const data = await response.json();
+            const categoryResponse = await fetch('/api/categories');
+            const categoryData = await categoryResponse.json();
 
-            if (data.success && data.services) {
-                setServices(data.services);
+            if (categoryData.success && Array.isArray(categoryData.categories)) {
+                const categories = categoryData.categories as CategoryNode[];
+                const parentCategory = categories.find(
+                    (category) => category.slug === 'for-established-providers-and-medical-groups'
+                );
+
+                if (parentCategory) {
+                    const subCategoryTreeIds = new Set<string>();
+                    const queue = categories
+                        .filter((category) => String(category.parentId) === String(parentCategory.id))
+                        .map((category) => category.id);
+
+                    while (queue.length > 0) {
+                        const currentId = queue.shift() as string;
+                        if (!subCategoryTreeIds.has(currentId)) {
+                            subCategoryTreeIds.add(currentId);
+                            const children = categories
+                                .filter((category) => String(category.parentId) === String(currentId))
+                                .map((category) => category.id);
+                            queue.push(...children);
+                        }
+                    }
+
+                    const filteredSubCategories = categories
+                        .filter((category) => subCategoryTreeIds.has(String(category.id)))
+                        .sort((a, b) => a.name.localeCompare(b.name));
+
+                    setSubCategories(filteredSubCategories);
+                    setSelectedSubCategories((prev) =>
+                        prev.filter((id) => filteredSubCategories.some((category) => String(category.id) === String(id)))
+                    );
+                    return;
+                }
             }
+
+            setSubCategories([]);
+            setSelectedSubCategories([]);
         } catch (err) {
-            console.error('Failed to fetch services:', err);
+            console.error('Failed to fetch subcategories:', err);
+            setSubCategories([]);
+            setSelectedSubCategories([]);
         } finally {
             setServicesLoading(false);
         }
@@ -99,7 +142,7 @@ export default function About() {
         setSubmitMessage(null);
 
         try {
-            const selectedServiceObjs = services.filter((service) => selectedServices.includes(service.id));
+            const selectedSubCategoryObjs = subCategories.filter((category) => selectedSubCategories.includes(category.id));
             
             const response = await fetch('/api/bookings', {
                 method: 'POST',
@@ -107,10 +150,10 @@ export default function About() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    serviceId: selectedServices[0] || null,
-                    serviceName: selectedServiceObjs.map((service) => service.title).join(', ') || null,
-                    serviceIds: selectedServices,
-                    serviceNames: selectedServiceObjs.map((service) => service.title),
+                    subCategoryId: selectedSubCategories[0] || null,
+                    subCategoryName: selectedSubCategoryObjs.map((category) => category.name).join(', ') || null,
+                    subCategoryIds: selectedSubCategories,
+                    subCategoryNames: selectedSubCategoryObjs.map((category) => category.name),
                     name: name.trim(),
                     email: email.trim(),
                     phone: phone.trim(),
@@ -129,7 +172,7 @@ export default function About() {
                 setEmail('');
                 setDate(new Date().toISOString().split('T')[0]);
                 setPhone('');
-                setSelectedServices([]);
+                setSelectedSubCategories([]);
             } else {
                 setSubmitMessage({ type: 'error', text: data.message || 'Failed to submit booking. Please try again.' });
             }
@@ -170,11 +213,11 @@ export default function About() {
     const aboutTitle = getAboutTitle();
     const aboutDescription = getAboutDescription();
     const imageUrl = aboutImage || '/assets/images/resource/about-1.jpg';
-    const serviceOptions: ServiceOption[] = services.map((service) => ({
-        value: service.id,
-        label: service.title,
+    const serviceOptions: ServiceOption[] = subCategories.map((category) => ({
+        value: category.id,
+        label: category.name,
     }));
-    const selectedServiceOptions = serviceOptions.filter((option) => selectedServices.includes(option.value));
+    const selectedServiceOptions = serviceOptions.filter((option) => selectedSubCategories.includes(option.value));
 
   return (
         <section className="about-section p_relative">
@@ -287,20 +330,20 @@ export default function About() {
                                         options={serviceOptions}
                                         value={selectedServiceOptions}
                                         onChange={(selected: MultiValue<ServiceOption>) => {
-                                            setSelectedServices(selected.map((option) => option.value));
+                                            setSelectedSubCategories(selected.map((option) => option.value));
                                         }}
                                         classNamePrefix="booking-service-select"
-                                        placeholder={servicesLoading ? 'Loading services...' : 'Search and select services'}
+                                        placeholder={servicesLoading ? 'Loading subcategories...' : 'Search and select subcategories'}
                                         isDisabled={servicesLoading || submitting}
                                         closeMenuOnSelect={false}
-                                        noOptionsMessage={() => 'No services found'}
+                                        noOptionsMessage={() => 'No subcategories found'}
                                     />
                                     <input
                                         type="text"
                                         tabIndex={-1}
                                         autoComplete="off"
                                         style={{ opacity: 0, height: 0, position: 'absolute', pointerEvents: 'none' }}
-                                        value={selectedServices.join(',')}
+                                        value={selectedSubCategories.join(',')}
                                         readOnly
                                         disabled={servicesLoading || submitting}
                                         required
@@ -378,7 +421,7 @@ export default function About() {
                                 <button 
                                     type="submit" 
                                     className="theme-btn btn-one"
-                                    disabled={submitting || !date || !phone || selectedServices.length === 0 || !name || !email}
+                                    disabled={submitting || !date || !phone || selectedSubCategories.length === 0 || !name || !email}
                                     style={{ position: 'relative', opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
                                 >
                                     {submitting && (

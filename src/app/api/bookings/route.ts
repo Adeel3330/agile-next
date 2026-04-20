@@ -11,6 +11,10 @@ export async function POST(req: NextRequest) {
       serviceName,
       serviceIds,
       serviceNames,
+      subCategoryId,
+      subCategoryName,
+      subCategoryIds,
+      subCategoryNames,
       name,
       email,
       phone,
@@ -70,9 +74,26 @@ export async function POST(req: NextRequest) {
       ? serviceNames.filter((name) => typeof name === 'string' && name.trim().length > 0)
       : [];
 
-    if (requestedServiceIds.length === 0 && requestedServiceNames.length === 0) {
+    const requestedSubCategoryIds = Array.isArray(subCategoryIds)
+      ? subCategoryIds.filter((id) => typeof id === 'string' && id.trim().length > 0)
+      : subCategoryId && typeof subCategoryId === 'string'
+        ? [subCategoryId]
+        : [];
+
+    const requestedSubCategoryNames = Array.isArray(subCategoryNames)
+      ? subCategoryNames.filter((name) => typeof name === 'string' && name.trim().length > 0)
+      : subCategoryName && typeof subCategoryName === 'string' && subCategoryName.trim().length > 0
+        ? [subCategoryName.trim()]
+        : [];
+
+    if (
+      requestedServiceIds.length === 0 &&
+      requestedServiceNames.length === 0 &&
+      requestedSubCategoryIds.length === 0 &&
+      requestedSubCategoryNames.length === 0
+    ) {
       return NextResponse.json(
-        { success: false, message: 'Please select at least one service or provide a service name' },
+        { success: false, message: 'Please select at least one subcategory' },
         { status: 400 }
       );
     }
@@ -102,23 +123,61 @@ export async function POST(req: NextRequest) {
       foundServices = data;
     }
 
+    let foundSubCategories: any[] = [];
+    if (requestedSubCategoryIds.length > 0) {
+      const { data, error: subCategoriesError } = await supabaseAdmin
+        .from('blog_categories')
+        .select('id, name, deleted_at')
+        .in('id', requestedSubCategoryIds);
+
+      if (subCategoriesError || !data || data.length !== requestedSubCategoryIds.length) {
+        return NextResponse.json(
+          { success: false, message: 'One or more selected subcategories were not found' },
+          { status: 404 }
+        );
+      }
+
+      const deletedSubCategory = data.find((category) => category.deleted_at);
+      if (deletedSubCategory) {
+        return NextResponse.json(
+          { success: false, message: `Selected subcategory is not available: ${deletedSubCategory.name}` },
+          { status: 400 }
+        );
+      }
+
+      foundSubCategories = data;
+    }
+
     const serviceTitleById = new Map(foundServices.map((service) => [service.id, service.title]));
     const orderedSelectedServices = requestedServiceIds.map((id) => ({
       id,
       title: serviceTitleById.get(id) || 'Service'
     }));
 
+    const subCategoryNameById = new Map(foundSubCategories.map((category) => [category.id, category.name]));
+    const orderedSelectedSubCategories = requestedSubCategoryIds.map((id) => ({
+      id,
+      name: subCategoryNameById.get(id) || 'Subcategory'
+    }));
+
     const legacyServiceName = orderedSelectedServices.map((service) => service.title).join(', ');
+    const legacySubCategoryName =
+      orderedSelectedSubCategories.map((category) => category.name).join(', ') ||
+      requestedSubCategoryNames.join(', ');
 
     // Insert booking
     const { data: booking, error: insertError } = await supabaseAdmin
       .from('bookings')
       .insert({
         service_id: orderedSelectedServices[0]?.id || null,
+        subcategory_id: orderedSelectedSubCategories[0]?.id || null,
         service_name:
           legacyServiceName ||
           (requestedServiceNames.length > 0 ? requestedServiceNames.join(', ').trim() : serviceName?.trim()) ||
+          legacySubCategoryName ||
+          subCategoryName?.trim() ||
           null,
+        subcategory_name: legacySubCategoryName || subCategoryName?.trim() || null,
         name: name.trim(),
         email: email.toLowerCase().trim(),
         phone: phone.trim(),
@@ -156,6 +215,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const bookingSubCategoryRows = orderedSelectedSubCategories.map((category) => ({
+      booking_id: booking.id,
+      subcategory_id: category.id,
+      subcategory_name: category.name
+    }));
+
+    if (bookingSubCategoryRows.length > 0) {
+      const { error: bookingSubCategoriesError } = await supabaseAdmin
+        .from('booking_subcategories')
+        .insert(bookingSubCategoryRows);
+
+      if (bookingSubCategoriesError && bookingSubCategoriesError.code !== '42P01') {
+        console.error('Insert booking_subcategories error:', bookingSubCategoriesError);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Booking submitted successfully! We will contact you soon.',
@@ -164,7 +239,8 @@ export async function POST(req: NextRequest) {
         name: booking.name,
         email: booking.email,
         appointmentDate: booking.appointment_date,
-        services: orderedSelectedServices
+        services: orderedSelectedServices,
+        subCategories: orderedSelectedSubCategories
       }
     });
   } catch (error) {
