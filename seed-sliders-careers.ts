@@ -35,7 +35,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 function getMedicalBillingImage(index: number = 1): string {
   // Using Cloudinary demo images as placeholders - replace with actual medical billing images
   const images = [
-    'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg', // Medical billing office
+    'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png', // Medical billing office
     'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill/v1312461204/sample.jpg', // Healthcare billing
     'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill/v1312461204/sample.jpg', // Revenue cycle
     'https://res.cloudinary.com/demo/image/upload/w_800,h_600,c_fill/v1312461204/sample.jpg', // Medical coding

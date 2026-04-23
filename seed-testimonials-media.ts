@@ -23,7 +23,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Placeholder for media table (image not displayed in testimonial; title + description only)
-const PLACEHOLDER_IMAGE = 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg';
+const PLACEHOLDER_IMAGE = 'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png';
 
 // Testimonials from https://agilenexussolution.com/
 const testimonialsData = [

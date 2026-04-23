@@ -34,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const title = settings.seoDefaultTitle?.trim() || DEFAULT_TITLE;
     const description = settings.seoDefaultDescription?.trim() || DEFAULT_DESCRIPTION;
     const keywords = settings.seoDefaultKeywords?.trim() || undefined;
-    const openGraphImage = settings.seoDefaultImage || undefined;
+    const openGraphImage = settings.seoDefaultImage ? `${settings.seoDefaultImage}?v=${Date.now()}` : undefined;
 
     return {
       title,
