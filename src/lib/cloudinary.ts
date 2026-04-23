@@ -21,22 +21,21 @@ export async function uploadToCloudinary(
   resourceType: 'image' | 'video' | 'auto' = 'auto'
 ): Promise<{ url: string; public_id: string; resource_type: string }> {
   return new Promise((resolve, reject) => {
+
+    // 🔥 FIX: detect raw files (PDF/DOC)
+    const isRawFile = resourceType === 'auto';
+
     const uploadOptions: any = {
       folder,
-      resource_type: resourceType === 'auto' ? undefined : resourceType,
+      resource_type: isRawFile ? 'raw' : resourceType,
     };
 
     if (Buffer.isBuffer(file)) {
       cloudinary.uploader
         .upload_stream(uploadOptions, (error, result) => {
-          if (error) {
-            reject(error);
-            return;
-          }
-          if (!result) {
-            reject(new Error('Upload failed: No result'));
-            return;
-          }
+          if (error) return reject(error);
+          if (!result) return reject(new Error('Upload failed'));
+
           resolve({
             url: result.secure_url,
             public_id: result.public_id,
@@ -46,14 +45,9 @@ export async function uploadToCloudinary(
         .end(file);
     } else {
       cloudinary.uploader.upload(file, uploadOptions, (error, result) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-        if (!result) {
-          reject(new Error('Upload failed: No result'));
-          return;
-        }
+        if (error) return reject(error);
+        if (!result) return reject(new Error('Upload failed'));
+
         resolve({
           url: result.secure_url,
           public_id: result.public_id,
