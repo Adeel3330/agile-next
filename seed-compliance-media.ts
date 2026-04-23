@@ -24,7 +24,7 @@ const complianceMediaData = [
   {
     title: 'Compliance Hero Banner',
     description: 'Hero banner image for compliance page showcasing our commitment to regulatory standards',
-    fileUrl: 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg', // Replace with actual Cloudinary URL
+    fileUrl: 'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png', // Replace with actual Cloudinary URL
     fileName: 'compliance-hero.jpg',
     fileSize: 0,
     fileType: 'image/jpeg',
@@ -37,7 +37,7 @@ const complianceMediaData = [
   {
     title: 'Compliance Content Image',
     description: 'Image showing compliance processes and standards',
-    fileUrl: 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg', // Replace with actual Cloudinary URL
+    fileUrl: 'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png', // Replace with actual Cloudinary URL
     fileName: 'compliance-content.jpg',
     fileSize: 0,
     fileType: 'image/jpeg',
@@ -50,7 +50,7 @@ const complianceMediaData = [
   {
     title: 'Compliance Standards',
     description: 'Visual representation of our compliance standards',
-    fileUrl: 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg', // Replace with actual Cloudinary URL
+    fileUrl: 'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png', // Replace with actual Cloudinary URL
     fileName: 'compliance-standards.jpg',
     fileSize: 0,
     fileType: 'image/jpeg',

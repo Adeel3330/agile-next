@@ -40,7 +40,7 @@ function generateSlug(title: string): string {
 function getPlaceholderImage(): string {
   // Using medical billing related placeholder - replace with actual medical billing images
   // Example: medical billing office, healthcare revenue cycle, medical coding, etc.
-  return 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg';
+  return 'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png';
 }
 
 // Helper function to get medical billing blog images

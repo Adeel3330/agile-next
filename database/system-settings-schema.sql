@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS settings (
   -- Contact Information
   contact_email VARCHAR(255),
   contact_phone VARCHAR(50),
+  emergency_no VARCHAR(50),
   contact_address TEXT,
   contact_city VARCHAR(100),
   contact_state VARCHAR(100),

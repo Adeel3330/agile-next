@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
             logoUrl: null,
             contactEmail: null,
             contactPhone: null,
+            emergencyNo: null,
             contactAddress: null,
             contactAddress2: null,
             contactCity: null,
@@ -68,6 +69,11 @@ export async function GET(req: NextRequest) {
       logoUrl: settings.logo_url,
       contactEmail: settings.contact_email,
       contactPhone: settings.contact_phone,
+      emergencyNo:
+        settings.emergency_no ||
+        settings.additional_settings?.emergencyNo ||
+        settings.additional_settings?.emergency_no ||
+        null,
       contactAddress: settings.contact_address,
       contactAddress2:
         settings.contact_address_2 ||
@@ -126,6 +132,7 @@ export async function PUT(req: NextRequest) {
       logoUrl,
       contactEmail,
       contactPhone,
+      emergencyNo,
       contactAddress,
       contactAddress2,
       contactCity,
@@ -165,6 +172,7 @@ export async function PUT(req: NextRequest) {
     if (logoUrl !== undefined) updateData.logo_url = logoUrl?.trim() || null;
     if (contactEmail !== undefined) updateData.contact_email = contactEmail?.trim() || null;
     if (contactPhone !== undefined) updateData.contact_phone = contactPhone?.trim() || null;
+    if (emergencyNo !== undefined) updateData.emergency_no = emergencyNo?.trim() || null;
     if (contactAddress !== undefined) updateData.contact_address = contactAddress?.trim() || null;
     if (contactAddress2 !== undefined) updateData.contact_address_2 = contactAddress2?.trim() || null;
     if (contactCity !== undefined) updateData.contact_city = contactCity?.trim() || null;
@@ -197,12 +205,18 @@ export async function PUT(req: NextRequest) {
       additionalSettings !== undefined ||
       normalizedWhatsappUrl !== undefined ||
       normalizedChatbotUrl !== undefined ||
-      contactAddress2 !== undefined
+      contactAddress2 !== undefined ||
+      emergencyNo !== undefined
     ) {
       const nextAdditional = {
         ...(existing?.additional_settings || {}),
         ...(updateData.additional_settings || {}),
       } as any;
+
+      if (emergencyNo !== undefined) {
+        nextAdditional.emergencyNo = emergencyNo?.trim() || null;
+        nextAdditional.emergency_no = emergencyNo?.trim() || null;
+      }
 
       if (normalizedWhatsappUrl !== undefined) {
         nextAdditional.whatsappUrl = normalizedWhatsappUrl;
@@ -281,6 +295,11 @@ export async function PUT(req: NextRequest) {
       logoUrl: result.logo_url,
       contactEmail: result.contact_email,
       contactPhone: result.contact_phone,
+      emergencyNo:
+        result.emergency_no ||
+        result.additional_settings?.emergencyNo ||
+        result.additional_settings?.emergency_no ||
+        null,
       contactAddress: result.contact_address,
       contactAddress2:
         result.contact_address_2 ||

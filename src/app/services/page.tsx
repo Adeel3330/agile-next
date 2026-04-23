@@ -26,6 +26,7 @@ interface Category {
   id: string;
   name: string;
   slug: string;
+  description?: string;
   parentId?: string | null;
 }
 
@@ -135,6 +136,16 @@ export default function ServicesPage() {
     ? categories.find((category) => category.slug === categorySlug)
     : null;
 
+  const selectedSubCategory = subCategorySlug
+    ? categories.find(
+        (category) =>
+          category.slug === subCategorySlug &&
+          (!selectedCategory || String(category.parentId) === String(selectedCategory.id))
+      ) || categories.find((category) => category.slug === subCategorySlug)
+    : null;
+
+  const serviceSectionDescription = selectedSubCategory?.description || selectedCategory?.description || '';
+
   const getDescendantIds = (parentId: string) => {
     const ids = new Set<string>([parentId]);
     const queue = [parentId];
@@ -206,12 +217,8 @@ export default function ServicesPage() {
       return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     };
 
-    const selectedSubCat = subCategorySlug
-      ? categories.find(c => c.slug === subCategorySlug)
-      : null;
-
     if (subCategorySlug) {
-      const catName = selectedSubCat?.name || formatSlug(subCategorySlug);
+      const catName = selectedSubCategory?.name || formatSlug(subCategorySlug);
       // const subCatName = selectedSubCat?.name || formatSlug(subCategorySlug);
       return `${catName}`;
     }
@@ -258,6 +265,12 @@ export default function ServicesPage() {
               <h3>
                 Services
               </h3>
+              {serviceSectionDescription && (
+                <div
+                  className="services-section-description"
+                  dangerouslySetInnerHTML={{ __html: serviceSectionDescription }}
+                />
+              )}
             </div>
 
             {loading ? (
@@ -478,6 +491,9 @@ export default function ServicesPage() {
                   }
                   .sec-card a:hover{
                     color: #0070f3;  
+                  }
+                  .services-section-description {
+                    margin-top: 10px;
                   }
               `,
             }}

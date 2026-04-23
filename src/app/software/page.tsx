@@ -35,6 +35,7 @@ export default function SoftwarePage() {
   const [pageData, setPageData] = useState<PageData | null>(null);
   const [heroImage, setHeroImage] = useState<MediaItem | null>(null);
   const [contentImage, setContentImage] = useState<MediaItem | null>(null);
+  const [subsectionImage, setSubsectionImage] = useState<MediaItem | null>(null);
   const [pageImage, setPageImage] = useState<string | null>(null);
   const [allMedia, setAllMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,13 +77,39 @@ export default function SoftwarePage() {
   const fetchSoftwareMedia = useCallback(async () => {
     setMediaLoading(true);
     try {
-      // Fetch media with position 'other' (software media from seeder)
-      const response = await fetch('/api/media?position=other');
-      const data = await response.json();
+      const fetchMediaByPosition = async (position: string) => {
+        const response = await fetch(`/api/media?position=${encodeURIComponent(position)}`);
+        const data = await response.json();
+        return data.success && Array.isArray(data.media) ? data.media : [];
+      };
 
-      if (data.success && data.media && data.media.length > 0) {
+      // Prefer explicit software position, fallback to older "other" data.
+      let baseMedia = await fetchMediaByPosition('software');
+      if (baseMedia.length === 0) {
+        baseMedia = await fetchMediaByPosition('other');
+      }
+
+      // Dedicated image for content block (admin can add media under one of these positions).
+      const subsectionPositions = ['software-subsections'];
+      let subsectionMedia: MediaItem[] = [];
+
+      for (const position of subsectionPositions) {
+        const items = await fetchMediaByPosition(position);
+        if (items.length > 0) {
+          subsectionMedia = items;
+          break;
+        }
+      }
+
+      if (Array.isArray(subsectionMedia) && subsectionMedia.length > 0) {
+        setSubsectionImage(subsectionMedia[0]);
+      } else {
+        setSubsectionImage(null);
+      }
+
+      if (baseMedia.length > 0) {
         // Filter for software-related media items
-        const softwareMedia = data.media.filter((m: MediaItem) => 
+        const softwareMedia = baseMedia.filter((m: MediaItem) => 
           m.title?.toLowerCase().includes('software') || 
           m.title?.toLowerCase().includes('virtual manager') ||
           m.title?.toLowerCase().includes('ehr') ||
@@ -90,7 +117,7 @@ export default function SoftwarePage() {
         );
 
         // Use filtered software media if available, otherwise use all media
-        const mediaToUse = softwareMedia.length >= 3 ? softwareMedia : data.media;
+        const mediaToUse = softwareMedia.length >= 3 ? softwareMedia : baseMedia;
         
         // Store all media items (sorted by display order)
         const sortedMedia = [...mediaToUse].sort((a, b) => {
@@ -226,44 +253,6 @@ export default function SoftwarePage() {
           </div>
         </section>
 
-        {/* Features Section */}
-        {/* {featuresSection && featuresSection.items && Array.isArray(featuresSection.items) && featuresSection.items.length > 0 && (
-          <section className="service-section p_relative pt_120 pb_90">
-            <div className="pattern-layer" style={{ backgroundImage: 'url(assets/images/shape/shape-13.png)' }}></div>
-            <div className="auto-container">
-              <div className="sec-title mb_60 centred">
-                <span className="sub-title mb_5">Our Software Solutions</span>
-                <h2>{featuresSection.title || 'Software Capabilities'}</h2>
-              </div>
-              <div className="row clearfix">
-                {featuresSection.items.slice(0, 6).map((item: any, index: number) => (
-                  <div key={index} className="col-lg-4 col-md-6 col-sm-12 service-block">
-                    <div className="service-block-one">
-                      <div className="inner-box" style={{ background: '#fff', padding: '40px 30px', borderRadius: '10px', boxShadow: '0 5px 20px rgba(0,0,0,0.08)', transition: 'all 0.3s ease', height: '100%' }}>
-                        <div className="lower-content">
-                          <div className="inner">
-                            {item.icon && (
-                              <div className="icon-box" style={{ marginBottom: '20px' }}>
-                                <i className={item.icon} style={{ fontSize: '50px', color: 'var(--theme-color)' }}></i>
-                              </div>
-                            )}
-                            <h3 style={{ marginBottom: '15px', fontSize: '22px', fontWeight: '700' }}>
-                              {item.title || `Feature ${index + 1}`}
-                            </h3>
-                            <p style={{ color: '#666', lineHeight: '26px' }}>
-                              {item.description || item.text || ''}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )} */}
-
         {/* Content Section */}
         <section className="about-section about-page p_relative pb_120 pt_90">
           <div className="auto-container">
@@ -294,11 +283,11 @@ export default function SoftwarePage() {
                   <div className="image-box" style={{ position: 'relative', borderRadius: '10px', padding: '0', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
                     {mediaLoading ? (
                       <div className="skeleton-image" style={{ width: '100%', height: '500px', background: '#e0e0e0', borderRadius: '10px' }}></div>
-                    ) : pageImage ? (
+                    ) : subsectionImage ? (
                       <figure className="image">
                         <Image 
-                          src={getCloudinaryImageUrl(pageImage)} 
-                          alt={pageData?.title || 'Software'} 
+                          src={getCloudinaryImageUrl(subsectionImage.fileUrl)} 
+                          alt={subsectionImage.altText || subsectionImage.title || 'Software'} 
                           width={523} 
                           height={500} 
                           priority 
@@ -310,6 +299,17 @@ export default function SoftwarePage() {
                         <Image 
                           src={getCloudinaryImageUrl(contentImage.fileUrl)} 
                           alt={contentImage.altText || contentImage.title || 'Software'} 
+                          width={523} 
+                          height={500} 
+                          priority 
+                          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                        />
+                      </figure>
+                    ) : pageImage ? (
+                      <figure className="image">
+                        <Image 
+                          src={getCloudinaryImageUrl(pageImage)} 
+                          alt={pageData?.title || 'Software'} 
                           width={523} 
                           height={500} 
                           priority 

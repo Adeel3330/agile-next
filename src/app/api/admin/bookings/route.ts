@@ -56,6 +56,7 @@ export async function GET(req: NextRequest) {
     const bookingIds = bookingList.map((booking) => booking.id).filter(Boolean);
 
     let bookingServicesMap: Record<string, string[]> = {};
+    let bookingSubCategoriesMap: Record<string, string[]> = {};
     if (bookingIds.length > 0) {
       const { data: bookingServices, error: bookingServicesError } = await supabaseAdmin
         .from('booking_services')
@@ -77,10 +78,37 @@ export async function GET(req: NextRequest) {
           return acc;
         }, {});
       }
+
+      const { data: bookingSubCategories, error: bookingSubCategoriesError } = await supabaseAdmin
+        .from('booking_subcategories')
+        .select('booking_id, subcategory_name')
+        .in('booking_id', bookingIds);
+
+      if (bookingSubCategoriesError && bookingSubCategoriesError.code !== '42P01') {
+        console.error('Fetch booking_subcategories error:', bookingSubCategoriesError);
+      }
+
+      if (bookingSubCategories && bookingSubCategories.length > 0) {
+        bookingSubCategoriesMap = bookingSubCategories.reduce((acc: Record<string, string[]>, row) => {
+          if (!acc[row.booking_id]) {
+            acc[row.booking_id] = [];
+          }
+          if (row.subcategory_name) {
+            acc[row.booking_id].push(row.subcategory_name);
+          }
+          return acc;
+        }, {});
+      }
     }
 
     const enrichedBookings = bookingList.map((booking) => ({
       ...booking,
+      subcategory_names:
+        bookingSubCategoriesMap[booking.id] && bookingSubCategoriesMap[booking.id].length > 0
+          ? bookingSubCategoriesMap[booking.id]
+          : booking.subcategory_name
+            ? booking.subcategory_name.split(',').map((item: string) => item.trim()).filter(Boolean)
+            : [],
       service_names:
         bookingServicesMap[booking.id] && bookingServicesMap[booking.id].length > 0
           ? bookingServicesMap[booking.id]

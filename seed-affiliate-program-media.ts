@@ -19,7 +19,7 @@ const affiliateMediaData = [
   {
     title: 'Affiliate Program Hero Banner',
     description: 'Hero banner for affiliate program page',
-    fileUrl: 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg',
+    fileUrl: 'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png',
     fileName: 'affiliate-hero.jpg',
     fileSize: 0,
     fileType: 'image/jpeg',
@@ -32,7 +32,7 @@ const affiliateMediaData = [
   {
     title: 'Affiliate Program Content',
     description: 'Content image for why partner section',
-    fileUrl: 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg',
+    fileUrl: 'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png',
     fileName: 'affiliate-content.jpg',
     fileSize: 0,
     fileType: 'image/jpeg',
@@ -45,7 +45,7 @@ const affiliateMediaData = [
   {
     title: 'Partnership Growth',
     description: 'Image for partnership growth section',
-    fileUrl: 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg',
+    fileUrl: 'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png',
     fileName: 'affiliate-growth.jpg',
     fileSize: 0,
     fileType: 'image/jpeg',
