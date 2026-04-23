@@ -348,20 +348,20 @@ export default function ResumesPage() {
                           <td>{formatDate(resume.created_at)}</td>
                           <td>
                             <div className="d-flex gap-2">
-                              {resume.coverLetter && (
+                              {/* {resume.coverLetter && (
                                 <button
                                   className="btn btn-sm btn-info"
                                   onClick={() => alert(resume.coverLetter)}
                                   title="View Cover Letter"
                                 >
-                                  <i className="bi bi-file-text"></i>
+                                  <i className="fa fa-file-text"></i>
                                 </button>
-                              )}
+                              )} */}
                               <button
                                 className="btn btn-sm btn-danger"
                                 onClick={() => handleDelete(resume.id)}
                               >
-                                <i className="bi bi-trash"></i>
+                                <i className="fa fa-trash"></i>
                               </button>
                             </div>
                           </td>
