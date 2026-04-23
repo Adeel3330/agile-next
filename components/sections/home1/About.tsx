@@ -309,8 +309,8 @@ export default function About() {
                                     )}
                                     <div className="text-box">
                                         <div className="image-shape"style={{ backgroundImage: "url(assets/images/shape/shape-7.png)" }}></div>
-                                        <h2>{new Date().getFullYear() - 2018}</h2>
-                                        <span>Years of Experience (Since 2018)</span>
+                                        <h2>{new Date().getFullYear() - 2023}</h2>
+                                        <span>Years of Experience (Since 2023)</span>
                                     </div>
                                 </div>
                             </div>
