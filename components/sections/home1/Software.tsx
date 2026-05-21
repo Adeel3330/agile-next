@@ -58,7 +58,7 @@ export default function Software() {
         <div className="sec-title mb_50 centred">
           <span className="sub-title mb_5">RCM Software</span>
           <h2>Software Platforms We Work With</h2>
-          <p style={{ maxWidth: '600px', margin: '15px auto 0', color: '#666' }}>
+          <p style={{ maxWidth: '600px', margin: '15px auto 0', color: '#000' }}>
             From virtual managers to EHR integrations, we operate on leading revenue cycle and
             practice management platforms.
           </p>

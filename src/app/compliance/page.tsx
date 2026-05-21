@@ -141,7 +141,7 @@ export default function CompliancePage() {
   }
 
   return (
-    <div className="boxed_wrapper">
+    <div className="boxed_wrapper compliance-page">
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={pageData?.title || 'Compliance'}>
         {/* Hero Banner Section */}
         <section className="page-banner p_relative" style={{ background: '#f5f8fa', padding: '120px 0 80px' }}>
@@ -163,7 +163,7 @@ export default function CompliancePage() {
                           {pageData?.title || 'Compliance'}
                         </h1>
                         {pageData?.description && (
-                          <p style={{ fontSize: '18px', lineHeight: '28px', color: '#666' }}>{pageData.description}</p>
+                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{pageData.description}</p>
                         )}
                       </div>
                     </>
@@ -301,11 +301,11 @@ export default function CompliancePage() {
                         />
                       </div>
                       <div className="content-box" style={{ padding: '20px' }}>
-                        <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '10px', color: '#333' }}>
+                        <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '10px', color: 'var(--title-color)' }}>
                           {media.title || `Resource ${index + 1}`}
                         </h4>
                         {media.description && (
-                          <p style={{ fontSize: '14px', color: '#666', lineHeight: '22px', margin: 0 }}>
+                          <p style={{ fontSize: '14px', color: 'var(--title-color)', lineHeight: '22px', margin: 0 }}>
                             {media.description.length > 100 ? media.description.substring(0, 100) + '...' : media.description}
                           </p>
                         )}
@@ -335,7 +335,7 @@ export default function CompliancePage() {
                     <h2 style={{ fontSize: '36px', marginBottom: '15px' }}>
                       Contact Us for Compliance Information
                     </h2>
-                    <p style={{ fontSize: '16px', color: '#666', maxWidth: '700px', margin: '0 auto' }}>
+                    <p style={{ fontSize: '16px', color: 'var(--title-color)', maxWidth: '700px', margin: '0 auto' }}>
                       Have questions about HIPAA, audits, or compliance documentation? Send us a message and our team will follow up promptly.
                     </p>
                   </div>
@@ -364,6 +364,11 @@ export default function CompliancePage() {
         .service-block-one .inner-box:hover {
           transform: translateY(-5px);
           box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+        }
+        .compliance-page p,
+        .compliance-page li,
+        .compliance-page .text-box {
+          color: var(--title-color);
         }
       `}} />
     </div>

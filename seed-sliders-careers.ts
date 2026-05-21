@@ -52,6 +52,7 @@ async function seedSliders() {
   const sliders = [
     {
       title: 'Expert Medical Billing Services for Healthcare Providers',
+      sort_order: 1,
       description: '<p>Agile Nexus Solutions provides comprehensive medical billing and revenue cycle management services. We help healthcare providers maximize revenue, reduce denials, and focus on patient care.</p><p>With over 95% first submission rate and $50M+ in charges submitted, we deliver results that matter.</p>',
       file: getMedicalBillingImage(0),
       file_type: 'image',
@@ -63,6 +64,7 @@ async function seedSliders() {
     },
     {
       title: 'Revenue Cycle Management Solutions',
+      sort_order: 2,
       description: '<p>Streamline your revenue cycle with our comprehensive RCM services. From eligibility verification to payment posting, we handle every step of the billing process.</p><p>Our team processes over 1000K+ charts coded and $25M+ in A/R annually, ensuring maximum revenue for your practice.</p>',
       file: getMedicalBillingImage(1),
       file_type: 'image',
@@ -74,6 +76,7 @@ async function seedSliders() {
     },
     {
       title: 'Medical Coding & Documentation Services',
+      sort_order: 3,
       description: '<p>Accurate ICD-10 coding is essential for proper reimbursement. Our certified coders ensure compliance and maximize revenue through precise documentation and coding.</p><p>We specialize in all medical specialties including Urgent Care, Cardiology, Family Medicine, and more.</p>',
       file: getMedicalBillingImage(2),
       file_type: 'image',
@@ -85,6 +88,7 @@ async function seedSliders() {
     },
     {
       title: 'The Most Affordable Medical Billing Company in USA',
+      sort_order: 4,
       description: '<p>Agile Nexus Solutions offers competitive pricing without compromising on quality. We deliver exceptional medical billing services at affordable rates.</p><p>Our transparent pricing and proven track record make us the preferred choice for healthcare providers nationwide.</p>',
       file: getMedicalBillingImage(3),
       file_type: 'image',

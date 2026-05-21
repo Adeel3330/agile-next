@@ -175,7 +175,7 @@ function CareersPageContent() {
   return (
     <div className="boxed_wrapper" suppressHydrationWarning>
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle="Careers">
-        <section className="sidebar-page-container pt_120 pb_120">
+        <section className="sidebar-page-container pt_120 pb_120" style={{ color: 'var(--title-color)' }}>
           <div className="auto-container">
             <div className="row clearfix mb_50">
               <div className="col-12">
@@ -184,7 +184,7 @@ function CareersPageContent() {
                   <h2>{careersMedia?.title || 'Build a Meaningful Career With Agile Nexus Solutions'}</h2>
                 </div>
                 <div
-                  style={{ color: '#666', fontSize: '17px', lineHeight: '30px', marginBottom: '25px' }}
+                  style={{ color: 'var(--title-color)', fontSize: '17px', lineHeight: '30px', marginBottom: '25px' }}
                   dangerouslySetInnerHTML={{
                     __html: careersMedia?.description || 'We believe great teams build great outcomes. Join us to work with purpose, continuous learning, and a culture that values people as much as performance.'
                   }}
@@ -228,7 +228,7 @@ function CareersPageContent() {
                                     )}
                                   </ul>
                                   {/* <p>{career.description?.substring(0, 150) || 'No description available'}...</p> */}
-                                  <div dangerouslySetInnerHTML={{ __html: career.description?.substring(0, 150) || 'No description available' }} />
+                                  <div style={{ color: 'var(--title-color)', fontSize: '16px', lineHeight: '28px' }} dangerouslySetInnerHTML={{ __html: career.description?.substring(0, 150) || 'No description available' }} />
                                   <div className="link">
                                     <Link href={`/careers/${career.slug}`}>View Details</Link>
                                   </div>
