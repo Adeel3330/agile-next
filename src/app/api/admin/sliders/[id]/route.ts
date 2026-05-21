@@ -39,6 +39,7 @@ export async function GET(
     const mappedSlider = {
       _id: slider.id,
       title: slider.title,
+      sortOrder: slider.sort_order ?? 0,
       description: slider.description,
       file: slider.file,
       fileType: slider.file_type,
@@ -80,6 +81,7 @@ export async function PUT(
     const body = await req.json();
     const {
       title,
+      sortOrder,
       description,
       file,
       fileType,
@@ -117,8 +119,14 @@ export async function PUT(
       .is('deleted_at', null)
       .single();
 
+    const parsedSortOrderRaw = Number.isFinite(Number(sortOrder))
+      ? Math.trunc(Number(sortOrder))
+      : 0;
+    const parsedSortOrder = Math.min(Math.max(parsedSortOrderRaw, 0), 9999);
+
     const updates: any = {
       title: title.trim(),
+      sort_order: parsedSortOrder,
       description: description?.trim() || null,
       file: file.trim(),
       file_type: fileType || 'image',
@@ -159,6 +167,7 @@ export async function PUT(
     const mappedSlider = {
       _id: slider.id,
       title: slider.title,
+      sortOrder: slider.sort_order ?? 0,
       description: slider.description,
       file: slider.file,
       fileType: slider.file_type,

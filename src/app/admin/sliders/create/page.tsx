@@ -22,6 +22,7 @@ export default function CreateSliderPage() {
 
   const [formData, setFormData] = useState({
     title: '',
+    sortOrder: 0,
     description: '',
     file: '',
     seoTitle: '',
@@ -191,6 +192,27 @@ export default function CreateSliderPage() {
                     required
                     placeholder="Enter slider title"
                   />
+                </div>
+
+                <div className="col-md-4">
+                  <label className="form-label">Sort Order</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={formData.sortOrder}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const parsed = value === '' ? 0 : parseInt(value, 10);
+                      setFormData({
+                        ...formData,
+                        sortOrder: Number.isFinite(parsed) ? parsed : 0,
+                      });
+                    }}
+                    placeholder="0"
+                    min={0}
+                    step={1}
+                  />
+                  <small className="form-text text-muted">Lower numbers show first on the home page.</small>
                 </div>
 
                 <div className="col-md-4">

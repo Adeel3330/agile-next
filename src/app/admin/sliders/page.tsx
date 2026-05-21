@@ -12,6 +12,7 @@ const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWd
 interface Slider {
   _id: string;
   title: string;
+  sortOrder?: number;
   description?: string;
   file: string;
   fileType: 'image' | 'video';
@@ -223,6 +224,7 @@ export default function SlidersPage() {
                 <tr>
                   <th>Preview</th>
                   <th>Title</th>
+                  <th>Order</th>
                   <th>Type</th>
                   <th>SEO Title</th>
                   <th>Created</th>
@@ -315,6 +317,7 @@ export default function SlidersPage() {
                           )}
                         </div>
                       </td>
+                      <td>{typeof slider.sortOrder === 'number' ? slider.sortOrder : 0}</td>
                       <td>
                         <span className={`${styles.badge} ${slider.fileType === 'image' ? styles.badgeImage : styles.badgeVideo}`}>
                           {slider.fileType === 'image' ? 'Image' : 'Video'}

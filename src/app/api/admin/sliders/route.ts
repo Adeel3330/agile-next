@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
     }
 
     query = query
+      .order('sort_order', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: false })
       .range((pageNumber - 1) * pageSize, pageNumber * pageSize - 1);
 
@@ -52,6 +53,7 @@ export async function GET(req: NextRequest) {
     const mappedSliders = (sliders || []).map((slider: any) => ({
       _id: slider.id,
       title: slider.title,
+      sortOrder: slider.sort_order ?? 0,
       description: slider.description,
       file: slider.file,
       fileType: slider.file_type,
@@ -92,6 +94,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       title,
+      sortOrder,
       description,
       file,
       fileType,
@@ -121,10 +124,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const parsedSortOrderRaw = Number.isFinite(Number(sortOrder))
+      ? Math.trunc(Number(sortOrder))
+      : 0;
+    const parsedSortOrder = Math.min(Math.max(parsedSortOrderRaw, 0), 9999);
+
     const { data: slider, error } = await supabaseAdmin
       .from('sliders')
       .insert({
         title: title.trim(),
+        sort_order: parsedSortOrder,
         description: description?.trim() || null,
         file: file.trim(),
         file_type: fileType || 'image',
@@ -153,6 +162,7 @@ export async function POST(req: NextRequest) {
     const mappedSlider = {
       _id: slider.id,
       title: slider.title,
+      sortOrder: slider.sort_order ?? 0,
       description: slider.description,
       file: slider.file,
       fileType: slider.file_type,

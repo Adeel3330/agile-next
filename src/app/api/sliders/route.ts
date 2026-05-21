@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
       .from('sliders')
       .select('*')
       .is('deleted_at', null)
+      .order('sort_order', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -27,6 +28,7 @@ export async function GET(req: NextRequest) {
     const mappedSliders = (sliders || []).map((slider: any) => ({
       id: slider.id,
       title: slider.title,
+      sortOrder: slider.sort_order ?? 0,
       description: slider.description,
       file: slider.file,
       fileType: slider.file_type || 'image',

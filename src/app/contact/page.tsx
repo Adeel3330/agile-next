@@ -292,13 +292,15 @@ export default function ContactPage() {
                           <>
                             <Link href={`mailto:${settings.contactEmail}`}>{settings.contactEmail}</Link>
                             {settings.contactEmail.includes('info') && settings.contactEmail !== 'info@agilenexussolution.com' && (
-                              <><br /><Link href="mailto:contact@agilenexussolution.com">contact@agilenexussolution.com</Link></>
+                              <><br />
+                              {/* <Link href="mailto:contact@agilenexussolution.com">contact@agilenexussolution.com</Link> */}
+                               </>
                             )}
                           </>
                         ) : (
                           <>
                             <Link href="mailto:info@agilenexussolution.com">info@agilenexussolution.com</Link>
-                            <br /><Link href="mailto:contact@agilenexussolution.com">contact@agilenexussolution.com</Link>
+                            {/* <br /><Link href="mailto:contact@agilenexussolution.com">contact@agilenexussolution.com</Link> */}
                           </>
                         )}
                       </p>
