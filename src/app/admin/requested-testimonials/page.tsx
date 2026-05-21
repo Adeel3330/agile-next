@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import styles from '../media/media.module.css';
 import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
 
@@ -190,6 +191,12 @@ export default function RequestedTestimonialsPage() {
                   <td>{new Date(item.created_at).toLocaleDateString()}</td>
                   <td>
                     <div className={styles.actionButtons}>
+                      <Link
+                        href={`/admin/requested-testimonials/view/${item._id}`}
+                        className={`${styles.btnAction} ${styles.btnView}`}
+                      >
+                        <i className="fa fa-eye"></i> View
+                      </Link>
                       <button
                         type="button"
                         className={`${styles.btnAction} ${styles.btnEdit}`}

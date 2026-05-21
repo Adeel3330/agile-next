@@ -20,6 +20,10 @@
   margin: 0;
   padding: 20px !important;
 }
+.btnView{
+  background: #6c757d;
+  color: #fff;
+}
 
 .btnPrimary {
   padding: 12px 24px;
