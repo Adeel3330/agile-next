@@ -193,7 +193,7 @@ export default function SoftwarePage() {
   const formSection = pageData?.sections?.find((s: any) => s.type === 'form');
 
   return (
-    <div className="boxed_wrapper">
+    <div className="boxed_wrapper software-page">
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={pageData?.title || 'Software'}>
         {/* Hero Banner Section */}
         <section className="page-banner p_relative" style={{ background: '#f5f8fa', padding: '120px 0 80px' }}>
@@ -215,7 +215,7 @@ export default function SoftwarePage() {
                           {pageData?.title || 'Software'}
                         </h1>
                         {pageData?.description && (
-                          <p style={{ fontSize: '18px', lineHeight: '28px', color: '#666' }}>{pageData.description}</p>
+                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{pageData.description}</p>
                         )}
                       </div>
                     </>
@@ -401,7 +401,7 @@ export default function SoftwarePage() {
                       {formSection?.title || 'Request a Demo'}
                     </h2>
                     {formSection?.description && (
-                      <p style={{ fontSize: '16px', color: '#666', maxWidth: '700px', margin: '0 auto' }}>
+                      <p style={{ fontSize: '16px', color: 'var(--title-color)', maxWidth: '700px', margin: '0 auto' }}>
                         {formSection.description}
                       </p>
                     )}
@@ -435,6 +435,11 @@ export default function SoftwarePage() {
         .gallery-item:hover {
           transform: translateY(-5px);
           box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+        }
+        .software-page p,
+        .software-page li,
+        .software-page .text-box {
+          color: var(--title-color);
         }
       `}} />
     </div>

@@ -145,7 +145,7 @@ export default function AffiliateProgramPage() {
   const showHero = heroTitle || heroSubtitle || heroDescription;
 
   return (
-    <div className="boxed_wrapper">
+    <div className="boxed_wrapper affiliate-program-page">
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={pageData?.title || 'Affiliate Program'}>
         {/* Hero - from admin */}
         {showHero && (
@@ -216,7 +216,7 @@ export default function AffiliateProgramPage() {
               <div className="sec-title mb_60 centred">
                 {(programCardsSection.subTitle || (programCardsSection as any).sub_title) && <span className="sub-title mb_5">{programCardsSection.subTitle || (programCardsSection as any).sub_title}</span>}
                 <h2>{programCardsSection.title}</h2>
-                {programCardsSection.subtitle && <p style={{ maxWidth: '700px', margin: '15px auto 0', color: '#666' }}>{programCardsSection.subtitle}</p>}
+                {programCardsSection.subtitle && <p style={{ maxWidth: '700px', margin: '15px auto 0', color: 'var(--title-color)' }}>{programCardsSection.subtitle}</p>}
               </div>
               <div className="row clearfix">
                 {programCardsSection.items.map((item: any, index: number) => (
@@ -226,7 +226,7 @@ export default function AffiliateProgramPage() {
                         <span className="sub-title mb_3" style={{ color: 'var(--theme-color)', fontSize: '14px', fontWeight: '600' }}>{item.badge}</span>
                       )}
                       <h3 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px' }}>{item.title}</h3>
-                      {item.subtitle && <p style={{ color: '#555', marginBottom: '16px', lineHeight: '26px' }}>{item.subtitle}</p>}
+                      {item.subtitle && <p style={{ color: 'var(--title-color)', marginBottom: '16px', lineHeight: '26px' }}>{item.subtitle}</p>}
                       {item.bullets && Array.isArray(item.bullets) && (
                         <ul className="list-style-one clearfix" style={{ marginBottom: '20px', flex: 1 }}>
                           {item.bullets.map((b: string, i: number) => (
@@ -261,7 +261,7 @@ export default function AffiliateProgramPage() {
                         {index + 1}
                       </div>
                       <h3 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '12px' }}>{step.title}</h3>
-                      <p style={{ color: '#666', lineHeight: '26px', margin: 0 }}>{step.description || step.text}</p>
+                      <p style={{ color: 'var(--title-color)', lineHeight: '26px', margin: 0 }}>{step.description || step.text}</p>
                     </div>
                   </div>
                 ))}
@@ -279,7 +279,7 @@ export default function AffiliateProgramPage() {
                   <div className="sec-title mb_30">
                     {(whySection.subTitle || (whySection as any).sub_title) && <span className="sub-title mb_5">{whySection.subTitle || (whySection as any).sub_title}</span>}
                     <h2>{whySection.title}</h2>
-                    {whySection.subtitle && <p style={{ marginTop: '15px', color: '#666', lineHeight: '28px' }}>{whySection.subtitle}</p>}
+                    {whySection.subtitle && <p style={{ marginTop: '15px', color: 'var(--title-color)', lineHeight: '28px' }}>{whySection.subtitle}</p>}
                   </div>
                   <ul className="list-style-one clearfix">
                     {whySection.items.map((item: any, i: number) => (
@@ -333,7 +333,7 @@ export default function AffiliateProgramPage() {
                           </button>
                           {openFaq === index && (
                             <div style={{ padding: '0 24px 20px' }}>
-                              <p style={{ color: '#666', lineHeight: '26px', margin: 0 }}>{faq.answer}</p>
+                              <p style={{ color: 'var(--title-color)', lineHeight: '26px', margin: 0 }}>{faq.answer}</p>
                             </div>
                           )}
                         </div>
@@ -350,7 +350,7 @@ export default function AffiliateProgramPage() {
                           </button>
                           {openFaq === index && (
                             <div style={{ padding: '0 24px 20px' }}>
-                              <p style={{ color: '#666', lineHeight: '26px', margin: 0 }}>{faq.answer || faq.description || faq.text}</p>
+                              <p style={{ color: 'var(--title-color)', lineHeight: '26px', margin: 0 }}>{faq.answer || faq.description || faq.text}</p>
                             </div>
                           )}
                         </div>
@@ -371,7 +371,7 @@ export default function AffiliateProgramPage() {
                 <span className="sub-title mb_5">{(formSection as any)?.subTitle || (formSection as any)?.sub_title || 'Get in Touch'}</span>
                 <h2>{formSection?.title || 'Contact Us'}</h2>
                 {(formSection?.description || formSection?.subtitle) && (
-                  <p style={{ fontSize: '16px', color: '#666', maxWidth: '700px', margin: '15px auto 0' }}>
+                  <p style={{ fontSize: '16px', color: 'var(--title-color)', maxWidth: '700px', margin: '15px auto 0' }}>
                     {formSection.description || formSection.subtitle}
                   </p>
                 )}
@@ -385,6 +385,10 @@ export default function AffiliateProgramPage() {
           .skeleton { animation: pulse 1.5s ease-in-out infinite; }
           @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
           .service-block-one .inner-box:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important; }
+          .affiliate-program-page p,
+          .affiliate-program-page li {
+            color: var(--title-color);
+          }
         `}} />
       </Layout>
     </div>
