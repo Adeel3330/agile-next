@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './media.module.css';
+import MediaViewModal, { type MediaViewItem } from '../../../components/admin/MediaViewModal';
 
 interface Media {
   _id: string;
@@ -47,6 +48,8 @@ export default function MediaPage() {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [availablePositions, setAvailablePositions] = useState<string[]>([]);
+  const [viewItem, setViewItem] = useState<MediaViewItem | null>(null);
+  const [viewOpen, setViewOpen] = useState(false);
 
   const fetchMedia = useCallback(async () => {
     setLoading(true);
@@ -347,6 +350,31 @@ export default function MediaPage() {
                     <td>{new Date(item.updated_at).toLocaleDateString()}</td>
                     <td>
                       <div className={styles.actionButtons}>
+                        <button
+                          type="button"
+                          className={`${styles.btnAction} ${styles.btnView}`}
+                          onClick={() => {
+                            setViewItem({
+                              _id: item._id,
+                              title: item.title,
+                              description: item.description,
+                              fileUrl: item.fileUrl,
+                              fileName: item.fileName,
+                              fileSize: item.fileSize,
+                              fileType: item.fileType,
+                              position: item.position,
+                              status: item.status,
+                              displayOrder: item.displayOrder,
+                              altText: item.altText,
+                              linkUrl: item.linkUrl,
+                              created_at: item.created_at,
+                              updated_at: item.updated_at,
+                            });
+                            setViewOpen(true);
+                          }}
+                        >
+                          <i className="fa fa-eye"></i> View
+                        </button>
                         <Link
                           href={`/admin/media/edit/${item._id}`}
                           className={`${styles.btnAction} ${styles.btnEdit}`}
@@ -391,6 +419,16 @@ export default function MediaPage() {
           </>
         )}
       </div>
+
+      <MediaViewModal
+        item={viewItem}
+        open={viewOpen}
+        onClose={() => {
+          setViewOpen(false);
+          setViewItem(null);
+        }}
+        title="Media Details"
+      />
     </div>
   );
 }
