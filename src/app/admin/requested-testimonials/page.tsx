@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import styles from '../media/media.module.css';
 import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
+import MediaViewModal, { type MediaViewItem } from '../../../components/admin/MediaViewModal';
 
 interface RequestedTestimonial {
   _id: string;
@@ -29,6 +30,8 @@ export default function RequestedTestimonialsPage() {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [viewItem, setViewItem] = useState<MediaViewItem | null>(null);
+  const [viewOpen, setViewOpen] = useState(false);
 
   const fetchRequested = useCallback(async () => {
     setLoading(true);
@@ -192,6 +195,24 @@ export default function RequestedTestimonialsPage() {
                     <div className={styles.actionButtons}>
                       <button
                         type="button"
+                        className={`${styles.btnAction} ${styles.btnView}`}
+                        onClick={() => {
+                          setViewItem({
+                            _id: item._id,
+                            title: item.title,
+                            description: item.description,
+                            fileUrl: item.fileUrl,
+                            position: 'testimonials',
+                            status: 'inactive',
+                            created_at: item.created_at,
+                          });
+                          setViewOpen(true);
+                        }}
+                      >
+                        <i className="fa fa-eye"></i> View
+                      </button>
+                      <button
+                        type="button"
                         className={`${styles.btnAction} ${styles.btnEdit}`}
                         onClick={() => handleApprove(item._id)}
                         disabled={approvingId === item._id}
@@ -210,6 +231,16 @@ export default function RequestedTestimonialsPage() {
           </table>
         )}
       </div>
+
+      <MediaViewModal
+        item={viewItem}
+        open={viewOpen}
+        onClose={() => {
+          setViewOpen(false);
+          setViewItem(null);
+        }}
+        title="Requested Testimonial"
+      />
     </div>
   );
 }
