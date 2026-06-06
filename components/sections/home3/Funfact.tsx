@@ -17,7 +17,7 @@ export default function Funfact() {
           >
             <path
               d="M0 69.0468L74.0685 69.0468L98.2276 40.7213L125.459 121L164.762 10L191.919 105.268L208.417 57.4162L233.167 87.0291L249.076 69.0468L308 69.0468"
-              stroke="#BDBDBD"
+              stroke="#000"
               strokeOpacity="0.15"
               strokeWidth="20"
               strokeMiterlimit="10"

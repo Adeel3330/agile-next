@@ -140,7 +140,7 @@
   border: 1px solid rgba(189, 189, 189, 0.6);
   border-radius: 5px;
   font-size: 16px;
-  color: #BDBDBD;
+  color: #000;
   background: #fff;
   padding: 10px 20px 10px 46px;
   transition: all 500ms ease;
@@ -151,7 +151,7 @@
   left: 20px;
   top: 16px;
   font-size: 16px;
-  color: #BDBDBD;
+  color: #000;
   z-index: 1;
 }
 

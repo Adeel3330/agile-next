@@ -907,7 +907,7 @@
    font-size: 12px;
    line-height: 15px;
    font-family: var(--title-font);
-   color: #BDBDBD;
+   color: #000;
    margin-bottom: 5px;
  }
 
@@ -1992,7 +1992,7 @@
  .nav-style-one .swiper-nav button:before {
    position: absolute;
    content: '';
-   background: #BDBDBD;
+   background: #000;
    width: 50px;
    height: 1px;
    top: 25px;
@@ -2568,7 +2568,7 @@
    border: 1px solid rgba(189, 189, 189, 0.6);
    border-radius: 5px;
    font-size: 16px;
-   color: #BDBDBD;
+   color: #000;
    background: #fff;
    padding: 10px 20px 10px 46px;
    transition: all 500ms ease;
@@ -2603,7 +2603,7 @@
    left: 20px;
    top: 16px;
    font-size: 18px;
-   color: #BDBDBD;
+   color: #000;
    z-index: 1;
  }
 
