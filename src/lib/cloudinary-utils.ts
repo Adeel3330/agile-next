@@ -129,3 +129,42 @@ export function getCloudinaryImageUrl(
     return url;
   }
 }
+
+/**
+ * Get Cloudinary URL that triggers file download (fl_attachment)
+ * @param url - Original Cloudinary URL
+ * @returns URL with attachment flag, or original if not Cloudinary
+ */
+export function getCloudinaryDownloadUrl(url: string): string {
+  if (!isCloudinaryUrl(url)) {
+    return url;
+  }
+
+  try {
+    const urlObj = new URL(url);
+    const pathParts = urlObj.pathname.split('/');
+    const uploadIndex = pathParts.findIndex((part) => part === 'upload');
+
+    if (uploadIndex === -1) {
+      return url;
+    }
+
+    const afterUpload = pathParts.slice(uploadIndex + 1);
+    const hasAttachment = afterUpload.some((part) => part.startsWith('fl_attachment'));
+    if (hasAttachment) {
+      return url;
+    }
+
+    const newPathParts = [
+      ...pathParts.slice(0, uploadIndex + 1),
+      'fl_attachment',
+      ...afterUpload,
+    ];
+
+    urlObj.pathname = newPathParts.filter((part) => part !== '').join('/');
+    return urlObj.toString();
+  } catch (error) {
+    console.error('Error generating Cloudinary download URL:', error);
+    return url;
+  }
+}
