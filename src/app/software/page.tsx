@@ -441,6 +441,9 @@ export default function SoftwarePage() {
         .software-page .text-box {
           color: var(--title-color);
         }
+           .image-box { width: 200px; height: 100px; object-fit: cover;margin:auto }
+        .image-box img { width: 100%; height: 100%; object-fit: contain !important; }
+        .software-swiper .lower-content { padding: 20px;margin: auto; display: flex; text-align: center; justify-content: center; }
       `}} />
     </div>
   );

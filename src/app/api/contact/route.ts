@@ -14,7 +14,6 @@ export async function POST(req: NextRequest) {
       message
     } = body;
 
-    // Validation
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json(
         { success: false, message: 'Please provide your name' },
@@ -36,30 +35,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if user already submitted a contact (one contact per email)
-    const { data: existingContact, error: checkError } = await supabaseAdmin
-      .from('contact_submissions')
-      .select('id')
-      .eq('email', email.toLowerCase().trim())
-      .is('deleted_at', null)
-      .maybeSingle();
+    const now = new Date().toISOString();
 
-    if (checkError) {
-      console.error('Check existing contact error:', checkError);
-      return NextResponse.json(
-        { success: false, message: 'Failed to check existing contact' },
-        { status: 500 }
-      );
-    }
-
-    // if (existingContact) {
-    //   return NextResponse.json(
-    //     { success: false, message: 'You have already submitted a contact form. Each user can only submit one contact at a time.' },
-    //     { status: 400 }
-    //   );
-    // }
-
-    // Insert contact submission
     const { data: contact, error: insertError } = await supabaseAdmin
       .from('contact_submissions')
       .insert({
@@ -69,20 +46,23 @@ export async function POST(req: NextRequest) {
         subject: subject?.trim() || null,
         message: message.trim(),
         status: 'new',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: now,
+        updated_at: now,
       })
-      .select()
+      .select('id, name, email')
       .single();
 
     if (insertError) {
       console.error('Insert contact error:', insertError);
 
-      // Check if it's a unique constraint violation (email already exists)
       if (insertError.code === '23505') {
         return NextResponse.json(
-          { success: false, message: 'You have already submitted a contact form. Each user can only submit one contact at a time.' },
-          { status: 400 }
+          {
+            success: false,
+            message:
+              'Contact submissions are blocked by a database constraint. Run database/remove-contact-email-unique.sql in Supabase.',
+          },
+          { status: 500 }
         );
       }
 
@@ -98,8 +78,8 @@ export async function POST(req: NextRequest) {
       contact: {
         id: contact.id,
         name: contact.name,
-        email: contact.email
-      }
+        email: contact.email,
+      },
     });
   } catch (error) {
     console.error('Submit contact error:', error);

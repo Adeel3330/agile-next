@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 
-export default function ContactForm() {
+interface ContactFormProps {
+  defaultSubject?: string;
+}
+
+export default function ContactForm({ defaultSubject }: ContactFormProps = {}) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -25,20 +29,30 @@ export default function ContactForm() {
     setErrorMessage("");
 
     try {
+      const payload = {
+        ...formData,
+        subject: formData.subject.trim() || defaultSubject || "",
+      };
+
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      let data: { success?: boolean; message?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
 
-      if (data.success) {
+      if (res.ok && data.success) {
         setStatus("success");
         setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
       } else {
         setStatus("error");
-        setErrorMessage(data.message || "Something went wrong");
+        setErrorMessage(data.message || "Something went wrong. Please try again.");
       }
     } catch (err) {
       console.error(err);
@@ -102,15 +116,38 @@ export default function ContactForm() {
                 <button
                 type="submit"
                 className="theme-btn btn-two"
+                disabled={status === "loading"}
             >
-                <span>Send Message</span>
+                <span>{status === "loading" ? "Sending..." : "Send Message"}</span>
             </button>
             </div>
         </div>
 
-      {status === "loading" && <p className="text-gray-600">Sending...</p>}
-      {status === "success" && <p className="text-green-600">Message sent successfully ✅</p>}
-      {status === "error" && <p className="text-red-600">{errorMessage || "Something went wrong ❌"}</p>}
+      {status === "success" && (
+        <p className="contact-form-feedback success">Message sent successfully!</p>
+      )}
+      {status === "error" && (
+        <p className="contact-form-feedback error">
+          {errorMessage || "Something went wrong. Please try again."}
+        </p>
+      )}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        .contact-form-feedback {
+          margin-top: 12px;
+          margin-bottom: 0;
+          font-size: 14px;
+        }
+        .contact-form-feedback.success {
+          color: #1e8e3e;
+        }
+        .contact-form-feedback.error {
+          color: #d93025;
+        }
+      `,
+        }}
+      />
     </form>
   );
 }

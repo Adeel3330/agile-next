@@ -172,6 +172,7 @@ export default function Software() {
           __html: `
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .software-swiper .certification-badge:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,0.1); }
+       
       `,
         }}
       />

@@ -12,9 +12,7 @@ CREATE TABLE IF NOT EXISTS contact_submissions (
   status VARCHAR(20) DEFAULT 'new' CHECK (status IN ('new', 'read', 'replied', 'archived')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  deleted_at TIMESTAMPTZ,
-  -- Ensure one contact submission per email (user can only submit one contact at a time)
-  UNIQUE(email)
+  deleted_at TIMESTAMPTZ
 );
 
 -- Create indexes
