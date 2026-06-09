@@ -124,7 +124,7 @@ export default function AdminLoginPage() {
           margin-bottom: 8px;
         }
         .login-header p {
-          color: #666;
+          color: #000;
           font-size: 14px;
           margin: 0;
         }

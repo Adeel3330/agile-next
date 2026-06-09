@@ -115,7 +115,7 @@ export default function RichTextEditor({
   if (!mounted) {
     return (
       <div style={{ height, border: '1px solid #ddd', borderRadius: '4px', padding: '10px', backgroundColor: '#f9f9f9' }}>
-        <div style={{ color: '#666', fontSize: '14px' }}>Loading editor...</div>
+        <div style={{ color: '#000', fontSize: '14px' }}>Loading editor...</div>
       </div>
     );
   }

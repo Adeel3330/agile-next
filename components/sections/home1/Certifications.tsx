@@ -48,7 +48,7 @@ export default function Certifications() {
         <div className="sec-title mb_50 centred">
           <span className="sub-title mb_5">Our Standards</span>
           <h2>Trusted. Certified. Compliant.</h2>
-          <p style={{ maxWidth: '600px', margin: '15px auto 0', color: '#666' }}>
+          <p style={{ maxWidth: '600px', margin: '15px auto 0', color: '#000' }}>
             We uphold the highest standards in medical billing and data protection.
           </p>
         </div>
@@ -100,7 +100,7 @@ export default function Certifications() {
                     />
                   </div>
                   {item.title && (
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#555' }}>{item.title}</span>
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#000' }}>{item.title}</span>
                   )}
                 </div>
               </div>

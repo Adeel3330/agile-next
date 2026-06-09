@@ -278,7 +278,7 @@ export default function AdminDashboard() {
         }
         .stat-label {
           font-size: 14px;
-          color: #666;
+          color: #000;
           margin-top: 8px;
           font-weight: 500;
         }
@@ -360,7 +360,7 @@ export default function AdminDashboard() {
         .chart-label {
           width: 120px;
           font-size: 14px;
-          color: #666;
+          color: #000;
           font-weight: 500;
         }
         .chart-bar-container {
@@ -606,7 +606,7 @@ export default function AdminDashboard() {
               </div>
             </>
           ) : (
-            <p style={{ color: '#666', textAlign: 'center', padding: '20px' }}>No content data available</p>
+            <p style={{ color: '#000', textAlign: 'center', padding: '20px' }}>No content data available</p>
           )}
         </div>
 
@@ -661,7 +661,7 @@ export default function AdminDashboard() {
               </div>
             </>
           ) : (
-            <p style={{ color: '#666', textAlign: 'center', padding: '20px' }}>No submissions yet</p>
+            <p style={{ color: '#000', textAlign: 'center', padding: '20px' }}>No submissions yet</p>
           )}
         </div>
       </div>

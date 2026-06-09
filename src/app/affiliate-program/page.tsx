@@ -376,7 +376,7 @@ export default function AffiliateProgramPage() {
                   </p>
                 )}
               </div>
-              <ContactForm />
+              <ContactForm defaultSubject="Affiliate Program Inquiry" />
             </div>
           </div>
         </section>

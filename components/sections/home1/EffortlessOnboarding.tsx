@@ -123,7 +123,7 @@ export default function EffortlessOnboarding() {
           <div className="col-lg-6 col-md-12 col-sm-12">
             <div
               className="text-box"
-              style={{ maxWidth: '620px', color: '#555', fontSize: '15px', lineHeight: 1.8 }}
+              style={{ maxWidth: '620px', color: '#000', fontSize: '15px', lineHeight: 1.8 }}
               dangerouslySetInnerHTML={{ __html: contentHtml }}
             />
             <div style={{ marginTop: '24px' }}>

@@ -159,7 +159,7 @@ export default function AdminProfilePage() {
         }
         .loading-text {
           margin-top: 15px;
-          color: #666;
+          color: #000;
           font-size: 14px;
         }
         .page-header {
@@ -172,7 +172,7 @@ export default function AdminProfilePage() {
           margin-bottom: 5px;
         }
         .page-header p {
-          color: #666;
+          color: #000;
           font-size: 15px;
           margin: 0;
         }

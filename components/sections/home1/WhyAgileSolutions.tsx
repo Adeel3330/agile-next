@@ -231,7 +231,7 @@ export default function WhyAgileSolutions() {
         >
           <div className="centred mb_35">
             <h3 style={{ marginBottom: '12px', fontSize: '30px', fontWeight: 700 }}>Our Key Performance Indicators</h3>
-            <p style={{ color: '#555', maxWidth: '860px', margin: '0 auto', lineHeight: 1.8 }}>{introText}</p>
+            <p style={{ color: '#000', maxWidth: '860px', margin: '0 auto', lineHeight: 1.8 }}>{introText}</p>
           </div>
 
           <div className="kpi-grid">
@@ -291,7 +291,7 @@ export default function WhyAgileSolutions() {
             .kpi-label {
               font-size: 14px;
               line-height: 22px;
-              color: #555;
+              color: #000;
               margin: 0;
               font-weight: 500;
             }

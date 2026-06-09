@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect,useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { isTextOnlyMediaPosition } from '@/lib/media-positions';
 
 export default function CreateMediaPage() {
   const router = useRouter();
@@ -128,18 +129,22 @@ export default function CreateMediaPage() {
     }
   };
 
+  const normalizedPosition = useMemo(
+    () => (formData.position === 'other' ? customPosition.trim() : formData.position),
+    [formData.position, customPosition]
+  );
+  const isTextOnlyPosition = isTextOnlyMediaPosition(normalizedPosition);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    const normalizedPosition = formData.position === 'other' ? customPosition.trim() : formData.position;
 
     if (!normalizedPosition) {
       setError('Please provide a position');
       return;
     }
     
-    if (!uploadedFileData) {
+    if (!isTextOnlyPosition && !uploadedFileData) {
       setError('Please upload an image first');
       return;
     }
@@ -156,10 +161,14 @@ export default function CreateMediaPage() {
       const submitData = {
         ...formData,
         position: normalizedPosition,
-        fileUrl: uploadedFileData.url,
-        fileName: uploadedFileData.fileName,
-        fileSize: uploadedFileData.fileSize,
-        fileType: uploadedFileData.fileType
+        ...(uploadedFileData
+          ? {
+              fileUrl: uploadedFileData.url,
+              fileName: uploadedFileData.fileName,
+              fileSize: uploadedFileData.fileSize,
+              fileType: uploadedFileData.fileType,
+            }
+          : {}),
       };
 
       const response = await fetch('/api/admin/media', {
@@ -313,17 +322,27 @@ export default function CreateMediaPage() {
                 </div>
               </div>
 
+              {isTextOnlyPosition && (
+                <div className="alert alert-info py-2" role="alert">
+                  <small>
+                    <strong>About Us text section:</strong> use Title as the section key
+                    (e.g. who-we-are, mission, support-highlights) and Description for the
+                    section content. One bullet per line for support-highlights. Image is optional.
+                  </small>
+                </div>
+              )}
+
               {/* Row 3: Image Upload */}
               <div className="row mb-3">
                 <div className="col-md-8">
-                  <label className="form-label">Image *</label>
+                  <label className="form-label">Image{isTextOnlyPosition ? '' : ' *'}</label>
                   <input
                     type="file"
                     className="form-control"
                     accept="image/*"
                     onChange={handleFileChange}
                     disabled={uploading}
-                    required
+                    required={!isTextOnlyPosition}
                   />
                   {uploading && (
                     <small className="text-muted d-block mt-1">

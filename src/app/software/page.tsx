@@ -37,10 +37,11 @@ export default function SoftwarePage() {
   const [contentImage, setContentImage] = useState<MediaItem | null>(null);
   const [subsectionImage, setSubsectionImage] = useState<MediaItem | null>(null);
   const [pageImage, setPageImage] = useState<string | null>(null);
-  const [allMedia, setAllMedia] = useState<MediaItem[]>([]);
+  const [ehrMedia, setEhrMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);
   const [mediaLoading, setMediaLoading] = useState(true);
+  const [ehrLoading, setEhrLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -50,6 +51,7 @@ export default function SoftwarePage() {
     if (mounted) {
       fetchPageData();
       fetchSoftwareMedia();
+      fetchEhrMedia();
     }
   }, [mounted]);
 
@@ -108,44 +110,39 @@ export default function SoftwarePage() {
       }
 
       if (baseMedia.length > 0) {
-        // Filter for software-related media items
-        const softwareMedia = baseMedia.filter((m: MediaItem) => 
-          m.title?.toLowerCase().includes('software') || 
-          m.title?.toLowerCase().includes('virtual manager') ||
-          m.title?.toLowerCase().includes('ehr') ||
-          m.title?.toLowerCase().includes('practice management')
-        );
-
-        // Use filtered software media if available, otherwise use all media
-        const mediaToUse = softwareMedia.length >= 3 ? softwareMedia : baseMedia;
-        
-        // Store all media items (sorted by display order)
-        const sortedMedia = [...mediaToUse].sort((a, b) => {
-          // Sort by title to ensure consistent order
-          return (a.title || '').localeCompare(b.title || '');
-        });
-        setAllMedia(sortedMedia);
-
-        // First image for hero
-        const hero = sortedMedia.find((m: MediaItem) => 
-          m.title?.toLowerCase().includes('virtual manager') || 
-          m.title?.toLowerCase().includes('hero') || 
+        const hero = baseMedia.find((m: MediaItem) =>
+          m.title?.toLowerCase().includes('hero') ||
           m.title?.toLowerCase().includes('banner')
-        ) || sortedMedia[0];
+        ) || baseMedia[0];
         setHeroImage(hero);
 
-        // Second image for content section
-        const content = sortedMedia.find((m: MediaItem) => 
-          m.title?.toLowerCase().includes('ehr') || 
-          m.title?.toLowerCase().includes('content') || 
-          m.title?.toLowerCase().includes('practice')
-        ) || sortedMedia[sortedMedia.length > 1 ? 1 : 0];
+        const content = baseMedia.find((m: MediaItem) =>
+          m.title?.toLowerCase().includes('content')
+        ) || baseMedia[baseMedia.length > 1 ? 1 : 0];
         setContentImage(content);
       }
     } catch (err) {
       console.error('Failed to fetch software media:', err);
     } finally {
       setMediaLoading(false);
+    }
+  }, []);
+
+  const fetchEhrMedia = useCallback(async () => {
+    setEhrLoading(true);
+    try {
+      const response = await fetch('/api/media?position=software-ehr');
+      const data = await response.json();
+      if (data.success && Array.isArray(data.media)) {
+        setEhrMedia(data.media);
+      } else {
+        setEhrMedia([]);
+      }
+    } catch (err) {
+      console.error('Failed to fetch software EHR media:', err);
+      setEhrMedia([]);
+    } finally {
+      setEhrLoading(false);
     }
   }, []);
 
@@ -338,8 +335,8 @@ export default function SoftwarePage() {
 
         <Software/>
 
-        {/* Software Media Section - service-style-two design */}
-        {allMedia.length > 0 && (
+        {/* EHR / Practice Management — media position: software-ehr */}
+        {(ehrLoading || ehrMedia.length > 0) && (
           <section className="service-section alternat-2 p_relative pt_120 pb_90">
             <div className="pattern-layer" style={{ backgroundImage: 'url(assets/images/shape/shape-13.png)' }}></div>
             <div className="auto-container">
@@ -348,37 +345,47 @@ export default function SoftwarePage() {
                 <h2>EHR / Practice Management Software</h2>
                 <p>Comprehensive software solutions designed to streamline and optimize your revenue cycle management</p>
               </div>
-              <div className="row clearfix">
-                {allMedia.slice(0, 3).map((media: MediaItem, index: number) => (
-                  <div key={media.id || index} className="col-lg-4 col-md-6 col-sm-12 service-block">
-                    <div className="chooseus-block-one" >
-                      <div className="inner-box" style={{ padding: '0' }}>
-                        <figure className="image-box">
-                          <Image 
-                            src={getCloudinaryImageUrl(media.fileUrl)} 
-                            alt={media.altText || media.title || 'Software'} 
-                            width={416} 
-                            height={358} 
-                            priority={index === 0}
-                            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                          />
-                        </figure>
-                        <div className="lower-content" style={{ padding: '31px 30px 33px 30px' }}>
-                          <div className="inner">
-                            {/* <div className="icon-box">
-                              <i className={`icon-${18 + index}`}></i>
-                            </div> */}
-                            <h3>
-                              <span>{media.title || `Software ${index + 1}`}</span>
-                            </h3>
-                            <p>{media.description || ''}</p>
+              {ehrLoading ? (
+                <div className="row clearfix">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="col-lg-4 col-md-6 col-sm-12 service-block">
+                      <div
+                        className="skeleton"
+                        style={{ height: '420px', borderRadius: '10px', background: '#e0e0e0', animation: 'pulse 1.5s ease-in-out infinite' }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="row clearfix">
+                  {ehrMedia.map((media: MediaItem, index: number) => (
+                    <div key={media.id || index} className="col-lg-4 col-md-6 col-sm-12 service-ehr service-block">
+                      <div className="chooseus-block-one">
+                        <div className="inner-box" style={{ padding: '0' }}>
+                          <figure className="image-box">
+                            <Image
+                              src={getCloudinaryImageUrl(media.fileUrl)}
+                              alt={media.altText || media.title || 'Software'}
+                              width={416}
+                              height={358}
+                              priority={index === 0}
+                              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                            />
+                          </figure>
+                          <div className="lower-content" style={{ padding: '31px 30px 33px 30px' }}>
+                            <div className="inner">
+                              <h3>
+                                <span>{media.title || `Software ${index + 1}`}</span>
+                              </h3>
+                             
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </section>
         )}
@@ -408,7 +415,7 @@ export default function SoftwarePage() {
                   </div>
                 </>
               )}
-              <ContactForm />
+              <ContactForm defaultSubject="Software Demo Request" />
             </div>
           </div>
         </section>
@@ -441,6 +448,9 @@ export default function SoftwarePage() {
         .software-page .text-box {
           color: var(--title-color);
         }
+           .service-ehr .image-box { width: 200px; height: 100px; object-fit: cover;margin:auto }
+        .service-ehr .image-box img { width: 100%; height: 100%; object-fit: contain !important; }
+        .software-swiper .lower-content { padding: 20px;margin: auto; display: flex; text-align: center; justify-content: center; }
       `}} />
     </div>
   );
