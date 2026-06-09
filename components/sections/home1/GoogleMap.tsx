@@ -217,7 +217,7 @@ export default function GoogleMapSection({ settings: propSettings, loading: prop
       </div>
       <div className="content-box">
         <div className="inner-box">
-          <h3>Working Hour:</h3>
+          <h3>Working Hours:</h3>
           <div className="content-inner">
             <ul className="schedule-list clearfix">
               {formatWorkingHours()}
