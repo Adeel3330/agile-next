@@ -79,7 +79,7 @@ export default function SubmitTestimonialPage() {
           <div className="sec-title centred mb_60">
             <span className="sub-title mb_5">Share your experience</span>
             <h2>Submit a Testimonial</h2>
-            <p style={{ maxWidth: '640px', margin: '15px auto 0', color: '#666' }}>
+            <p style={{ maxWidth: '640px', margin: '15px auto 0', color: '#000' }}>
               Doctors and clients: share your experience with Agile Nexus Solutions. Your testimonial and photo may be featured on our website after review.
             </p>
           </div>

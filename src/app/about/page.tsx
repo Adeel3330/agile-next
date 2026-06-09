@@ -42,6 +42,7 @@ export default function AboutPage() {
   const [loading, setLoading] = useState(true);
   const [pageData, setPageData] = useState<PageData | null>(null);
   const [aboutMedia, setAboutMedia] = useState<MediaItem[]>([]);
+  const [aboutSections, setAboutSections] = useState<MediaItem[]>([]);
   const [teamMedia, setTeamMedia] = useState<MediaItem[]>([]);
   const [teamLoading, setTeamLoading] = useState(true);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -56,14 +57,16 @@ export default function AboutPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [pageRes, mediaRes, teamMediaRes] = await Promise.all([
+        const [pageRes, mediaRes, sectionsRes, teamMediaRes] = await Promise.all([
           fetch('/api/pages?template=about-us'),
           fetch('/api/media?position=about'),
+          fetch('/api/media?position=about-us-sections'),
           fetch('/api/media?position=team')
         ]);
 
         const pagePayload = await pageRes.json();
         const mediaPayload = await mediaRes.json();
+        const sectionsPayload = await sectionsRes.json();
         const teamMediaPayload = await teamMediaRes.json();
 
         if (pagePayload.success && pagePayload.page) {
@@ -72,6 +75,10 @@ export default function AboutPage() {
 
         if (mediaPayload.success && Array.isArray(mediaPayload.media) && mediaPayload.media.length > 0) {
           setAboutMedia(mediaPayload.media);
+        }
+
+        if (sectionsPayload.success && Array.isArray(sectionsPayload.media)) {
+          setAboutSections(sectionsPayload.media);
         }
 
         if (teamMediaPayload.success && Array.isArray(teamMediaPayload.media) && teamMediaPayload.media.length > 0) {
@@ -100,32 +107,13 @@ export default function AboutPage() {
     fetchData();
   }, [mounted]);
 
-  const parsedSections = useMemo(() => {
-    if (!pageData?.sections) return [] as any[];
-    if (Array.isArray(pageData.sections)) return pageData.sections;
-    if (typeof pageData.sections === 'string') {
-      try {
-        const parsed = JSON.parse(pageData.sections);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
-    }
-    return [] as any[];
-  }, [pageData?.sections]);
-
-  const sectionText = (keyword: string, fallback: string) => {
-    const section = parsedSections.find((entry: any) => {
-      const title = (entry?.title || entry?.heading || '').toLowerCase();
-      return title.includes(keyword.toLowerCase());
+  const sectionText = (key: string, fallback: string) => {
+    const normalizedKey = key.toLowerCase();
+    const item = aboutSections.find((entry) => {
+      const title = (entry.title || '').toLowerCase().trim();
+      return title === normalizedKey || title.replace(/\s+/g, '-') === normalizedKey;
     });
-
-    return (
-      section?.text ||
-      section?.description ||
-      section?.content ||
-      fallback
-    );
+    return item?.description?.trim() || fallback;
   };
 
   const overviewText =
@@ -133,7 +121,7 @@ export default function AboutPage() {
     'Agile Nexus Solutions delivers secure, cost-effective medical billing, coding, and revenue cycle management solutions that help healthcare providers optimize reimbursements and streamline operations.';
 
   const whoWeAreText = sectionText(
-    'who we are',
+    'who-we-are',
     'We are a trusted partner for healthcare organizations, combining experienced teams and smart workflows to reduce complexity, improve collections, and support long-term financial growth.'
   );
 
@@ -143,18 +131,30 @@ export default function AboutPage() {
   );
 
   const WeCare = sectionText('wecare', 'Agile Nexus Solutions services exceed customer expectations, and we are proud of our history, but more importantly, we are focused on the future. We have grown in recent years by continuing to invest in technology and people while maintaining a commitment to excellent service and innovation. We have the best customer service and one of the highest success rates for reimbursement, so you know your money will be going where it belongs - back into your pocket.');
-  const BestInIndustry = sectionText('industry', 'From electronic health records, billing services and practice management tools – Agile Nexus Solutions has you covered! In addition to being an industry leader when it comes to pricing, we also provide personalized support for every client.');
+  const BestInIndustry = sectionText('best-in-industry', 'From electronic health records, billing services and practice management tools – Agile Nexus Solutions has you covered! In addition to being an industry leader when it comes to pricing, we also provide personalized support for every client.');
 
   const supportText = sectionText(
     'support',
     'Healthcare runs around the clock. Our team is available to support urgent billing and operational needs so your revenue workflows stay uninterrupted.'
   );
 
-  const supportHighlights = [
+  const defaultSupportHighlights = [
     'Healthcare is continuous and your billing support should be too.',
     'Real-time assistance across time zones and provider locations.',
     'Fast response for urgent denials, eligibility, and claim issues.',
   ];
+
+  const supportHighlights = useMemo(() => {
+    const highlightsItem = aboutSections.find(
+      (entry) => (entry.title || '').toLowerCase().trim() === 'support-highlights'
+    );
+    if (!highlightsItem?.description) return defaultSupportHighlights;
+    const lines = highlightsItem.description
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+    return lines.length > 0 ? lines : defaultSupportHighlights;
+  }, [aboutSections]);
 
   if (!mounted) {
     return null;
@@ -195,11 +195,7 @@ export default function AboutPage() {
                     <h3>Who We Are</h3>
                     <p>{whoWeAreText}</p>
 
-                    {loading ? (
-                      <p>Loading details...</p>
-                    ) : pageData?.content ? (
-                      <div className="about-content-html" dangerouslySetInnerHTML={{ __html: pageData.content }} />
-                    ) : null}
+                    
                   </div>
                 </div>
               </div>
@@ -265,13 +261,13 @@ export default function AboutPage() {
                     margin-bottom: 14px;
                   }
                   .about-card p {
-                    color: #555;
+                    color: #000;
                     line-height: 1.8;
                     margin-bottom: 0;
                   }
                   .about-content-html {
                     margin-top: 16px;
-                    color: #555;
+                    color: #000;
                   }
                   .about-feature-image {
                     border-radius: 16px;
@@ -292,7 +288,7 @@ export default function AboutPage() {
                 <span className="sub-title mb_5">Our Team</span>
                 <h2>{teamMedia[0]?.title || 'Our Leadership and Operations Team'}</h2>
                 {teamMedia[0]?.description && (
-                  <p style={{ maxWidth: '860px', margin: '14px auto 0', color: '#555' }}>
+                  <p style={{ maxWidth: '860px', margin: '14px auto 0', color: '#000' }}>
                     {teamMedia[0].description}
                   </p>
                 )}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
+import { isTextOnlyMediaPosition, TEXT_ONLY_MEDIA_PLACEHOLDER_URL } from '@/lib/media-positions';
 
 // GET /api/admin/media?search=&page=&limit=&position=&status=
 export async function GET(req: NextRequest) {
@@ -125,27 +126,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!fileUrl || typeof fileUrl !== 'string' || fileUrl.trim().length === 0) {
+    if (!position || typeof position !== 'string' || position.trim().length === 0) {
+      return NextResponse.json(
+        { success: false, message: 'Please provide a position (e.g. home, services, about, about-us-sections, contact, cta, compliance, affiliate, other)' },
+        { status: 400 }
+      );
+    }
+
+    const positionValue = position.trim();
+    const textOnlyPosition = isTextOnlyMediaPosition(positionValue);
+
+    if (!textOnlyPosition && (!fileUrl || typeof fileUrl !== 'string' || fileUrl.trim().length === 0)) {
       return NextResponse.json(
         { success: false, message: 'Please provide file URL' },
         { status: 400 }
       );
     }
 
-    if (!position || typeof position !== 'string' || position.trim().length === 0) {
-      return NextResponse.json(
-        { success: false, message: 'Please provide a position (e.g. home, services, about, specialties, certifications, contact, cta, compliance, affiliate, other)' },
-        { status: 400 }
-      );
-    }
-
-    const positionValue = position.trim();
+    const resolvedFileUrl =
+      fileUrl && typeof fileUrl === 'string' && fileUrl.trim().length > 0
+        ? fileUrl.trim()
+        : TEXT_ONLY_MEDIA_PLACEHOLDER_URL;
 
     const insertData: any = {
       title: title.trim(),
       description: description?.trim() || null,
-      file_url: fileUrl.trim(),
-      file_name: fileName?.trim() || null,
+      file_url: resolvedFileUrl,
+      file_name: fileName?.trim() || (textOnlyPosition ? 'text-section-placeholder.jpg' : null),
       file_size: fileSize || null,
       file_type: fileType?.trim() || null,
       position: positionValue,

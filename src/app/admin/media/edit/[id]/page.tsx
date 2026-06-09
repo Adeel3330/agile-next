@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { isTextOnlyMediaPosition } from '@/lib/media-positions';
 
 interface Media {
   _id: string;
@@ -117,7 +118,7 @@ export default function EditMediaPage() {
 
       const media: Media = data.media;
       const normalizedPosition = media.position || 'home';
-      const isKnownPosition = ['home', 'services', 'about', 'contact', 'cta', 'testimonials'].includes(normalizedPosition);
+      const isKnownPosition = ['home', 'services', 'about', 'about-us-sections', 'contact', 'cta', 'testimonials'].includes(normalizedPosition);
 
       setFormData({
         title: media.title,
@@ -284,6 +285,12 @@ export default function EditMediaPage() {
     }
   };
 
+  const normalizedPosition = useMemo(
+    () => (formData.position === 'other' ? customPosition.trim() : formData.position),
+    [formData.position, customPosition]
+  );
+  const isTextOnlyPosition = isTextOnlyMediaPosition(normalizedPosition);
+
   if (!mounted) {
     return null;
   }
@@ -418,10 +425,20 @@ export default function EditMediaPage() {
                 </div>
               </div>
 
+              {isTextOnlyPosition && (
+                <div className="alert alert-info py-2" role="alert">
+                  <small>
+                    <strong>About Us text section:</strong> use Title as the section key
+                    (e.g. who-we-are, mission, support-highlights) and Description for the
+                    section content. One bullet per line for support-highlights. Image is optional.
+                  </small>
+                </div>
+              )}
+
               {/* Row 3: Image Upload */}
               <div className="row mb-3">
                 <div className="col-md-8">
-                  <label className="form-label">Image</label>
+                  <label className="form-label">{isTextOnlyPosition ? 'Image (optional)' : 'Image'}</label>
                   <input
                     type="file"
                     className="form-control"

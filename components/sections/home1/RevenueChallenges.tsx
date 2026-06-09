@@ -282,7 +282,7 @@ export default function RevenueChallenges() {
           height: 100%;
         }
         .challenges-intro {
-          color: #555;
+          color: #000;
           margin-bottom: 18px;
         }
         .challenge-list {

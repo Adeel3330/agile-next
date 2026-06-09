@@ -1,0 +1,22 @@
+export const TEXT_ONLY_MEDIA_POSITIONS = ['about-us-sections'] as const;
+
+export const TEXT_ONLY_MEDIA_PLACEHOLDER_URL = '/assets/images/resource/about-1.jpg';
+
+export const SUGGESTED_MEDIA_POSITIONS = [
+  'home',
+  'services',
+  'about',
+  'about-us-sections',
+  'contact',
+  'cta',
+  'compliance',
+  'affiliate',
+  'software',
+  'software-ehr',
+  'testimonials',
+  'other',
+];
+
+export function isTextOnlyMediaPosition(position: string): boolean {
+  return (TEXT_ONLY_MEDIA_POSITIONS as readonly string[]).includes(position);
+}

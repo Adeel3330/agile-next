@@ -108,7 +108,7 @@ export default function RequestedTestimonialViewPage() {
               )}
             </div>
             <div className="col-lg-8">
-              <div style={{ fontSize: 14, color: '#666', marginBottom: 8 }}>
+              <div style={{ fontSize: 14, color: '#000', marginBottom: 8 }}>
                 {item.created_at ? `Submitted: ${new Date(item.created_at).toLocaleString()}` : ''}
               </div>
               <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>{item.title}</h2>

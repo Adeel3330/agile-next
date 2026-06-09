@@ -79,7 +79,7 @@ export default function JsonEditor({
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <span style={{ fontSize: '12px', fontWeight: '600', color: '#666' }}>
+          <span style={{ fontSize: '12px', fontWeight: '600', color: '#000' }}>
             JSON Editor {isValid ? '✓' : '✗'}
           </span>
           <div style={{ display: 'flex', gap: '8px' }}>

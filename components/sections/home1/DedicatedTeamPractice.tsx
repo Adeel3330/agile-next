@@ -112,7 +112,7 @@ export default function DedicatedTeamPractice() {
               <>
                 {pageData?.content ? (
                   <div
-                    style={{ color: '#555', lineHeight: 1.8 }}
+                    style={{ color: '#000', lineHeight: 1.8 }}
                     className="list-style-one dedicated-list"
                     dangerouslySetInnerHTML={{ __html: pageData.content }}
                   />

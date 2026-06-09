@@ -144,7 +144,7 @@ export default function Software() {
                         style={{
                           fontSize: '13px',
                           fontWeight: '600',
-                          color: '#555',
+                          color: '#000',
                         }}
                       >
                         {item.title}

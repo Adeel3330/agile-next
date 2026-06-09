@@ -149,7 +149,7 @@ export default function AdminLayout({
         }
         .loading-text {
           margin-top: 15px;
-          color: #666;
+          color: #000;
           font-size: 14px;
         }
         .admin-layout {
@@ -194,7 +194,7 @@ export default function AdminLayout({
           align-items: center;
           gap: 12px;
           padding: 7px 15px;
-          color: #555;
+          color: #000;
           text-decoration: none;
           font-size: 14px;
           font-weight: 500;
@@ -256,7 +256,7 @@ export default function AdminLayout({
           align-items: center;
           gap: 12px;
           padding: 10px 20px 10px 50px;
-          color: #666;
+          color: #000;
           text-decoration: none;
           font-size: 13px;
           font-weight: 500;
@@ -335,7 +335,7 @@ export default function AdminLayout({
           background: none;
           border: none;
           font-size: 20px;
-          color: #555;
+          color: #000;
           cursor: pointer;
           padding: 5px 10px;
         }

@@ -249,7 +249,7 @@ export default function ContactPage() {
               <div className="col-md-6 m-auto">
                 {pageData?.content && (
                   <div
-                    style={{ color: '#666', fontSize: '16px', lineHeight: '28px', marginBottom: '22px' }}
+                    style={{ color: '#000', fontSize: '16px', lineHeight: '28px', marginBottom: '22px' }}
                     dangerouslySetInnerHTML={{ __html: pageData.content }}
                   />
                 )}

@@ -46,7 +46,7 @@ export default function FaqSection() {
         <div className="sec-title mb_60 centred">
           <span className="sub-title mb_5">FAQs</span>
           <h2>Frequently Asked Questions</h2>
-          <p style={{ maxWidth: '700px', margin: '15px auto 0', color: '#666' }}>
+          <p style={{ maxWidth: '700px', margin: '15px auto 0', color: '#000' }}>
             Common questions about our medical billing and revenue cycle management services.
           </p>
         </div>
@@ -97,7 +97,7 @@ export default function FaqSection() {
                   </button>
                   {openIndex === index && (
                     <div style={{ padding: '0 24px 20px' }}>
-                      <p style={{ color: '#666', lineHeight: '26px', margin: 0 }}>{faq.answer}</p>
+                      <p style={{ color: '#000', lineHeight: '26px', margin: 0 }}>{faq.answer}</p>
                     </div>
                   )}
                 </div>

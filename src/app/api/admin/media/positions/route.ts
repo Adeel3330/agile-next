@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
+import { SUGGESTED_MEDIA_POSITIONS } from '@/lib/media-positions';
 
 // GET /api/admin/media/positions - Get distinct positions
 export async function GET(req: NextRequest) {
@@ -27,8 +28,9 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        // Extract unique positions and sort them
-        const uniquePositions = [...new Set(data.map((item: any) => item.position))].sort();
+        const uniquePositions = [
+          ...new Set([...SUGGESTED_MEDIA_POSITIONS, ...data.map((item: any) => item.position)]),
+        ].sort();
 
         return NextResponse.json({
             success: true,

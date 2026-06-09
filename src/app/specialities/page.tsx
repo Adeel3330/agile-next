@@ -80,7 +80,7 @@ export default function SpecialitiesPage() {
             <div className="sec-title mb_60 centred">
               <span className="sub-title mb_5">Specialties We Serve</span>
               <h2>{pageData?.title || 'Medical Specialties We Support'}</h2>
-              <p style={{ maxWidth: '720px', margin: '15px auto 0', color: '#666' }}>
+              <p style={{ maxWidth: '720px', margin: '15px auto 0', color: '#000' }}>
                 {pageData?.description ||
                   'From urgent care to specialty practices, we provide end-to-end medical billing and revenue cycle management tailored to each specialty.'}
               </p>
@@ -145,7 +145,7 @@ export default function SpecialitiesPage() {
                         />
                       </div>
                       {item.title && (
-                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#555' }}>{item.title}</span>
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#000' }}>{item.title}</span>
                       )}
                     </div>
                   );
