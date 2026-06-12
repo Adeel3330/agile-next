@@ -193,9 +193,7 @@ export default function AboutPage() {
                 <div className="col-lg-6 col-md-12 col-sm-12 content-column mb_30">
                   <div className="about-card">
                     <h3>Who We Are</h3>
-                    <p>{whoWeAreText}</p>
-
-                    
+                    <p>{whoWeAreText}</p>           
                   </div>
                 </div>
               </div>
