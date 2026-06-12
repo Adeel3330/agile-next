@@ -337,50 +337,48 @@ export default function SoftwarePage() {
 
         {/* EHR / Practice Management — media position: software-ehr */}
         {(ehrLoading || ehrMedia.length > 0) && (
-          <section className="service-section alternat-2 p_relative pt_120 pb_90">
-            <div className="pattern-layer" style={{ backgroundImage: 'url(assets/images/shape/shape-13.png)' }}></div>
+          <section className="funfact-section p_relative pt_90 pb_90" style={{ background: '#f5f8fa' }}>
             <div className="auto-container">
-              <div className="sec-title mb_60 centred">
+              <div className="sec-title mb_50 centred">
                 <span className="sub-title mb_5">Our Software Solutions</span>
                 <h2>EHR / Practice Management Software</h2>
-                <p>Comprehensive software solutions designed to streamline and optimize your revenue cycle management</p>
+                <p style={{ maxWidth: '600px', margin: '15px auto 0', color: '#000' }}>
+                  Comprehensive software solutions designed to streamline and optimize your revenue cycle management
+                </p>
               </div>
               {ehrLoading ? (
-                <div className="row clearfix">
+                <div className="row clearfix justify-content-center">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="col-lg-4 col-md-6 col-sm-12 service-block">
+                    <div key={i} className="col-lg-3 col-md-4 col-sm-6">
                       <div
                         className="skeleton"
-                        style={{ height: '420px', borderRadius: '10px', background: '#e0e0e0', animation: 'pulse 1.5s ease-in-out infinite' }}
+                        style={{
+                          height: '140px',
+                          margin: '0 15px 20px',
+                          borderRadius: '12px',
+                          background: '#e0e0e0',
+                          animation: 'pulse 1.5s ease-in-out infinite',
+                        }}
                       />
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="row clearfix">
-                  {ehrMedia.map((media: MediaItem, index: number) => (
-                    <div key={media.id || index} className="col-lg-4 col-md-6 col-sm-12 service-ehr service-block">
-                      <div className="chooseus-block-one">
-                        <div className="inner-box" style={{ padding: '0' }}>
-                          <figure className="image-box">
-                            <Image
-                              src={getCloudinaryImageUrl(media.fileUrl)}
-                              alt={media.altText || media.title || 'Software'}
-                              width={416}
-                              height={358}
-                              priority={index === 0}
-                              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                            />
-                          </figure>
-                          <div className="lower-content" style={{ padding: '31px 30px 33px 30px' }}>
-                            <div className="inner">
-                              <h3>
-                                <span>{media.title || `Software ${index + 1}`}</span>
-                              </h3>
-                             
-                            </div>
-                          </div>
+                <div className="row clearfix justify-content-center">
+                  {ehrMedia.map((media: MediaItem) => (
+                    <div key={media.id} className="col-lg-3 col-md-4 col-sm-6 col-6 mb_30">
+                      <div className="software-ehr-card certification-badge">
+                        <div className="software-ehr-card__image">
+                          <Image
+                            src={getCloudinaryImageUrl(media.fileUrl)}
+                            alt={media.altText || media.title || 'Software'}
+                            fill
+                            style={{ objectFit: 'contain' }}
+                          />
                         </div>
+                        {media.title && (
+                          <span className="software-ehr-card__title">{media.title}</span>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -448,9 +446,35 @@ export default function SoftwarePage() {
         .software-page .text-box {
           color: var(--title-color);
         }
-           .service-ehr .image-box { width: 200px; height: 100px; object-fit: cover;margin:auto }
-        .service-ehr .image-box img { width: 100%; height: 100%; object-fit: contain !important; }
-        .software-swiper .lower-content { padding: 20px;margin: auto; display: flex; text-align: center; justify-content: center; }
+        .software-ehr-card.certification-badge {
+          text-align: center;
+          padding: 24px 16px;
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+          transition: all 0.3s ease;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        .software-ehr-card.certification-badge:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+        }
+        .software-ehr-card__image {
+          width: 100%;
+          max-width: 120px;
+          height: 80px;
+          position: relative;
+          margin: 0 auto 12px;
+        }
+        .software-ehr-card__title {
+          font-size: 13px;
+          font-weight: 600;
+          color: #000;
+        }
       `}} />
     </div>
   );
