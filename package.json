@@ -22,7 +22,9 @@
     "seed:software-page-media": "ts-node seed-software-page-media.ts",
     "seed:software-ehr-media": "ts-node seed-software-ehr-media.ts",
     "seed:compliance-media": "ts-node seed-compliance-media.ts",
-    "seed:about-us-sections": "ts-node seed-about-us-sections.ts"
+    "seed:about-us-sections": "ts-node seed-about-us-sections.ts",
+    "seed:affiliate-program": "ts-node seed-affiliate-program.ts",
+    "seed:affiliate-program-media": "ts-node seed-affiliate-program-media.ts"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",
