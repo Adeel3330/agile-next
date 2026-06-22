@@ -1,4 +1,4 @@
-export const TEXT_ONLY_MEDIA_POSITIONS = ['about-us-sections'] as const;
+export const TEXT_ONLY_MEDIA_POSITIONS = ['about-us-sections', 'compliance-gallery-heading'] as const;
 
 export const TEXT_ONLY_MEDIA_PLACEHOLDER_URL = '/assets/images/resource/about-1.jpg';
 
@@ -12,6 +12,7 @@ export const SUGGESTED_MEDIA_POSITIONS = [
   'compliance',
   'compliance-hero',
   'compliance-content',
+  'compliance-gallery-heading',
   'affiliate',
   'software',
   'software-hero',

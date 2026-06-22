@@ -428,9 +428,19 @@ export default function EditMediaPage() {
               {isTextOnlyPosition && (
                 <div className="alert alert-info py-2" role="alert">
                   <small>
-                    <strong>About Us text section:</strong> use Title as the section key
-                    (e.g. who-we-are, mission, support-highlights) and Description for the
-                    section content. One bullet per line for support-highlights. Image is optional.
+                    {normalizedPosition === 'compliance-gallery-heading' ? (
+                      <>
+                        <strong>Compliance page — section 3 heading only:</strong> Alt Text = small sub-heading,
+                        Title = main heading (H2), Description = short intro text below the heading.
+                        No image needed. Bottom cards still use position <strong>compliance</strong>.
+                      </>
+                    ) : (
+                      <>
+                        <strong>About Us sections:</strong> use Title as the section key
+                        (e.g. who-we-are, mission, support-highlights) and Description for the
+                        section content. One bullet per line for support-highlights. Image is optional.
+                      </>
+                    )}
                   </small>
                 </div>
               )}

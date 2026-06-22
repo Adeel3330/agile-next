@@ -86,12 +86,6 @@ const compliancePageData = {
         'We are committed to maintaining the highest standards of compliance across all medical billing and revenue cycle management services.',
     },
     {
-      type: 'gallery',
-      subTitle: 'Our Compliance Resources',
-      title: 'Compliance Documentation & Resources',
-      description: 'Access our compliance-related documents and visual resources.',
-    },
-    {
       type: 'form',
       subTitle: 'Get in Touch',
       title: 'Contact Us for Compliance Information',

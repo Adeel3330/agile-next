@@ -36,6 +36,7 @@ export default function CompliancePage() {
   const [contentImage, setContentImage] = useState<MediaItem | null>(null);
   const [pageImage, setPageImage] = useState<string | null>(null);
   const [resourceMedia, setResourceMedia] = useState<MediaItem[]>([]);
+  const [galleryHeading, setGalleryHeading] = useState<MediaItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);
   const [mediaLoading, setMediaLoading] = useState(true);
@@ -81,15 +82,17 @@ export default function CompliancePage() {
         return data.success && Array.isArray(data.media) ? data.media : [];
       };
 
-      const [heroItems, contentItems, galleryItems] = await Promise.all([
+      const [heroItems, contentItems, galleryItems, galleryHeadingItems] = await Promise.all([
         fetchMediaByPosition('compliance-hero'),
         fetchMediaByPosition('compliance-content'),
         fetchMediaByPosition('compliance'),
+        fetchMediaByPosition('compliance-gallery-heading'),
       ]);
 
       setHeroImage(heroItems[0] ?? null);
       setContentImage(contentItems[0] ?? null);
       setResourceMedia(galleryItems);
+      setGalleryHeading(galleryHeadingItems[0] ?? null);
     } catch (err) {
       console.error('Failed to fetch compliance media:', err);
     } finally {
@@ -141,8 +144,11 @@ export default function CompliancePage() {
   const contentSection = sections.find(
     (s: any) => s.type === 'content' && (s.subTitle || (s as any).sub_title)
   );
-  const gallerySection = sections.find((s: any) => s.type === 'gallery');
   const formSection = sections.find((s: any) => s.type === 'form');
+
+  const gallerySubTitle = galleryHeading?.altText || '';
+  const galleryTitle = galleryHeading?.title || 'Compliance Documentation & Resources';
+  const galleryIntro = galleryHeading?.description || '';
 
   const heroSubTitle =
     heroSection?.subTitle ||
@@ -305,17 +311,13 @@ export default function CompliancePage() {
         </section>
 
         {/* Media Gallery Section - Display All Media Items */}
-        {resourceMedia.length > 0 && (
+        {(resourceMedia.length > 0 || galleryHeading) && (
           <section className="gallery-section p_relative pt_90 pb_90" style={{ background: '#fff' }}>
             <div className="auto-container">
               <div className="sec-title mb_60 centred">
-                {(gallerySection?.subTitle || (gallerySection as any)?.sub_title) && (
-                  <span className="sub-title mb_5">
-                    {gallerySection.subTitle || (gallerySection as any).sub_title}
-                  </span>
-                )}
-                <h2>{gallerySection?.title || 'Compliance Documentation & Resources'}</h2>
-                {gallerySection?.description && <p>{gallerySection.description}</p>}
+                {gallerySubTitle && <span className="sub-title mb_5">{gallerySubTitle}</span>}
+                <h2>{galleryTitle}</h2>
+                {galleryIntro && <p>{galleryIntro}</p>}
               </div>
               <div className="row clearfix">
                 {resourceMedia.map((media: MediaItem, index: number) => (

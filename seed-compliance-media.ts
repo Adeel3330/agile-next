@@ -39,6 +39,16 @@ const complianceMediaData = [
     altText: 'HIPAA Compliance and Data Security',
   },
   {
+    title: 'Compliance Documentation & Resources',
+    description: 'Access our compliance-related documents and visual resources.',
+    fileUrl: PLACEHOLDER,
+    fileName: 'compliance-gallery-heading.txt',
+    fileType: 'image/jpeg',
+    position: 'compliance-gallery-heading',
+    displayOrder: 1,
+    altText: 'Our Compliance Resources',
+  },
+  {
     title: 'HIPAA Compliance',
     description:
       'Fully compliant with Health Insurance Portability and Accountability Act regulations, ensuring patient data protection and privacy through strict access controls, encrypted data transmission and storage, regular security audits, employee training, Business Associate Agreements, and incident response procedures.',
