@@ -24,6 +24,7 @@ export default function Software() {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<MediaItem[]>([]);
+  const [sectionHeading, setSectionHeading] = useState<MediaItem | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -33,11 +34,21 @@ export default function Software() {
   const fetchSoftware = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/media?position=software');
-      const data = await response.json();
-      if (data.success && data.media?.length > 0) {
-        setItems(data.media);
+      const fetchByPosition = async (position: string) => {
+        const response = await fetch(`/api/media?position=${encodeURIComponent(position)}`);
+        const data = await response.json();
+        return data.success && Array.isArray(data.media) ? data.media : [];
+      };
+
+      const [carouselItems, headingItems] = await Promise.all([
+        fetchByPosition('software'),
+        fetchByPosition('software-carousel-heading'),
+      ]);
+
+      if (carouselItems.length > 0) {
+        setItems(carouselItems);
       }
+      setSectionHeading(headingItems[0] ?? null);
     } catch (err) {
       console.error('Failed to fetch software media:', err);
     } finally {
@@ -46,7 +57,11 @@ export default function Software() {
   };
 
   if (!mounted) return null;
-  if (!loading && items.length === 0) return null;
+  if (!loading && items.length === 0 && !sectionHeading) return null;
+
+  const carouselSubTitle = sectionHeading?.altText || '';
+  const carouselTitle = sectionHeading?.title || 'Software Platforms We Work With';
+  const carouselIntro = sectionHeading?.description || '';
 
   return (
     <section
@@ -56,12 +71,13 @@ export default function Software() {
     >
       <div className="auto-container">
         <div className="sec-title mb_50 centred">
-          <span className="sub-title mb_5">RCM Software</span>
-          <h2>Software Platforms We Work With</h2>
-          <p style={{ maxWidth: '600px', margin: '15px auto 0', color: '#000' }}>
-            From virtual managers to EHR integrations, we operate on leading revenue cycle and
-            practice management platforms.
-          </p>
+          {carouselSubTitle && <span className="sub-title mb_5">{carouselSubTitle}</span>}
+          <h2>{carouselTitle}</h2>
+          {carouselIntro && (
+            <p style={{ maxWidth: '600px', margin: '15px auto 0', color: 'var(--title-color)' }}>
+              {carouselIntro}
+            </p>
+          )}
         </div>
 
         {loading ? (
@@ -144,7 +160,7 @@ export default function Software() {
                         style={{
                           fontSize: '13px',
                           fontWeight: '600',
-                          color: '#000',
+                          color: 'var(--title-color)',
                         }}
                       >
                         {item.title}

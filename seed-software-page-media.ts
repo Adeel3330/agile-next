@@ -49,6 +49,17 @@ const softwarePageMedia = [
     displayOrder: 1,
     altText: 'Our Software Solutions',
   },
+  {
+    title: 'Software Platforms We Work With',
+    description:
+      'From virtual managers to EHR integrations, we operate on leading revenue cycle and practice management platforms.',
+    fileUrl: PLACEHOLDER,
+    fileName: 'software-carousel-heading.txt',
+    fileType: 'image/jpeg',
+    position: 'software-carousel-heading',
+    displayOrder: 1,
+    altText: 'RCM Software',
+  },
 ];
 
 async function seedSoftwarePageMedia() {
