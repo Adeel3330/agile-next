@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Layout from '../../../components/layout/Layout';
 import Cta from '../../../components/sections/home2/Cta';
 import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
+import { TEXT_ONLY_MEDIA_PLACEHOLDER_URL } from '@/lib/media-positions';
 
 interface MediaItem {
   id: string;
@@ -14,6 +15,30 @@ interface MediaItem {
   title?: string;
   altText?: string;
   description?: string;
+  displayOrder?: number;
+}
+
+const SECTION_HEADINGS: Record<string, string> = {
+  'who-we-are': 'Who We Are',
+  'best-in-industry': 'Best In Industry',
+  wecare: 'WeCare',
+  mission: 'Our Mission',
+  support: '24/7 Support: Anytime, Anywhere Services',
+};
+
+function getSectionKey(title?: string) {
+  return (title || '').toLowerCase().trim();
+}
+
+function sectionHeading(title?: string) {
+  const key = getSectionKey(title);
+  return SECTION_HEADINGS[key] || title || '';
+}
+
+function isDisplayableImage(url?: string) {
+  const trimmed = url?.trim();
+  if (!trimmed || trimmed === TEXT_ONLY_MEDIA_PLACEHOLDER_URL) return false;
+  return true;
 }
 
 interface PageData {
@@ -78,7 +103,10 @@ export default function AboutPage() {
         }
 
         if (sectionsPayload.success && Array.isArray(sectionsPayload.media)) {
-          setAboutSections(sectionsPayload.media);
+          const sortedSections = [...sectionsPayload.media].sort(
+            (a: MediaItem, b: MediaItem) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+          );
+          setAboutSections(sortedSections);
         }
 
         if (teamMediaPayload.success && Array.isArray(teamMediaPayload.media) && teamMediaPayload.media.length > 0) {
@@ -107,54 +135,54 @@ export default function AboutPage() {
     fetchData();
   }, [mounted]);
 
-  const sectionText = (key: string, fallback: string) => {
+  const sectionItem = (key: string) => {
     const normalizedKey = key.toLowerCase();
-    const item = aboutSections.find((entry) => {
-      const title = (entry.title || '').toLowerCase().trim();
+    return aboutSections.find((entry) => {
+      const title = getSectionKey(entry.title);
       return title === normalizedKey || title.replace(/\s+/g, '-') === normalizedKey;
     });
-    return item?.description?.trim() || fallback;
   };
+
+  const whoWeAreSection = sectionItem('who-we-are');
+
+  const gridSections = useMemo(
+    () =>
+      aboutSections.filter((item) => {
+        const key = getSectionKey(item.title);
+        return key !== 'who-we-are' && key !== 'support-highlights';
+      }),
+    [aboutSections]
+  );
+
+  const supportHighlights = useMemo(() => {
+    const highlightsItem = aboutSections.find(
+      (entry) => getSectionKey(entry.title) === 'support-highlights'
+    );
+    if (!highlightsItem?.description) return [];
+    return highlightsItem.description
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }, [aboutSections]);
 
   const overviewText =
     pageData?.description ||
     'Agile Nexus Solutions delivers secure, cost-effective medical billing, coding, and revenue cycle management solutions that help healthcare providers optimize reimbursements and streamline operations.';
 
-  const whoWeAreText = sectionText(
-    'who-we-are',
-    'We are a trusted partner for healthcare organizations, combining experienced teams and smart workflows to reduce complexity, improve collections, and support long-term financial growth.'
-  );
-
-  const missionText = sectionText(
-    'mission',
-    'Our mission is to improve the financial and operational health of medical practices through accurate, compliant, and transparent revenue cycle services that allow providers to focus on patient care.'
-  );
-
-  const WeCare = sectionText('wecare', 'Agile Nexus Solutions services exceed customer expectations, and we are proud of our history, but more importantly, we are focused on the future. We have grown in recent years by continuing to invest in technology and people while maintaining a commitment to excellent service and innovation. We have the best customer service and one of the highest success rates for reimbursement, so you know your money will be going where it belongs - back into your pocket.');
-  const BestInIndustry = sectionText('best-in-industry', 'From electronic health records, billing services and practice management tools – Agile Nexus Solutions has you covered! In addition to being an industry leader when it comes to pricing, we also provide personalized support for every client.');
-
-  const supportText = sectionText(
-    'support',
-    'Healthcare runs around the clock. Our team is available to support urgent billing and operational needs so your revenue workflows stay uninterrupted.'
-  );
-
-  const defaultSupportHighlights = [
-    'Healthcare is continuous and your billing support should be too.',
-    'Real-time assistance across time zones and provider locations.',
-    'Fast response for urgent denials, eligibility, and claim issues.',
-  ];
-
-  const supportHighlights = useMemo(() => {
-    const highlightsItem = aboutSections.find(
-      (entry) => (entry.title || '').toLowerCase().trim() === 'support-highlights'
+  const renderSectionImage = (section: MediaItem) => {
+    if (!isDisplayableImage(section.fileUrl)) return null;
+    return (
+      <figure className="about-card-image">
+        <Image
+          src={getCloudinaryImageUrl(section.fileUrl)}
+          alt={section.altText || sectionHeading(section.title) || 'About section'}
+          width={520}
+          height={280}
+          style={{ objectFit: 'cover', width: '100%', height: '400px', borderRadius: '12px' }}
+        />
+      </figure>
     );
-    if (!highlightsItem?.description) return defaultSupportHighlights;
-    const lines = highlightsItem.description
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean);
-    return lines.length > 0 ? lines : defaultSupportHighlights;
-  }, [aboutSections]);
+  };
 
   if (!mounted) {
     return null;
@@ -176,60 +204,67 @@ export default function AboutPage() {
                 <p style={{ maxWidth: '860px', margin: '14px auto 0' }}>{overviewText}</p>
               </div>
 
-              <div className="row clearfix align-items-center mb_70">
-                <div className="col-lg-6 col-md-12 col-sm-12 image-column mb_30">
-                  <figure className="about-feature-image">
-                    <Image
-                      src={getCloudinaryImageUrl(aboutMedia[0]?.fileUrl || '/assets/images/resource/about-1.jpg')}
-                      alt={aboutMedia[0]?.altText || aboutMedia[0]?.title || 'Who we are'}
-                      width={640}
-                      height={460}
-                      style={{ objectFit: 'cover', borderRadius: '16px' }}
-                      priority
-                    />
-                  </figure>
-                </div>
+              {whoWeAreSection && (
+                <div className="row clearfix align-items-center mb_70">
+                  <div className="col-lg-6 col-md-12 col-sm-12 image-column mb_30">
+                    {isDisplayableImage(whoWeAreSection.fileUrl) ? (
+                      <figure className="about-feature-image">
+                        <Image
+                          src={getCloudinaryImageUrl(whoWeAreSection.fileUrl)}
+                          alt={whoWeAreSection.altText || sectionHeading(whoWeAreSection.title) || 'Who we are'}
+                          width={640}
+                          height={460}
+                          style={{ objectFit: 'cover', borderRadius: '16px' }}
+                          priority
+                        />
+                      </figure>
+                    ) : (
+                      <figure className="about-feature-image">
+                        <Image
+                          src={getCloudinaryImageUrl('/assets/images/resource/about-1.jpg')}
+                          alt="Who we are"
+                          width={640}
+                          height={460}
+                          style={{ objectFit: 'cover', borderRadius: '16px' }}
+                          priority
+                        />
+                      </figure>
+                    )}
+                  </div>
 
-                <div className="col-lg-6 col-md-12 col-sm-12 content-column mb_30">
-                  <div className="about-card">
-                    <h3>Who We Are</h3>
-                    <p>{whoWeAreText}</p>           
+                  <div className="col-lg-6 col-md-12 col-sm-12 content-column mb_30">
+                    <div className="about-card">
+                      <h3>{sectionHeading(whoWeAreSection.title)}</h3>
+                      {whoWeAreSection.description && (
+                        <p style={{ whiteSpace: 'pre-line' }}>{whoWeAreSection.description}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              <div className="row clearfix mb_30">
-                <div className="col-lg-6 col-md-12 col-sm-12 mb_30">
-                  <div className="about-card h-100">
-                    <h3>Best In Industry</h3>
-                    <p>{BestInIndustry}</p>
-                  </div>
+              {gridSections.length > 0 && (
+                <div className="row clearfix mb_30">
+                  {gridSections.map((section) => (
+                    <div key={section.id} className="col-lg-6 col-md-12 col-sm-12 mb_30">
+                      <div className="about-card h-100">
+                        {renderSectionImage(section)}
+                        <h3>{sectionHeading(section.title)}</h3>
+                        {section.description && (
+                          <p style={{ whiteSpace: 'pre-line' }}>{section.description}</p>
+                        )}
+                        {getSectionKey(section.title) === 'support' && supportHighlights.length > 0 && (
+                          <ul className="list-style-one clearfix mt_20">
+                            {supportHighlights.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="col-lg-6 col-md-12 col-sm-12 mb_30">
-                  <div className="about-card h-100">
-                    <h3>WeCare</h3>
-                    <p>{WeCare}</p>
-                  </div>
-                </div>
-                <div className="col-lg-6 col-md-12 col-sm-12 mb_30">
-                  <div className="about-card h-100">
-                    <h3>Our Mission</h3>
-                    <p>{missionText}</p>
-                  </div>
-                </div>
-
-                <div className="col-lg-6 col-md-12 col-sm-12 mb_30">
-                  <div className="about-card h-100">
-                    <h3>24/7 Support: Anytime, Anywhere Services</h3>
-                    <p>{supportText}</p>
-                    <ul className="list-style-one clearfix mt_20">
-                      {/* {supportHighlights.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))} */}
-                    </ul>
-                  </div>
-                </div>
-              </div>
+              )}
 
               {/* <div className="row clearfix">
                 <div className="col-lg-12 col-md-12 col-sm-12">
@@ -257,6 +292,11 @@ export default function AboutPage() {
                   }
                   .about-card h3 {
                     margin-bottom: 14px;
+                  }
+                  .about-card-image {
+                    margin: 0 0 20px;
+                    border-radius: 12px;
+                    overflow: hidden;
                   }
                   .about-card p {
                     color: #000;
