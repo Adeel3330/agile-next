@@ -223,9 +223,9 @@ export default function AboutPage() {
                     <h3>24/7 Support: Anytime, Anywhere Services</h3>
                     <p>{supportText}</p>
                     <ul className="list-style-one clearfix mt_20">
-                      {supportHighlights.map((item) => (
+                      {/* {supportHighlights.map((item) => (
                         <li key={item}>{item}</li>
-                      ))}
+                      ))} */}
                     </ul>
                   </div>
                 </div>

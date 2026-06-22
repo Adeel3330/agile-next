@@ -38,6 +38,7 @@ export default function SoftwarePage() {
   const [subsectionImage, setSubsectionImage] = useState<MediaItem | null>(null);
   const [pageImage, setPageImage] = useState<string | null>(null);
   const [ehrMedia, setEhrMedia] = useState<MediaItem[]>([]);
+  const [ehrHeading, setEhrHeading] = useState<MediaItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);
   const [mediaLoading, setMediaLoading] = useState(true);
@@ -85,42 +86,15 @@ export default function SoftwarePage() {
         return data.success && Array.isArray(data.media) ? data.media : [];
       };
 
-      // Prefer explicit software position, fallback to older "other" data.
-      let baseMedia = await fetchMediaByPosition('software');
-      if (baseMedia.length === 0) {
-        baseMedia = await fetchMediaByPosition('other');
-      }
+      const [heroItems, contentItems, subsectionItems] = await Promise.all([
+        fetchMediaByPosition('software-hero'),
+        fetchMediaByPosition('software-content'),
+        fetchMediaByPosition('software-subsections'),
+      ]);
 
-      // Dedicated image for content block (admin can add media under one of these positions).
-      const subsectionPositions = ['software-subsections'];
-      let subsectionMedia: MediaItem[] = [];
-
-      for (const position of subsectionPositions) {
-        const items = await fetchMediaByPosition(position);
-        if (items.length > 0) {
-          subsectionMedia = items;
-          break;
-        }
-      }
-
-      if (Array.isArray(subsectionMedia) && subsectionMedia.length > 0) {
-        setSubsectionImage(subsectionMedia[0]);
-      } else {
-        setSubsectionImage(null);
-      }
-
-      if (baseMedia.length > 0) {
-        const hero = baseMedia.find((m: MediaItem) =>
-          m.title?.toLowerCase().includes('hero') ||
-          m.title?.toLowerCase().includes('banner')
-        ) || baseMedia[0];
-        setHeroImage(hero);
-
-        const content = baseMedia.find((m: MediaItem) =>
-          m.title?.toLowerCase().includes('content')
-        ) || baseMedia[baseMedia.length > 1 ? 1 : 0];
-        setContentImage(content);
-      }
+      setHeroImage(heroItems[0] ?? null);
+      setContentImage(contentItems[0] ?? null);
+      setSubsectionImage(subsectionItems[0] ?? null);
     } catch (err) {
       console.error('Failed to fetch software media:', err);
     } finally {
@@ -131,16 +105,23 @@ export default function SoftwarePage() {
   const fetchEhrMedia = useCallback(async () => {
     setEhrLoading(true);
     try {
-      const response = await fetch('/api/media?position=software-ehr');
-      const data = await response.json();
-      if (data.success && Array.isArray(data.media)) {
-        setEhrMedia(data.media);
-      } else {
-        setEhrMedia([]);
-      }
+      const fetchMediaByPosition = async (position: string) => {
+        const response = await fetch(`/api/media?position=${encodeURIComponent(position)}`);
+        const data = await response.json();
+        return data.success && Array.isArray(data.media) ? data.media : [];
+      };
+
+      const [ehrItems, ehrHeadingItems] = await Promise.all([
+        fetchMediaByPosition('software-ehr'),
+        fetchMediaByPosition('software-ehr-heading'),
+      ]);
+
+      setEhrMedia(ehrItems);
+      setEhrHeading(ehrHeadingItems[0] ?? null);
     } catch (err) {
       console.error('Failed to fetch software EHR media:', err);
       setEhrMedia([]);
+      setEhrHeading(null);
     } finally {
       setEhrLoading(false);
     }
@@ -185,9 +166,38 @@ export default function SoftwarePage() {
     return null;
   }
 
+  const sections = Array.isArray(pageData?.sections) ? pageData.sections : [];
+  const heroSection = sections.find((s: any) => s.type === 'hero');
+  const contentSection = sections.find((s: any) => s.type === 'content');
+  const formSection = sections.find((s: any) => s.type === 'form');
+
+  const ehrSubTitle = ehrHeading?.altText || '';
+  const ehrTitle = ehrHeading?.title || 'EHR / Practice Management Software';
+  const ehrIntro = ehrHeading?.description || '';
+
+  const heroSubTitle =
+    heroSection?.subTitle ||
+    (heroSection as any)?.sub_title ||
+    heroSection?.title ||
+    heroImage?.altText ||
+    'Software Solutions';
+  const heroHeading =
+    heroSection?.subtitle ||
+    (heroSection as any)?.heading ||
+    heroImage?.title ||
+    pageData?.title ||
+    'Software';
+  const heroText =
+    heroSection?.description || heroImage?.description || pageData?.seoDescription || '';
+
+  const contentSubTitle =
+    contentSection?.subTitle || (contentSection as any)?.sub_title || contentImage?.altText || '';
+  const contentHeading = contentSection?.title || contentImage?.title || '';
+  const contentIntro = contentSection?.description || contentImage?.description || '';
+  const contentHtml = contentSection?.content || pageData?.content || '';
+
   // Parse sections for features/stats
   const featuresSection = pageData?.sections?.find((s: any) => s.type === 'features');
-  const formSection = pageData?.sections?.find((s: any) => s.type === 'form');
 
   return (
     <div className="boxed_wrapper software-page">
@@ -207,12 +217,16 @@ export default function SoftwarePage() {
                   ) : (
                     <>
                       <div className="sec-title mb_30">
-                        <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>Software Solutions</span>
+                        {heroSubTitle && (
+                          <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>
+                            {heroSubTitle}
+                          </span>
+                        )}
                         <h1 style={{ fontSize: '48px', lineHeight: '58px', fontWeight: '700', marginBottom: '20px' }}>
-                          {pageData?.title || 'Software'}
+                          {heroHeading}
                         </h1>
-                        {pageData?.description && (
-                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{pageData.description}</p>
+                        {heroText && (
+                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{heroText}</p>
                         )}
                       </div>
                     </>
@@ -222,22 +236,22 @@ export default function SoftwarePage() {
               <div className="col-lg-6 col-md-12 col-sm-12 image-column">
                 {mediaLoading ? (
                   <div className="skeleton-image" style={{ width: '100%', height: '400px', background: '#e0e0e0', borderRadius: '10px' }}></div>
-                ) : pageImage ? (
+                ) : heroImage ? (
                   <div className="image-box" style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
                     <Image 
-                      src={getCloudinaryImageUrl(pageImage)} 
-                      alt={pageData?.title || 'Software'} 
+                      src={getCloudinaryImageUrl(heroImage.fileUrl)} 
+                      alt={heroImage.altText || heroImage.title || 'Software'} 
                       width={600} 
                       height={400} 
                       priority 
                       style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                     />
                   </div>
-                ) : heroImage ? (
+                ) : pageImage ? (
                   <div className="image-box" style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
                     <Image 
-                      src={getCloudinaryImageUrl(heroImage.fileUrl)} 
-                      alt={heroImage.altText || heroImage.title || 'Software'} 
+                      src={getCloudinaryImageUrl(pageImage)} 
+                      alt={pageData?.title || 'Software'} 
                       width={600} 
                       height={400} 
                       priority 
@@ -265,9 +279,23 @@ export default function SoftwarePage() {
                       </div>
                     ) : (
                       <>
-                        {pageData?.content && (
-                          <div className="text-box mb_30 pb_30">
-                            <div dangerouslySetInnerHTML={{ __html: pageData.content }}></div>
+                        {(contentSubTitle || contentHeading || contentIntro) && (
+                          <div className="sec-title mb_30">
+                            {contentSubTitle && (
+                              <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>
+                                {contentSubTitle}
+                              </span>
+                            )}
+                            {contentHeading && (
+                              <h2 style={{ fontSize: '36px', lineHeight: '46px', fontWeight: '700', marginBottom: '16px' }}>
+                                {contentHeading}
+                              </h2>
+                            )}
+                            {contentIntro && (
+                              <p style={{ fontSize: '16px', lineHeight: '28px', color: 'var(--title-color)', marginBottom: '20px' }}>
+                                {contentIntro}
+                              </p>
+                            )}
                           </div>
                         )}
                       </>
@@ -302,17 +330,6 @@ export default function SoftwarePage() {
                           style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                         />
                       </figure>
-                    ) : pageImage ? (
-                      <figure className="image">
-                        <Image 
-                          src={getCloudinaryImageUrl(pageImage)} 
-                          alt={pageData?.title || 'Software'} 
-                          width={523} 
-                          height={500} 
-                          priority 
-                          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                        />
-                      </figure>
                     ) : (
                       <figure className="image">
                         <Image 
@@ -336,15 +353,17 @@ export default function SoftwarePage() {
         <Software/>
 
         {/* EHR / Practice Management — media position: software-ehr */}
-        {(ehrLoading || ehrMedia.length > 0) && (
+        {(ehrLoading || ehrMedia.length > 0 || ehrHeading) && (
           <section className="funfact-section p_relative pt_90 pb_90" style={{ background: '#f5f8fa' }}>
             <div className="auto-container">
               <div className="sec-title mb_50 centred">
-                <span className="sub-title mb_5">Our Software Solutions</span>
-                <h2>EHR / Practice Management Software</h2>
-                <p style={{ maxWidth: '600px', margin: '15px auto 0', color: '#000' }}>
-                  Comprehensive software solutions designed to streamline and optimize your revenue cycle management
-                </p>
+                {ehrSubTitle && <span className="sub-title mb_5">{ehrSubTitle}</span>}
+                <h2>{ehrTitle}</h2>
+                {ehrIntro && (
+                  <p style={{ maxWidth: '600px', margin: '15px auto 0', color: 'var(--title-color)' }}>
+                    {ehrIntro}
+                  </p>
+                )}
               </div>
               {ehrLoading ? (
                 <div className="row clearfix justify-content-center">
@@ -401,7 +420,11 @@ export default function SoftwarePage() {
               ) : (
                 <>
                   <div className="sec-title mb_40 centred">
-                    <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>Get in Touch</span>
+                    {(formSection?.subTitle || (formSection as any)?.sub_title) && (
+                      <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>
+                        {formSection.subTitle || (formSection as any).sub_title}
+                      </span>
+                    )}
                     <h2 style={{ fontSize: '36px', marginBottom: '15px' }}>
                       {formSection?.title || 'Request a Demo'}
                     </h2>

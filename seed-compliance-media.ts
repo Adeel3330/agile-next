@@ -2,155 +2,139 @@ import { config } from 'dotenv';
 import { resolve } from 'path';
 import { createClient } from '@supabase/supabase-js';
 
-// Load environment variables
 config({ path: resolve(process.cwd(), '.env.local') });
 config({ path: resolve(process.cwd(), '.env') });
 
-// Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.error('❌ Error: Missing Supabase configuration');
-  console.error('   Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local');
   process.exit(1);
 }
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Compliance Media Data
-// Note: These use placeholder URLs. You should upload actual images to Cloudinary and replace these URLs
+const PLACEHOLDER = '/assets/images/resource/about-1.jpg';
+
 const complianceMediaData = [
   {
     title: 'Compliance Hero Banner',
-    description: 'Hero banner image for compliance page showcasing our commitment to regulatory standards',
-    fileUrl: 'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png', // Replace with actual Cloudinary URL
+    description: 'We maintain the highest standards of HIPAA compliance, CMS adherence, and data security across all medical billing and revenue cycle services.',
+    fileUrl: PLACEHOLDER,
     fileName: 'compliance-hero.jpg',
-    fileSize: 0,
     fileType: 'image/jpeg',
-    position: 'compliance',
-    status: 'active',
+    position: 'compliance-hero',
     displayOrder: 1,
     altText: 'Compliance and Regulatory Standards',
-    linkUrl: null
   },
   {
     title: 'Compliance Content Image',
     description: 'Image showing compliance processes and standards',
-    fileUrl: 'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png', // Replace with actual Cloudinary URL
+    fileUrl: PLACEHOLDER,
     fileName: 'compliance-content.jpg',
-    fileSize: 0,
     fileType: 'image/jpeg',
-    position: 'compliance',
-    status: 'active',
-    displayOrder: 2,
+    position: 'compliance-content',
+    displayOrder: 1,
     altText: 'HIPAA Compliance and Data Security',
-    linkUrl: null
   },
   {
-    title: 'Compliance Standards',
-    description: 'Visual representation of our compliance standards',
-    fileUrl: 'https://res.cloudinary.com/https://res.cloudinary.com/da59axjla/image/upload/v1776934269/sample.png', // Replace with actual Cloudinary URL
-    fileName: 'compliance-standards.jpg',
-    fileSize: 0,
+    title: 'Compliance Documentation & Resources',
+    description: 'Access our compliance-related documents and visual resources.',
+    fileUrl: PLACEHOLDER,
+    fileName: 'compliance-gallery-heading.txt',
+    fileType: 'image/jpeg',
+    position: 'compliance-gallery-heading',
+    displayOrder: 1,
+    altText: 'Our Compliance Resources',
+  },
+  {
+    title: 'HIPAA Compliance',
+    description:
+      'Fully compliant with Health Insurance Portability and Accountability Act regulations, ensuring patient data protection and privacy through strict access controls, encrypted data transmission and storage, regular security audits, employee training, Business Associate Agreements, and incident response procedures.',
+    fileUrl: PLACEHOLDER,
+    fileName: 'hipaa-compliance.jpg',
     fileType: 'image/jpeg',
     position: 'compliance',
-    status: 'active',
+    displayOrder: 1,
+    altText: 'HIPAA Compliance',
+  },
+  {
+    title: 'CMS Guidelines',
+    description:
+      'Adherence to Centers for Medicare & Medicaid Services billing requirements and guidelines, ensuring accurate claim submission, proper documentation, and compliance with federal healthcare billing standards.',
+    fileUrl: PLACEHOLDER,
+    fileName: 'cms-guidelines.jpg',
+    fileType: 'image/jpeg',
+    position: 'compliance',
+    displayOrder: 2,
+    altText: 'CMS Guidelines',
+  },
+  {
+    title: 'Data Security',
+    description:
+      'End-to-end encryption and industry-leading security measures to protect sensitive healthcare information, including secure cloud infrastructure, multi-factor authentication, and 24/7 monitoring.',
+    fileUrl: PLACEHOLDER,
+    fileName: 'data-security.jpg',
+    fileType: 'image/jpeg',
+    position: 'compliance',
     displayOrder: 3,
-    altText: 'Compliance Standards and Certifications',
-    linkUrl: null
-  }
+    altText: 'Data Security Standards',
+  },
 ];
 
 async function seedComplianceMedia() {
   console.log('🌱 Starting Compliance media seeder...\n');
 
-  try {
-    for (const mediaItem of complianceMediaData) {
-      // Check if media already exists by title and position
-      const { data: existingMedia } = await supabase
-        .from('media')
-        .select('id, title')
-        .eq('title', mediaItem.title)
-        .eq('position', mediaItem.position)
-        .is('deleted_at', null)
-        .maybeSingle();
+  for (const mediaItem of complianceMediaData) {
+    const { data: existingMedia } = await supabase
+      .from('media')
+      .select('id')
+      .eq('title', mediaItem.title)
+      .eq('position', mediaItem.position)
+      .is('deleted_at', null)
+      .maybeSingle();
 
-      if (existingMedia) {
-        console.log(`⚠️  Media "${mediaItem.title}" already exists`);
-        console.log('   Updating existing media...\n');
+    const payload = {
+      description: mediaItem.description,
+      file_url: mediaItem.fileUrl,
+      file_name: mediaItem.fileName,
+      file_size: 0,
+      file_type: mediaItem.fileType,
+      status: 'active',
+      display_order: mediaItem.displayOrder,
+      alt_text: mediaItem.altText,
+      link_url: null,
+      updated_at: new Date().toISOString(),
+    };
 
-        const { data: updatedMedia, error: updateError } = await supabase
-          .from('media')
-          .update({
-            description: mediaItem.description,
-            file_url: mediaItem.fileUrl,
-            file_name: mediaItem.fileName,
-            file_size: mediaItem.fileSize,
-            file_type: mediaItem.fileType,
-            status: mediaItem.status,
-            display_order: mediaItem.displayOrder,
-            alt_text: mediaItem.altText,
-            link_url: mediaItem.linkUrl,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existingMedia.id)
-          .select()
-          .single();
-
-        if (updateError) {
-          console.error(`❌ Error updating media "${mediaItem.title}":`, updateError);
-          continue;
-        }
-
-        console.log(`✅ Successfully updated: ${updatedMedia.title}`);
-      } else {
-        console.log(`📝 Creating new media: ${mediaItem.title}...\n`);
-
-        const { data: newMedia, error: insertError } = await supabase
-          .from('media')
-          .insert({
-            title: mediaItem.title,
-            description: mediaItem.description,
-            file_url: mediaItem.fileUrl,
-            file_name: mediaItem.fileName,
-            file_size: mediaItem.fileSize,
-            file_type: mediaItem.fileType,
-            position: mediaItem.position,
-            status: mediaItem.status,
-            display_order: mediaItem.displayOrder,
-            alt_text: mediaItem.altText,
-            link_url: mediaItem.linkUrl
-          })
-          .select()
-          .single();
-
-        if (insertError) {
-          console.error(`❌ Error creating media "${mediaItem.title}":`, insertError);
-          continue;
-        }
-
-        console.log(`✅ Successfully created: ${newMedia.title}`);
-        console.log(`   Position: ${newMedia.position}`);
-        console.log(`   Display Order: ${newMedia.display_order}\n`);
+    if (existingMedia) {
+      const { error } = await supabase.from('media').update(payload).eq('id', existingMedia.id);
+      if (error) {
+        console.error(`❌ Error updating "${mediaItem.title}":`, error);
+        continue;
       }
+      console.log(`✅ Updated: ${mediaItem.title} (${mediaItem.position})`);
+    } else {
+      const { error } = await supabase.from('media').insert({
+        title: mediaItem.title,
+        position: mediaItem.position,
+        ...payload,
+      });
+      if (error) {
+        console.error(`❌ Error creating "${mediaItem.title}":`, error);
+        continue;
+      }
+      console.log(`✅ Created: ${mediaItem.title} (${mediaItem.position})`);
     }
-
-    console.log('🎉 Compliance media seeder completed successfully!\n');
-    console.log('📝 Note: Please replace placeholder Cloudinary URLs with actual uploaded images.\n');
-  } catch (error) {
-    console.error('❌ Seeder failed:', error);
-    process.exit(1);
   }
+
+  console.log('\n🎉 Compliance media seeder completed!\n');
 }
 
-// Run the seeder
 seedComplianceMedia()
-  .then(() => {
-    console.log('✨ All done!');
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error('💥 Fatal error:', error);
+  .then(() => process.exit(0))
+  .catch((err) => {
+    console.error(err);
     process.exit(1);
   });
