@@ -13,29 +13,80 @@ interface MediaItem {
   title?: string;
   altText?: string;
   description?: string;
+  linkUrl?: string;
 }
 
 interface PageData {
   id: string;
   title: string;
   slug: string;
-  content?: string;
-  description?: string;
-  fileUrl?: string;
-  sections?: any[];
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string;
   seoImage?: string;
 }
 
+function parseParagraphs(description?: string) {
+  return (description || '').split('\n\n').map((p) => p.trim()).filter(Boolean);
+}
+
+function parseLeadAndBullets(description?: string) {
+  const parts = parseParagraphs(description);
+  return { lead: parts[0] || '', bullets: parts.slice(1) };
+}
+
+function parseCommission(description?: string) {
+  const parts = parseParagraphs(description);
+  if (parts.length <= 1) {
+    return { subtitle: parts[0] || '', bullets: [] as string[], closing: '' };
+  }
+  return {
+    subtitle: parts[0],
+    bullets: parts.slice(1, -1),
+    closing: parts[parts.length - 1],
+  };
+}
+
+function parseWhyHeading(description?: string) {
+  const parts = parseParagraphs(description);
+  return {
+    intro: parts[0] || '',
+    subtitle: parts[1] || '',
+    listLabel: parts[2] || '',
+    closing: parts.slice(3),
+  };
+}
+
+async function fetchMediaByPosition(position: string): Promise<MediaItem[]> {
+  const response = await fetch(`/api/media?position=${encodeURIComponent(position)}`);
+  const data = await response.json();
+  if (!data.success || !Array.isArray(data.media)) return [];
+  return data.media.map((item: any) => ({
+    id: item.id,
+    fileUrl: item.fileUrl,
+    title: item.title,
+    altText: item.altText,
+    description: item.description,
+    linkUrl: item.linkUrl,
+  }));
+}
+
 export default function AffiliateProgramPage() {
   const [mounted, setMounted] = useState(false);
   const [pageData, setPageData] = useState<PageData | null>(null);
-  const [heroImage, setHeroImage] = useState<MediaItem | null>(null);
-  const [allMedia, setAllMedia] = useState<MediaItem[]>([]);
-  const [pageImage, setPageImage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [heroMedia, setHeroMedia] = useState<MediaItem | null>(null);
+  const [heroCtas, setHeroCtas] = useState<MediaItem[]>([]);
+  const [featuresHeading, setFeaturesHeading] = useState<MediaItem | null>(null);
+  const [features, setFeatures] = useState<MediaItem[]>([]);
+  const [programsHeading, setProgramsHeading] = useState<MediaItem | null>(null);
+  const [programs, setPrograms] = useState<MediaItem[]>([]);
+  const [stepsHeading, setStepsHeading] = useState<MediaItem | null>(null);
+  const [steps, setSteps] = useState<MediaItem[]>([]);
+  const [whyHeading, setWhyHeading] = useState<MediaItem | null>(null);
+  const [whyBullets, setWhyBullets] = useState<MediaItem[]>([]);
+  const [whyImage, setWhyImage] = useState<MediaItem | null>(null);
+  const [commission, setCommission] = useState<MediaItem | null>(null);
+  const [formHeading, setFormHeading] = useState<MediaItem | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
   const [mediaLoading, setMediaLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -44,14 +95,6 @@ export default function AffiliateProgramPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (mounted) {
-      fetchPageData();
-      fetchAffiliateMedia();
-      fetchAffiliateFaqs();
-    }
-  }, [mounted]);
 
   const fetchAffiliateFaqs = useCallback(async () => {
     try {
@@ -72,28 +115,60 @@ export default function AffiliateProgramPage() {
       const data = await response.json();
       if (data.success && data.page) {
         setPageData(data.page);
-        if (data.page.fileUrl) setPageImage(data.page.fileUrl);
       }
     } catch (err) {
       console.error('Failed to fetch affiliate page:', err);
     } finally {
       setPageLoading(false);
-      setLoading(false);
     }
   }, []);
 
   const fetchAffiliateMedia = useCallback(async () => {
     setMediaLoading(true);
     try {
-      const response = await fetch('/api/media?position=affiliate');
-      const data = await response.json();
-      if (data.success && data.media?.length > 0) {
-        setAllMedia(data.media);
-        const hero = data.media.find((m: MediaItem) =>
-          m.title?.toLowerCase().includes('hero') || m.title?.toLowerCase().includes('banner')
-        ) || data.media[0];
-        setHeroImage(hero);
-      }
+      const [
+        heroItems,
+        ctaItems,
+        featuresHeadingItems,
+        featureItems,
+        programsHeadingItems,
+        programItems,
+        stepsHeadingItems,
+        stepItems,
+        whyHeadingItems,
+        whyBulletItems,
+        whyImageItems,
+        commissionItems,
+        formHeadingItems,
+      ] = await Promise.all([
+        fetchMediaByPosition('affiliate-hero'),
+        fetchMediaByPosition('affiliate-hero-ctas'),
+        fetchMediaByPosition('affiliate-features-heading'),
+        fetchMediaByPosition('affiliate-features'),
+        fetchMediaByPosition('affiliate-programs-heading'),
+        fetchMediaByPosition('affiliate-programs'),
+        fetchMediaByPosition('affiliate-steps-heading'),
+        fetchMediaByPosition('affiliate-steps'),
+        fetchMediaByPosition('affiliate-why-heading'),
+        fetchMediaByPosition('affiliate-why'),
+        fetchMediaByPosition('affiliate-why-image'),
+        fetchMediaByPosition('affiliate-commission'),
+        fetchMediaByPosition('affiliate-form-heading'),
+      ]);
+
+      setHeroMedia(heroItems[0] ?? null);
+      setHeroCtas(ctaItems);
+      setFeaturesHeading(featuresHeadingItems[0] ?? null);
+      setFeatures(featureItems);
+      setProgramsHeading(programsHeadingItems[0] ?? null);
+      setPrograms(programItems);
+      setStepsHeading(stepsHeadingItems[0] ?? null);
+      setSteps(stepItems);
+      setWhyHeading(whyHeadingItems[0] ?? null);
+      setWhyBullets(whyBulletItems);
+      setWhyImage(whyImageItems[0] ?? null);
+      setCommission(commissionItems[0] ?? null);
+      setFormHeading(formHeadingItems[0] ?? null);
     } catch (err) {
       console.error('Failed to fetch affiliate media:', err);
     } finally {
@@ -102,11 +177,19 @@ export default function AffiliateProgramPage() {
   }, []);
 
   useEffect(() => {
+    if (mounted) {
+      fetchPageData();
+      fetchAffiliateMedia();
+      fetchAffiliateFaqs();
+    }
+  }, [mounted, fetchPageData, fetchAffiliateMedia, fetchAffiliateFaqs]);
+
+  useEffect(() => {
     if (!pageData || typeof window === 'undefined') return;
     const title = pageData.seoTitle || pageData.title || '';
-    const description = pageData.seoDescription || pageData.description || '';
+    const description = pageData.seoDescription || '';
     const keywords = pageData.seoKeywords || '';
-    const image = pageData.seoImage || heroImage?.fileUrl || '';
+    const image = pageData.seoImage || heroMedia?.fileUrl || '';
     if (title) document.title = title;
     const updateMeta = (name: string, content: string, attr = 'name') => {
       if (!content) return;
@@ -125,143 +208,146 @@ export default function AffiliateProgramPage() {
     if (image) updateMeta('og:image', image, 'property');
     updateMeta('og:url', window.location.href, 'property');
     updateMeta('og:type', 'website', 'property');
-  }, [pageData, heroImage]);
+  }, [pageData, heroMedia]);
 
   if (!mounted) return null;
 
-  const sections = Array.isArray(pageData?.sections) ? pageData.sections : [];
-  const heroSection = sections.find((s: any) => s.type === 'hero');
-  const featuresSection = sections.find((s: any) => s.type === 'features');
-  const programCardsSection = sections.find((s: any) => s.type === 'program_cards');
-  const stepsSection = sections.find((s: any) => s.type === 'steps');
-  const whySection = sections.find((s: any) => s.type === 'list');
-  const commissionSection = sections.find((s: any) => s.type === 'commission');
-  const faqSection = sections.find((s: any) => s.type === 'faq');
-  const formSection = sections.find((s: any) => s.type === 'form');
+  const heroParts = parseParagraphs(heroMedia?.description);
+  const heroSubtitle = heroParts[0] || '';
+  const heroDescription = heroParts[1] || '';
+  const whyParsed = parseWhyHeading(whyHeading?.description);
+  const commissionParsed = parseCommission(commission?.description);
 
-  const heroTitle = heroSection?.title ?? pageData?.title ?? '';
-  const heroSubtitle = heroSection?.subtitle ?? '';
-  const heroDescription = heroSection?.description ?? pageData?.description ?? '';
-  const showHero = heroTitle || heroSubtitle || heroDescription;
+  const renderProgramImage = (item: MediaItem) => (
+    <div className="col-lg-6 col-md-12 col-sm-12 image-column mb_30">
+      {item.fileUrl && (
+        <div className="affiliate-image-box">
+          <Image
+            src={getCloudinaryImageUrl(item.fileUrl)}
+            alt={item.altText || item.title || 'Affiliate Program'}
+            width={560}
+            height={400}
+            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+          />
+        </div>
+      )}
+    </div>
+  );
+
+  const renderProgramContent = (item: MediaItem) => {
+    const { lead, bullets } = parseLeadAndBullets(item.description);
+    return (
+      <div className="col-lg-6 col-md-12 col-sm-12 content-column mb_30">
+        <div className="affiliate-program-block">
+          <h3>{item.title}</h3>
+          {lead && <p className="affiliate-program-lead">{lead}</p>}
+          {bullets.length > 0 && (
+            <ul className="list-style-one clearfix affiliate-program-bullets">
+              {bullets.map((b, i) => (
+                <li key={i}>{b}</li>
+              ))}
+            </ul>
+          )}
+          <Link href="#contact-form" className="theme-btn btn-one">
+            <span>{item.linkUrl || 'Get Started'}</span>
+          </Link>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="boxed_wrapper affiliate-program-page">
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={pageData?.title || 'Affiliate Program'}>
-        {/* Hero - from admin */}
-        {showHero && (
-          <section className="page-banner p_relative" style={{ background: 'linear-gradient(135deg, #0d3b5c 0%, #1a5f7a 100%)', padding: '120px 0 80px', color: '#fff' }}>
+        {/* Hero */}
+        {heroMedia && (
+          <section
+            className="affiliate-hero p_relative"
+            style={{
+              background: heroMedia.fileUrl
+                ? `linear-gradient(135deg, rgba(13, 59, 92, 0.92) 0%, rgba(26, 95, 122, 0.88) 100%), url(${getCloudinaryImageUrl(heroMedia.fileUrl)}) center/cover no-repeat`
+                : 'linear-gradient(135deg, #0d3b5c 0%, #1a5f7a 100%)',
+              padding: '120px 0 100px',
+              color: '#fff',
+            }}
+          >
             <div className="auto-container">
-              <div className="row clearfix align-items-center">
-                <div className="col-lg-7 col-md-12 col-sm-12 content-column">
-                  <div className="content-box">
-                    {pageLoading ? (
+              <div className="row clearfix justify-content-center">
+                <div className="col-lg-10 col-md-12 col-sm-12">
+                  <div className="content-box text-center">
+                    {pageLoading || mediaLoading ? (
                       <div className="skeleton-content">
-                        <div className="skeleton skeleton-text" style={{ width: '40%', height: '28px', marginBottom: '16px', background: 'rgba(255,255,255,0.2)', borderRadius: '4px' }} />
-                        <div className="skeleton skeleton-text" style={{ width: '90%', height: '48px', marginBottom: '16px', background: 'rgba(255,255,255,0.2)', borderRadius: '4px' }} />
-                        <div className="skeleton skeleton-text" style={{ width: '80%', height: '20px', background: 'rgba(255,255,255,0.2)', borderRadius: '4px' }} />
+                        <div className="skeleton skeleton-text" style={{ width: '40%', height: '28px', margin: '0 auto 16px', background: 'rgba(255,255,255,0.2)', borderRadius: '4px' }} />
+                        <div className="skeleton skeleton-text" style={{ width: '90%', height: '48px', margin: '0 auto 16px', background: 'rgba(255,255,255,0.2)', borderRadius: '4px' }} />
                       </div>
                     ) : (
                       <>
-                        {heroTitle && (
+                        {heroMedia.title && (
                           <span className="sub-title mb_5" style={{ color: 'rgba(255,255,255,0.9)', fontSize: '16px', fontWeight: '600', display: 'block' }}>
-                            {heroTitle}
+                            {heroMedia.title}
                           </span>
                         )}
                         {heroSubtitle && (
-                          <h1 style={{ fontSize: 'clamp(32px, 4vw, 48px)', lineHeight: '1.2', fontWeight: '700', marginBottom: '20px' }}>
+                          <h1 style={{ fontSize: 'clamp(32px, 4vw, 48px)', lineHeight: '1.2', fontWeight: '700', marginBottom: '20px', color: '#fff' }}>
                             {heroSubtitle}
                           </h1>
                         )}
                         {heroDescription && (
-                          <p style={{ fontSize: '18px', lineHeight: '28px', opacity: 0.95, marginBottom: '28px',color:'#fff' }}>
+                          <p style={{ fontSize: '18px', lineHeight: '28px', opacity: 0.95, marginBottom: '32px', color: '#fff', maxWidth: '760px', marginLeft: 'auto', marginRight: 'auto' }}>
                             {heroDescription}
                           </p>
                         )}
-                        <div className="btn-box" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-                          <Link href="#programs" className="theme-btn btn-one" style={{ marginRight: '10px' }}>
-                            <span>{heroSection?.primaryCtaText || 'Partner With Us'}</span>
-                          </Link>
-                          <Link href="#contact-form" className="theme-btn btn-two">
-                            <span>{heroSection?.secondaryCtaText || 'Get Started'}</span>
-                          </Link>
-                        </div>
+                        {heroCtas.length > 0 && (
+                          <div className="btn-box" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
+                            {heroCtas.map((cta, index) => (
+                              <Link
+                                key={cta.id || cta.title}
+                                href={cta.linkUrl || '#programs'}
+                                className={`theme-btn ${index === 0 ? 'btn-one' : 'btn-two'}`}
+                              >
+                                <span>{cta.title}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
                 </div>
-                <div className="col-lg-5 col-md-12 col-sm-12 image-column d-none d-lg-block">
-                  {!mediaLoading && (pageImage || heroImage?.fileUrl) && (
-                    <div className="image-box" style={{ borderRadius: '12px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}>
-                      <Image
-                        src={getCloudinaryImageUrl(pageImage || heroImage!.fileUrl)}
-                        alt={heroTitle || pageData?.title || 'Affiliate Program'}
-                        width={500}
-                        height={380}
-                        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                      />
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
           </section>
         )}
 
-       
-
-        {/* Program cards - from admin */}
-        {programCardsSection?.items?.length > 0 && (
-          <section className="about-section p_relative pt_90 pb_120" id="programs" style={{ background: '#f5f8fa' }}>
-            <div className="auto-container">
-              <div className="sec-title mb_60 centred">
-                {(programCardsSection.subTitle || (programCardsSection as any).sub_title) && <span className="sub-title mb_5">{programCardsSection.subTitle || (programCardsSection as any).sub_title}</span>}
-                <h2>{programCardsSection.title}</h2>
-                {programCardsSection.subtitle && <p style={{ maxWidth: '700px', margin: '15px auto 0', color: 'var(--title-color)' }}>{programCardsSection.subtitle}</p>}
-              </div>
-              <div className="row clearfix">
-                {programCardsSection.items.map((item: any, index: number) => (
-                  <div key={index} className="col-lg-4 col-md-6 col-sm-12 mb-4">
-                    <div className="inner-box" style={{ background: '#fff', padding: '36px 28px', borderRadius: '12px', boxShadow: '0 5px 20px rgba(0,0,0,0.06)', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      {item.badge && (
-                        <span className="sub-title mb_3" style={{ color: 'var(--theme-color)', fontSize: '14px', fontWeight: '600' }}>{item.badge}</span>
-                      )}
-                      <h3 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px' }}>{item.title}</h3>
-                      {item.subtitle && <p style={{ color: 'var(--title-color)', marginBottom: '16px', lineHeight: '26px' }}>{item.subtitle}</p>}
-                      {item.bullets && Array.isArray(item.bullets) && (
-                        <ul className="list-style-one clearfix" style={{ marginBottom: '20px', flex: 1 }}>
-                          {item.bullets.map((b: string, i: number) => (
-                            <li key={i} style={{ marginBottom: '8px' }}>{b}</li>
-                          ))}
-                        </ul>
-                      )}
-                      <Link href="#contact-form" className="theme-btn btn-one" style={{ marginTop: 'auto' }}>
-                        <span>{item.ctaText || 'Get Started'}</span>
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Steps - from admin */}
-        {stepsSection?.items?.length > 0 && (
+        {/* Features */}
+        {features.length > 0 && (
           <section className="service-section p_relative pt_120 pb_90">
             <div className="auto-container">
               <div className="sec-title mb_60 centred">
-                {(stepsSection.subTitle || (stepsSection as any).sub_title) && <span className="sub-title mb_5">{stepsSection.subTitle || (stepsSection as any).sub_title}</span>}
-                <h2>{stepsSection.title}</h2>
+                <h2>{featuresHeading?.title || 'Why partner with Agile Nexus Solutions Medical Billing'}</h2>
+                {featuresHeading?.description && (
+                  <p style={{ maxWidth: '860px', margin: '15px auto 0', color: 'var(--title-color)', lineHeight: '28px' }}>
+                    {featuresHeading.description}
+                  </p>
+                )}
               </div>
               <div className="row clearfix">
-                {stepsSection.items.map((step: any, index: number) => (
-                  <div key={index} className="col-lg-4 col-md-6 col-sm-12">
-                    <div className="inner-box" style={{ textAlign: 'center', padding: '40px 24px', background: '#fff', borderRadius: '12px', boxShadow: '0 5px 20px rgba(0,0,0,0.06)', height: '100%' }}>
-                      <div className="count-outer" style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--theme-color)', color: '#fff', fontSize: '24px', fontWeight: '700', lineHeight: '60px', margin: '0 auto 20px' }}>
-                        {index + 1}
-                      </div>
-                      <h3 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '12px' }}>{step.title}</h3>
-                      <p style={{ color: 'var(--title-color)', lineHeight: '26px', margin: 0 }}>{step.description || step.text}</p>
+                {features.map((item) => (
+                  <div key={item.id} className="col-lg-4 col-md-6 col-sm-12 mb-4">
+                    <div className="affiliate-feature-card">
+                      {item.fileUrl && (
+                        <div className="affiliate-feature-icon-img">
+                          <Image
+                            src={getCloudinaryImageUrl(item.fileUrl)}
+                            alt={item.altText || item.title || 'Feature'}
+                            width={64}
+                            height={64}
+                            style={{ objectFit: 'contain' }}
+                          />
+                        </div>
+                      )}
+                      <h3>{item.title}</h3>
+                      <p>{item.description}</p>
                     </div>
                   </div>
                 ))}
@@ -270,32 +356,116 @@ export default function AffiliateProgramPage() {
           </section>
         )}
 
-        {/* Why / List - from admin */}
-        {whySection?.items?.length > 0 && (
+        {/* Programs — alternating layout */}
+        {programs.length > 0 && (
+          <section className="about-section p_relative pt_90 pb_120" id="programs" style={{ background: '#f5f8fa' }}>
+            <div className="auto-container">
+              <div className="sec-title mb_60 centred">
+                <h2>{programsHeading?.title || 'Affiliate Programs Built Around Your Success'}</h2>
+                {programsHeading?.description && (
+                  <p style={{ maxWidth: '860px', margin: '15px auto 0', color: 'var(--title-color)', lineHeight: '28px' }}>
+                    {programsHeading.description}
+                  </p>
+                )}
+              </div>
+              {programs.map((item, index) => {
+                const imageFirst = index % 2 === 1;
+                return (
+                  <div key={item.id} className="row clearfix align-items-center affiliate-program-row mb_60">
+                    {imageFirst ? (
+                      <>
+                        {renderProgramImage(item)}
+                        {renderProgramContent(item)}
+                      </>
+                    ) : (
+                      <>
+                        {renderProgramContent(item)}
+                        {renderProgramImage(item)}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Steps */}
+        {steps.length > 0 && (
+          <section className="service-section p_relative pt_120 pb_90">
+            <div className="auto-container">
+              <div className="sec-title mb_60 centred">
+                <h2>{stepsHeading?.title || 'Getting Started: Your Path to Partnership'}</h2>
+                {stepsHeading?.description && (
+                  <p style={{ maxWidth: '760px', margin: '15px auto 0', color: 'var(--title-color)', lineHeight: '28px' }}>
+                    {stepsHeading.description}
+                  </p>
+                )}
+              </div>
+              <div className="row clearfix">
+                {steps.map((step, index) => (
+                  <div key={step.id} className="col-lg-4 col-md-6 col-sm-12 mb-4">
+                    <div className="affiliate-step-card">
+                      {step.fileUrl ? (
+                        <div className="affiliate-step-icon-img">
+                          <Image
+                            src={getCloudinaryImageUrl(step.fileUrl)}
+                            alt={step.altText || step.title || 'Step'}
+                            width={72}
+                            height={72}
+                            style={{ objectFit: 'contain' }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="affiliate-step-number">{index + 1}</div>
+                      )}
+                      <h3>{step.title}</h3>
+                      <p>{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Why Affiliate Program */}
+        {(whyHeading || whyBullets.length > 0) && (
           <section className="about-section p_relative pt_90 pb_90" style={{ background: '#f5f8fa' }}>
             <div className="auto-container">
               <div className="row clearfix align-items-center">
-                <div className="col-lg-6 col-md-12 col-sm-12 content-column">
+                <div className="col-lg-6 col-md-12 col-sm-12 content-column mb_30">
                   <div className="sec-title mb_30">
-                    {(whySection.subTitle || (whySection as any).sub_title) && <span className="sub-title mb_5">{whySection.subTitle || (whySection as any).sub_title}</span>}
-                    <h2>{whySection.title}</h2>
-                    {whySection.subtitle && <p style={{ marginTop: '15px', color: 'var(--title-color)', lineHeight: '28px' }}>{whySection.subtitle}</p>}
+                    <h2>{whyHeading?.title || 'Why Agile Nexus Affiliate Program?'}</h2>
                   </div>
-                  <ul className="list-style-one clearfix">
-                    {whySection.items.map((item: any, i: number) => (
-                      <li key={i} style={{ marginBottom: '12px', fontSize: '16px' }}>{typeof item === 'string' ? item : (item.title || item.text || item)}</li>
-                    ))}
-                  </ul>
-                  <Link href="#contact-form" className="theme-btn btn-one mt_30">
-                    <span>Getting Started</span>
-                  </Link>
+                  {whyParsed.intro && <p className="affiliate-body-text">{whyParsed.intro}</p>}
+                  {whyParsed.subtitle && <p className="affiliate-body-text">{whyParsed.subtitle}</p>}
+                  {whyParsed.listLabel && (
+                    <p className="affiliate-body-text" style={{ fontWeight: 600 }}>
+                      {whyParsed.listLabel}
+                    </p>
+                  )}
+                  {whyBullets.length > 0 && (
+                    <ul className="list-style-one clearfix">
+                      {whyBullets.map((item) => (
+                        <li key={item.id} className="affiliate-body-text">
+                          {item.description}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {whyParsed.closing.map((paragraph, i) => (
+                    <p key={i} className="affiliate-body-text" style={{ marginTop: '16px' }}>
+                      {paragraph}
+                    </p>
+                  ))}
                 </div>
                 <div className="col-lg-6 col-md-12 col-sm-12 image-column">
-                  {allMedia.length > 0 && (
-                    <div className="image-box" style={{ borderRadius: '12px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
+                  {!mediaLoading && whyImage?.fileUrl && (
+                    <div className="affiliate-image-box">
                       <Image
-                        src={getCloudinaryImageUrl(allMedia[1]?.fileUrl)}
-                        alt={allMedia[1]?.altText || allMedia[1]?.title || 'Affiliate Program'}
+                        src={getCloudinaryImageUrl(whyImage.fileUrl)}
+                        alt={whyImage.altText || whyImage.title || 'Affiliate Program'}
                         width={560}
                         height={400}
                         style={{ objectFit: 'cover', width: '100%', height: '100%' }}
@@ -308,71 +478,62 @@ export default function AffiliateProgramPage() {
           </section>
         )}
 
-        
-
-        {/* FAQ - from FAQs API (admin) or CMS fallback */}
-        {((apiFaqs.length > 0) || (faqSection?.items?.length > 0)) && (
-          <section className="about-section p_relative pt_90 pb_90" style={{ background: '#f5f8fa' }}>
+        {/* Commission */}
+        {commission && (
+          <section className="service-section p_relative pt_90 pb_90">
             <div className="auto-container">
-              <div className="sec-title mb_60 centred">
-                <span className="sub-title mb_5">{(faqSection as any)?.subTitle || (faqSection as any)?.sub_title || 'FAQs'}</span>
-                <h2>{apiFaqs.length > 0 ? 'Frequently Asked Questions' : (faqSection?.title || 'Frequently Asked Questions')}</h2>
-              </div>
-              <div className="row clearfix justify-content-center">
-                <div className="col-lg-8 col-md-12">
-                  {apiFaqs.length > 0
-                    ? apiFaqs.map((faq, index) => (
-                        <div key={faq.id} className="faq-block" style={{ background: '#fff', marginBottom: '12px', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
-                          <button
-                            type="button"
-                            onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                            style={{ width: '100%', padding: '20px 24px', textAlign: 'left', border: 'none', background: 'none', fontSize: '18px', fontWeight: '600', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                          >
-                            {faq.question}
-                            <span style={{ fontSize: '24px', color: 'var(--theme-color)' }}>{openFaq === index ? '−' : '+'}</span>
-                          </button>
-                          {openFaq === index && (
-                            <div style={{ padding: '0 24px 20px' }}>
-                              <p style={{ color: 'var(--title-color)', lineHeight: '26px', margin: 0 }}>{faq.answer}</p>
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    : faqSection!.items.map((faq: any, index: number) => (
-                        <div key={index} className="faq-block" style={{ background: '#fff', marginBottom: '12px', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
-                          <button
-                            type="button"
-                            onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                            style={{ width: '100%', padding: '20px 24px', textAlign: 'left', border: 'none', background: 'none', fontSize: '18px', fontWeight: '600', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                          >
-                            {faq.question || faq.title}
-                            <span style={{ fontSize: '24px', color: 'var(--theme-color)' }}>{openFaq === index ? '−' : '+'}</span>
-                          </button>
-                          {openFaq === index && (
-                            <div style={{ padding: '0 24px 20px' }}>
-                              <p style={{ color: 'var(--title-color)', lineHeight: '26px', margin: 0 }}>{faq.answer || faq.description || faq.text}</p>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+              <div className="row clearfix align-items-center">
+                <div className="col-lg-6 col-md-12 col-sm-12 content-column mb_30">
+                  <div className="affiliate-commission-card">
+                    <div className="sec-title mb_30">
+                      <h2>{commission.title || 'Commission Structure'}</h2>
+                      {commissionParsed.subtitle && (
+                        <p style={{ marginTop: '15px', color: 'var(--title-color)', lineHeight: '28px' }}>
+                          {commissionParsed.subtitle}
+                        </p>
+                      )}
+                    </div>
+                    {commissionParsed.bullets.length > 0 && (
+                      <ul className="list-style-one clearfix affiliate-commission-list">
+                        {commissionParsed.bullets.map((bullet, i) => (
+                          <li key={i}>{bullet}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {commissionParsed.closing && (
+                      <p className="affiliate-body-text" style={{ marginTop: '24px' }}>
+                        {commissionParsed.closing}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="col-lg-6 col-md-12 col-sm-12 image-column">
+                  {commission.fileUrl && (
+                    <div className="affiliate-image-box">
+                      <Image
+                        src={getCloudinaryImageUrl(commission.fileUrl)}
+                        alt={commission.altText || commission.title || 'Commission Structure'}
+                        width={560}
+                        height={400}
+                        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </section>
         )}
 
-        
-
-        {/* Contact Form - title/description from admin form section */}
-        <section className="contact-section sec-pad p_relative pt_120 pb_120" id="contact-form">
+        {/* Contact Form */}
+        <section className="contact-section sec-pad p_relative pt_120 pb_120" id="contact-form" style={{ background: '#f5f8fa' }}>
           <div className="auto-container">
-            <div className="inner-box" style={{ background: '#fff', padding: '60px 40px', borderRadius: '12px', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
+            <div className="affiliate-form-card">
               <div className="sec-title mb_40 centred">
-                <span className="sub-title mb_5">{(formSection as any)?.subTitle || (formSection as any)?.sub_title || 'Get in Touch'}</span>
-                <h2>{formSection?.title || 'Contact Us'}</h2>
-                {(formSection?.description || formSection?.subtitle) && (
-                  <p style={{ fontSize: '16px', color: 'var(--title-color)', maxWidth: '700px', margin: '15px auto 0' }}>
-                    {formSection.description || formSection.subtitle}
+                <h2>{formHeading?.title || 'Speak to Our Friendly Team'}</h2>
+                {formHeading?.description && (
+                  <p style={{ fontSize: '16px', color: 'var(--title-color)', maxWidth: '700px', margin: '15px auto 0', lineHeight: '28px' }}>
+                    {formHeading.description}
                   </p>
                 )}
               </div>
@@ -381,15 +542,195 @@ export default function AffiliateProgramPage() {
           </div>
         </section>
 
-        <style dangerouslySetInnerHTML={{ __html: `
+        {/* FAQ */}
+        {apiFaqs.length > 0 && (
+          <section className="about-section p_relative pt_90 pb_90">
+            <div className="auto-container">
+              <div className="sec-title mb_60 centred">
+                <h2>Frequently Asked Questions (FAQs)</h2>
+              </div>
+              <div className="row clearfix justify-content-center">
+                <div className="col-lg-8 col-md-12">
+                  {apiFaqs.map((faq, index) => (
+                    <div key={faq.id} className="affiliate-faq-block">
+                      <button
+                        type="button"
+                        onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                        className="affiliate-faq-btn"
+                      >
+                        {faq.question}
+                        <span>{openFaq === index ? '−' : '+'}</span>
+                      </button>
+                      {openFaq === index && (
+                        <div className="affiliate-faq-answer">
+                          <p>{faq.answer}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
           .skeleton { animation: pulse 1.5s ease-in-out infinite; }
           @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-          .service-block-one .inner-box:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important; }
           .affiliate-program-page p,
           .affiliate-program-page li {
             color: var(--title-color);
           }
-        `}} />
+          .affiliate-feature-card {
+            background: #fff;
+            padding: 36px 28px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+            height: 100%;
+          }
+          .affiliate-feature-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+          }
+          .affiliate-feature-card p {
+            line-height: 26px;
+            margin: 0;
+          }
+          .affiliate-feature-icon-img {
+            width: 72px;
+            height: 72px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .affiliate-program-row:last-child {
+            margin-bottom: 0 !important;
+          }
+          .affiliate-program-block {
+            background: #fff;
+            padding: 40px 36px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+            height: 100%;
+          }
+          .affiliate-program-block h3 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 16px;
+          }
+          .affiliate-program-lead {
+            line-height: 28px;
+            margin-bottom: 20px;
+          }
+          .affiliate-program-bullets {
+            margin-bottom: 24px;
+          }
+          .affiliate-program-bullets li {
+            margin-bottom: 10px;
+            line-height: 26px;
+          }
+          .affiliate-step-card {
+            text-align: center;
+            padding: 40px 24px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+            height: 100%;
+          }
+          .affiliate-step-icon-img {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .affiliate-step-number {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--theme-color);
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 60px;
+            margin: 0 auto 20px;
+          }
+          .affiliate-step-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+          }
+          .affiliate-step-card p {
+            line-height: 26px;
+            margin: 0;
+          }
+          .affiliate-body-text {
+            color: var(--title-color);
+            line-height: 28px;
+            margin-bottom: 12px;
+          }
+          .affiliate-image-box {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+          }
+          .affiliate-commission-card {
+            background: #fff;
+            padding: 48px 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+            height: 100%;
+          }
+          .affiliate-commission-list li {
+            margin-bottom: 12px;
+            font-size: 16px;
+          }
+          .affiliate-form-card {
+            background: #fff;
+            padding: 60px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+          }
+          .affiliate-faq-block {
+            background: #fff;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+          }
+          .affiliate-faq-btn {
+            width: 100%;
+            padding: 20px 24px;
+            text-align: left;
+            border: none;
+            background: none;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--title-color);
+          }
+          .affiliate-faq-btn span {
+            font-size: 24px;
+            color: var(--theme-color);
+          }
+          .affiliate-faq-answer {
+            padding: 0 24px 20px;
+          }
+          .affiliate-faq-answer p {
+            line-height: 26px;
+            margin: 0;
+          }
+        `,
+          }}
+        />
       </Layout>
     </div>
   );
