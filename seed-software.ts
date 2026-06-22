@@ -62,13 +62,6 @@ const softwarePageData = {
         'Agile Nexus Solutions supports healthcare providers with proven billing platforms and integrated practice management tools.',
     },
     {
-      type: 'ehr',
-      subTitle: 'Our Software Solutions',
-      title: 'EHR / Practice Management Software',
-      description:
-        'Comprehensive software solutions designed to streamline and optimize your revenue cycle management.',
-    },
-    {
       type: 'form',
       subTitle: 'Get in Touch',
       title: 'Request a Demo',

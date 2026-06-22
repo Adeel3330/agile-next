@@ -38,6 +38,17 @@ const softwarePageMedia = [
     displayOrder: 1,
     altText: 'Software platform overview',
   },
+  {
+    title: 'EHR / Practice Management Software',
+    description:
+      'Comprehensive software solutions designed to streamline and optimize your revenue cycle management.',
+    fileUrl: PLACEHOLDER,
+    fileName: 'software-ehr-heading.txt',
+    fileType: 'image/jpeg',
+    position: 'software-ehr-heading',
+    displayOrder: 1,
+    altText: 'Our Software Solutions',
+  },
 ];
 
 async function seedSoftwarePageMedia() {

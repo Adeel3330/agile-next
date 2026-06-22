@@ -331,6 +331,12 @@ export default function CreateMediaPage() {
                         Title = main heading (H2), Description = short intro text below the heading.
                         No image needed. Bottom cards still use position <strong>compliance</strong>.
                       </>
+                    ) : normalizedPosition === 'software-ehr-heading' ? (
+                      <>
+                        <strong>Software page — EHR section heading only:</strong> Alt Text = small sub-heading,
+                        Title = main heading (H2), Description = short intro text below the heading.
+                        No image needed. EHR logo cards still use position <strong>software-ehr</strong>.
+                      </>
                     ) : (
                       <>
                         <strong>About Us sections:</strong> use Title as the section key

@@ -38,6 +38,7 @@ export default function SoftwarePage() {
   const [subsectionImage, setSubsectionImage] = useState<MediaItem | null>(null);
   const [pageImage, setPageImage] = useState<string | null>(null);
   const [ehrMedia, setEhrMedia] = useState<MediaItem[]>([]);
+  const [ehrHeading, setEhrHeading] = useState<MediaItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);
   const [mediaLoading, setMediaLoading] = useState(true);
@@ -104,16 +105,23 @@ export default function SoftwarePage() {
   const fetchEhrMedia = useCallback(async () => {
     setEhrLoading(true);
     try {
-      const response = await fetch('/api/media?position=software-ehr');
-      const data = await response.json();
-      if (data.success && Array.isArray(data.media)) {
-        setEhrMedia(data.media);
-      } else {
-        setEhrMedia([]);
-      }
+      const fetchMediaByPosition = async (position: string) => {
+        const response = await fetch(`/api/media?position=${encodeURIComponent(position)}`);
+        const data = await response.json();
+        return data.success && Array.isArray(data.media) ? data.media : [];
+      };
+
+      const [ehrItems, ehrHeadingItems] = await Promise.all([
+        fetchMediaByPosition('software-ehr'),
+        fetchMediaByPosition('software-ehr-heading'),
+      ]);
+
+      setEhrMedia(ehrItems);
+      setEhrHeading(ehrHeadingItems[0] ?? null);
     } catch (err) {
       console.error('Failed to fetch software EHR media:', err);
       setEhrMedia([]);
+      setEhrHeading(null);
     } finally {
       setEhrLoading(false);
     }
@@ -161,8 +169,11 @@ export default function SoftwarePage() {
   const sections = Array.isArray(pageData?.sections) ? pageData.sections : [];
   const heroSection = sections.find((s: any) => s.type === 'hero');
   const contentSection = sections.find((s: any) => s.type === 'content');
-  const ehrSection = sections.find((s: any) => s.type === 'ehr');
   const formSection = sections.find((s: any) => s.type === 'form');
+
+  const ehrSubTitle = ehrHeading?.altText || '';
+  const ehrTitle = ehrHeading?.title || 'EHR / Practice Management Software';
+  const ehrIntro = ehrHeading?.description || '';
 
   const heroSubTitle =
     heroSection?.subTitle ||
@@ -287,7 +298,6 @@ export default function SoftwarePage() {
                             )}
                           </div>
                         )}
-                     
                       </>
                     )}
                   </div>
@@ -343,17 +353,15 @@ export default function SoftwarePage() {
         <Software/>
 
         {/* EHR / Practice Management — media position: software-ehr */}
-        {(ehrLoading || ehrMedia.length > 0) && (
+        {(ehrLoading || ehrMedia.length > 0 || ehrHeading) && (
           <section className="funfact-section p_relative pt_90 pb_90" style={{ background: '#f5f8fa' }}>
             <div className="auto-container">
               <div className="sec-title mb_50 centred">
-                {(ehrSection?.subTitle || (ehrSection as any)?.sub_title) && (
-                  <span className="sub-title mb_5">{ehrSection.subTitle || (ehrSection as any).sub_title}</span>
-                )}
-                <h2>{ehrSection?.title || 'EHR / Practice Management Software'}</h2>
-                {ehrSection?.description && (
+                {ehrSubTitle && <span className="sub-title mb_5">{ehrSubTitle}</span>}
+                <h2>{ehrTitle}</h2>
+                {ehrIntro && (
                   <p style={{ maxWidth: '600px', margin: '15px auto 0', color: 'var(--title-color)' }}>
-                    {ehrSection.description}
+                    {ehrIntro}
                   </p>
                 )}
               </div>
