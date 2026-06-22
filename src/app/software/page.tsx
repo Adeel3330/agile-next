@@ -85,42 +85,15 @@ export default function SoftwarePage() {
         return data.success && Array.isArray(data.media) ? data.media : [];
       };
 
-      // Prefer explicit software position, fallback to older "other" data.
-      let baseMedia = await fetchMediaByPosition('software');
-      if (baseMedia.length === 0) {
-        baseMedia = await fetchMediaByPosition('other');
-      }
+      const [heroItems, contentItems, subsectionItems] = await Promise.all([
+        fetchMediaByPosition('software-hero'),
+        fetchMediaByPosition('software-content'),
+        fetchMediaByPosition('software-subsections'),
+      ]);
 
-      // Dedicated image for content block (admin can add media under one of these positions).
-      const subsectionPositions = ['software-subsections'];
-      let subsectionMedia: MediaItem[] = [];
-
-      for (const position of subsectionPositions) {
-        const items = await fetchMediaByPosition(position);
-        if (items.length > 0) {
-          subsectionMedia = items;
-          break;
-        }
-      }
-
-      if (Array.isArray(subsectionMedia) && subsectionMedia.length > 0) {
-        setSubsectionImage(subsectionMedia[0]);
-      } else {
-        setSubsectionImage(null);
-      }
-
-      if (baseMedia.length > 0) {
-        const hero = baseMedia.find((m: MediaItem) =>
-          m.title?.toLowerCase().includes('hero') ||
-          m.title?.toLowerCase().includes('banner')
-        ) || baseMedia[0];
-        setHeroImage(hero);
-
-        const content = baseMedia.find((m: MediaItem) =>
-          m.title?.toLowerCase().includes('content')
-        ) || baseMedia[baseMedia.length > 1 ? 1 : 0];
-        setContentImage(content);
-      }
+      setHeroImage(heroItems[0] ?? null);
+      setContentImage(contentItems[0] ?? null);
+      setSubsectionImage(subsectionItems[0] ?? null);
     } catch (err) {
       console.error('Failed to fetch software media:', err);
     } finally {
@@ -211,9 +184,11 @@ export default function SoftwarePage() {
                         <h1 style={{ fontSize: '48px', lineHeight: '58px', fontWeight: '700', marginBottom: '20px' }}>
                           {pageData?.title || 'Software'}
                         </h1>
-                        {pageData?.description && (
-                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{pageData.description}</p>
-                        )}
+                        {heroImage?.description ? (
+                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{heroImage.description}</p>
+                        ) : pageData?.seoDescription ? (
+                          <p></p>
+                          ) : null}
                       </div>
                     </>
                   )}
@@ -222,22 +197,22 @@ export default function SoftwarePage() {
               <div className="col-lg-6 col-md-12 col-sm-12 image-column">
                 {mediaLoading ? (
                   <div className="skeleton-image" style={{ width: '100%', height: '400px', background: '#e0e0e0', borderRadius: '10px' }}></div>
-                ) : pageImage ? (
+                ) : heroImage ? (
                   <div className="image-box" style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
                     <Image 
-                      src={getCloudinaryImageUrl(pageImage)} 
-                      alt={pageData?.title || 'Software'} 
+                      src={getCloudinaryImageUrl(heroImage.fileUrl)} 
+                      alt={heroImage.altText || heroImage.title || 'Software'} 
                       width={600} 
                       height={400} 
                       priority 
                       style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                     />
                   </div>
-                ) : heroImage ? (
+                ) : pageImage ? (
                   <div className="image-box" style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
                     <Image 
-                      src={getCloudinaryImageUrl(heroImage.fileUrl)} 
-                      alt={heroImage.altText || heroImage.title || 'Software'} 
+                      src={getCloudinaryImageUrl(pageImage)} 
+                      alt={pageData?.title || 'Software'} 
                       width={600} 
                       height={400} 
                       priority 
@@ -296,17 +271,6 @@ export default function SoftwarePage() {
                         <Image 
                           src={getCloudinaryImageUrl(contentImage.fileUrl)} 
                           alt={contentImage.altText || contentImage.title || 'Software'} 
-                          width={523} 
-                          height={500} 
-                          priority 
-                          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                        />
-                      </figure>
-                    ) : pageImage ? (
-                      <figure className="image">
-                        <Image 
-                          src={getCloudinaryImageUrl(pageImage)} 
-                          alt={pageData?.title || 'Software'} 
                           width={523} 
                           height={500} 
                           priority 

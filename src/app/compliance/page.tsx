@@ -35,7 +35,7 @@ export default function CompliancePage() {
   const [heroImage, setHeroImage] = useState<MediaItem | null>(null);
   const [contentImage, setContentImage] = useState<MediaItem | null>(null);
   const [pageImage, setPageImage] = useState<string | null>(null);
-  const [allMedia, setAllMedia] = useState<MediaItem[]>([]);
+  const [resourceMedia, setResourceMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);
   const [mediaLoading, setMediaLoading] = useState(true);
@@ -75,25 +75,21 @@ export default function CompliancePage() {
   const fetchComplianceMedia = useCallback(async () => {
     setMediaLoading(true);
     try {
-      const response = await fetch('/api/media?position=compliance');
-      const data = await response.json();
+      const fetchMediaByPosition = async (position: string) => {
+        const response = await fetch(`/api/media?position=${encodeURIComponent(position)}`);
+        const data = await response.json();
+        return data.success && Array.isArray(data.media) ? data.media : [];
+      };
 
-      if (data.success && data.media && data.media.length > 0) {
-        // Store all media items
-        setAllMedia(data.media);
+      const [heroItems, contentItems, galleryItems] = await Promise.all([
+        fetchMediaByPosition('compliance-hero'),
+        fetchMediaByPosition('compliance-content'),
+        fetchMediaByPosition('compliance'),
+      ]);
 
-        // First image for hero
-        const hero = data.media.find((m: MediaItem) => 
-          m.title?.toLowerCase().includes('hero') || m.title?.toLowerCase().includes('banner')
-        ) || data.media[0];
-        setHeroImage(hero);
-
-        // Second image for content section
-        const content = data.media.find((m: MediaItem) => 
-          m.title?.toLowerCase().includes('content') || m.title?.toLowerCase().includes('about')
-        ) || data.media[data.media.length > 1 ? 1 : 0];
-        setContentImage(content);
-      }
+      setHeroImage(heroItems[0] ?? null);
+      setContentImage(contentItems[0] ?? null);
+      setResourceMedia(galleryItems);
     } catch (err) {
       console.error('Failed to fetch compliance media:', err);
     } finally {
@@ -162,9 +158,11 @@ export default function CompliancePage() {
                         <h1 style={{ fontSize: '48px', lineHeight: '58px', fontWeight: '700', marginBottom: '20px' }}>
                           {pageData?.title || 'Compliance'}
                         </h1>
-                        {pageData?.description && (
-                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{pageData.description}</p>
-                        )}
+                        {heroImage?.description ? (
+                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{heroImage.description}</p>
+                        ) : pageData?.seoDescription ? (
+                              <p></p>
+                        ) : null}
                       </div>
                     </>
                   )}
@@ -173,22 +171,22 @@ export default function CompliancePage() {
               <div className="col-lg-6 col-md-12 col-sm-12 image-column">
                 {mediaLoading ? (
                   <div className="skeleton-image" style={{ width: '100%', height: '400px', background: '#e0e0e0', borderRadius: '10px' }}></div>
-                    ) : pageImage ? (
+                    ) : heroImage ? (
                       <div className="image-box" style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
                         <Image 
-                          src={getCloudinaryImageUrl(pageImage)} 
-                          alt={pageData?.title || 'Compliance'} 
+                          src={getCloudinaryImageUrl(heroImage.fileUrl)} 
+                          alt={heroImage.altText || heroImage.title || 'Compliance'} 
                           width={600} 
                           height={400} 
                           priority 
                           style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                         />
                       </div>
-                    ) : heroImage ? (
+                    ) : pageImage ? (
                       <div className="image-box" style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
                         <Image 
-                          src={getCloudinaryImageUrl(heroImage.fileUrl)} 
-                          alt={heroImage.altText || heroImage.title || 'Compliance'} 
+                          src={getCloudinaryImageUrl(pageImage)} 
+                          alt={pageData?.title || 'Compliance'} 
                           width={600} 
                           height={400} 
                           priority 
@@ -231,17 +229,6 @@ export default function CompliancePage() {
                   <div className="image-box" style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
                     {mediaLoading ? (
                       <div className="skeleton-image" style={{ width: '100%', height: '500px', background: '#e0e0e0', borderRadius: '10px' }}></div>
-                    ) : pageImage ? (
-                      <figure className="image">
-                        <Image 
-                          src={getCloudinaryImageUrl(pageImage)} 
-                          alt={pageData?.title || 'Compliance'} 
-                          width={523} 
-                          height={500} 
-                          priority 
-                          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                        />
-                      </figure>
                     ) : contentImage ? (
                       <figure className="image">
                         <Image 
@@ -272,7 +259,7 @@ export default function CompliancePage() {
         </section>
 
         {/* Media Gallery Section - Display All Media Items */}
-        {allMedia.length > 0 && (
+        {resourceMedia.length > 0 && (
           <section className="gallery-section p_relative pt_90 pb_90" style={{ background: '#fff' }}>
             <div className="auto-container">
               <div className="sec-title mb_60 centred">
@@ -281,7 +268,7 @@ export default function CompliancePage() {
                 <p>Access our compliance-related documents and visual resources</p>
               </div>
               <div className="row clearfix">
-                {allMedia.map((media: MediaItem, index: number) => (
+                {resourceMedia.map((media: MediaItem, index: number) => (
                   <div key={media.id || index} className="col-lg-4 col-md-6 col-sm-12 gallery-block">
                     <div className="gallery-item" style={{ 
                       background: '#fff', 
@@ -306,7 +293,7 @@ export default function CompliancePage() {
                         </h4>
                         {media.description && (
                           <p style={{ fontSize: '14px', color: 'var(--title-color)', lineHeight: '22px', margin: 0 }}>
-                            {media.description.length > 100 ? media.description.substring(0, 100) + '...' : media.description}
+                            {media.description}
                           </p>
                         )}
                       </div>

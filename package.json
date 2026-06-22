@@ -19,7 +19,9 @@
     "seed:medivantek-home": "ts-node seed-medivantek-home.ts",
     "seed:why-agile-onboarding": "ts-node seed-why-agile-onboarding.ts",
     "seed:software-media": "ts-node seed-software-media.ts",
+    "seed:software-page-media": "ts-node seed-software-page-media.ts",
     "seed:software-ehr-media": "ts-node seed-software-ehr-media.ts",
+    "seed:compliance-media": "ts-node seed-compliance-media.ts",
     "seed:about-us-sections": "ts-node seed-about-us-sections.ts"
   },
   "dependencies": {

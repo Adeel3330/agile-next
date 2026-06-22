@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
         title: page.title,
         slug: page.slug,
         content: page.content,
-        description: page.content ? (page.content.replace(/<[^>]*>/g, '').substring(0, 500)) : null, // Extract plain text from content for description
+        description: page.seo_description || null,
         fileUrl: page.file_url,
         sections: sections,
         seoTitle: page.seo_title,
