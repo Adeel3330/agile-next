@@ -136,6 +136,35 @@ export default function CompliancePage() {
     return null;
   }
 
+  const sections = Array.isArray(pageData?.sections) ? pageData.sections : [];
+  const heroSection = sections.find((s: any) => s.type === 'hero');
+  const contentSection = sections.find(
+    (s: any) => s.type === 'content' && (s.subTitle || (s as any).sub_title)
+  );
+  const gallerySection = sections.find((s: any) => s.type === 'gallery');
+  const formSection = sections.find((s: any) => s.type === 'form');
+
+  const heroSubTitle =
+    heroSection?.subTitle ||
+    (heroSection as any)?.sub_title ||
+    heroSection?.title ||
+    heroImage?.altText ||
+    'Compliance & Standards';
+  const heroHeading =
+    heroSection?.subtitle ||
+    (heroSection as any)?.heading ||
+    heroImage?.title ||
+    pageData?.title ||
+    'Compliance';
+  const heroText =
+    heroSection?.description || heroImage?.description || pageData?.seoDescription || '';
+
+  const contentSubTitle =
+    contentSection?.subTitle || (contentSection as any)?.sub_title || contentImage?.altText || '';
+  const contentHeading = contentSection?.title || contentImage?.title || '';
+  const contentIntro = contentSection?.description || contentImage?.description || '';
+  const contentHtml = contentSection?.content || pageData?.content || '';
+
   return (
     <div className="boxed_wrapper compliance-page">
       <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={pageData?.title || 'Compliance'}>
@@ -154,15 +183,17 @@ export default function CompliancePage() {
                   ) : (
                     <>
                       <div className="sec-title mb_30">
-                        <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>Compliance & Standards</span>
+                        {heroSubTitle && (
+                          <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>
+                            {heroSubTitle}
+                          </span>
+                        )}
                         <h1 style={{ fontSize: '48px', lineHeight: '58px', fontWeight: '700', marginBottom: '20px' }}>
-                          {pageData?.title || 'Compliance'}
+                          {heroHeading}
                         </h1>
-                        {heroImage?.description ? (
-                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{heroImage.description}</p>
-                        ) : pageData?.seoDescription ? (
-                              <p></p>
-                        ) : null}
+                        {heroText && (
+                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{heroText}</p>
+                        )}
                       </div>
                     </>
                   )}
@@ -214,11 +245,26 @@ export default function CompliancePage() {
                       </div>
                     ) : (
                       <>
-                        {pageData?.content && (
-                          <div className="text-box mb_30 pb_30">
-                            <div dangerouslySetInnerHTML={{ __html: pageData.content }}></div>
+                        {(contentSubTitle || contentHeading || contentIntro) && (
+                          <div className="sec-title mb_30">
+                            {contentSubTitle && (
+                              <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>
+                                {contentSubTitle}
+                              </span>
+                            )}
+                            {contentHeading && (
+                              <h2 style={{ fontSize: '36px', lineHeight: '46px', fontWeight: '700', marginBottom: '16px' }}>
+                                {contentHeading}
+                              </h2>
+                            )}
+                            {contentIntro && (
+                              <p style={{ fontSize: '16px', lineHeight: '28px', color: 'var(--title-color)', marginBottom: '20px' }}>
+                                {contentIntro}
+                              </p>
+                            )}
                           </div>
                         )}
+                        
                       </>
                     )}
                   </div>
@@ -263,9 +309,13 @@ export default function CompliancePage() {
           <section className="gallery-section p_relative pt_90 pb_90" style={{ background: '#fff' }}>
             <div className="auto-container">
               <div className="sec-title mb_60 centred">
-                <span className="sub-title mb_5">Our Compliance Resources</span>
-                <h2>Compliance Documentation & Resources</h2>
-                <p>Access our compliance-related documents and visual resources</p>
+                {(gallerySection?.subTitle || (gallerySection as any)?.sub_title) && (
+                  <span className="sub-title mb_5">
+                    {gallerySection.subTitle || (gallerySection as any).sub_title}
+                  </span>
+                )}
+                <h2>{gallerySection?.title || 'Compliance Documentation & Resources'}</h2>
+                {gallerySection?.description && <p>{gallerySection.description}</p>}
               </div>
               <div className="row clearfix">
                 {resourceMedia.map((media: MediaItem, index: number) => (
@@ -318,13 +368,19 @@ export default function CompliancePage() {
               ) : (
                 <>
                   <div className="sec-title mb_40 centred">
-                    <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>Get in Touch</span>
+                    {(formSection?.subTitle || (formSection as any)?.sub_title) && (
+                      <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>
+                        {formSection.subTitle || (formSection as any).sub_title}
+                      </span>
+                    )}
                     <h2 style={{ fontSize: '36px', marginBottom: '15px' }}>
-                      Contact Us for Compliance Information
+                      {formSection?.title || 'Contact Us for Compliance Information'}
                     </h2>
-                    <p style={{ fontSize: '16px', color: 'var(--title-color)', maxWidth: '700px', margin: '0 auto' }}>
-                      Have questions about HIPAA, audits, or compliance documentation? Send us a message and our team will follow up promptly.
-                    </p>
+                    {formSection?.description && (
+                      <p style={{ fontSize: '16px', color: 'var(--title-color)', maxWidth: '700px', margin: '0 auto' }}>
+                        {formSection.description}
+                      </p>
+                    )}
                   </div>
                 </>
               )}

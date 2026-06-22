@@ -48,9 +48,32 @@ const softwarePageData = {
 <p>Interested in learning more about Virtual Manager? Contact us to request a demo or get more information about how our software can benefit your practice.</p>`,
   sections: JSON.stringify([
     {
+      type: 'hero',
+      subTitle: 'Software Solutions',
+      subtitle: 'Software',
+      description:
+        'Discover Virtual Manager and our comprehensive EHR and practice management software solutions built to streamline revenue cycle operations for healthcare providers.',
+    },
+    {
+      type: 'content',
+      subTitle: 'Platform Overview',
+      title: 'EHR / Practice Management Software',
+      description:
+        'Agile Nexus Solutions supports healthcare providers with proven billing platforms and integrated practice management tools.',
+    },
+    {
+      type: 'ehr',
+      subTitle: 'Our Software Solutions',
+      title: 'EHR / Practice Management Software',
+      description:
+        'Comprehensive software solutions designed to streamline and optimize your revenue cycle management.',
+    },
+    {
       type: 'form',
+      subTitle: 'Get in Touch',
       title: 'Request a Demo',
-      description: 'Interested in learning more about our software solutions? Fill out the form below and our team will get back to you with more information and demo scheduling options.'
+      description:
+        'Interested in learning more about our software solutions? Fill out the form below and our team will get back to you with more information and demo scheduling options.',
     },
     {
       type: 'features',

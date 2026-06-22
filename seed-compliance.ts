@@ -72,9 +72,31 @@ const compliancePageData = {
 <p>Compliance is not just a requirement—it's a core value at Agile Nexus Solutions. We continuously invest in technology, training, and processes to ensure we meet and exceed all regulatory standards. Our clients can trust that their billing operations are in full compliance with all applicable laws and regulations.</p>`,
   sections: JSON.stringify([
     {
+      type: 'hero',
+      subTitle: 'Compliance & Standards',
+      subtitle: 'Compliance',
+      description:
+        'Learn about Agile Nexus Solutions compliance standards, HIPAA adherence, and regulatory practices for medical billing and revenue cycle services.',
+    },
+    {
+      type: 'content',
+      subTitle: 'Regulatory Overview',
+      title: 'Compliance & Regulatory Standards',
+      description:
+        'We are committed to maintaining the highest standards of compliance across all medical billing and revenue cycle management services.',
+    },
+    {
+      type: 'gallery',
+      subTitle: 'Our Compliance Resources',
+      title: 'Compliance Documentation & Resources',
+      description: 'Access our compliance-related documents and visual resources.',
+    },
+    {
       type: 'form',
+      subTitle: 'Get in Touch',
       title: 'Contact Us for Compliance Information',
-      description: 'Have questions about our compliance standards or need more information? Please fill out the form below and our compliance team will get back to you.'
+      description:
+        'Have questions about HIPAA, audits, or compliance documentation? Send us a message and our team will follow up promptly.',
     },
     {
       type: 'features',

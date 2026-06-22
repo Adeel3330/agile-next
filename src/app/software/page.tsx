@@ -158,9 +158,35 @@ export default function SoftwarePage() {
     return null;
   }
 
+  const sections = Array.isArray(pageData?.sections) ? pageData.sections : [];
+  const heroSection = sections.find((s: any) => s.type === 'hero');
+  const contentSection = sections.find((s: any) => s.type === 'content');
+  const ehrSection = sections.find((s: any) => s.type === 'ehr');
+  const formSection = sections.find((s: any) => s.type === 'form');
+
+  const heroSubTitle =
+    heroSection?.subTitle ||
+    (heroSection as any)?.sub_title ||
+    heroSection?.title ||
+    heroImage?.altText ||
+    'Software Solutions';
+  const heroHeading =
+    heroSection?.subtitle ||
+    (heroSection as any)?.heading ||
+    heroImage?.title ||
+    pageData?.title ||
+    'Software';
+  const heroText =
+    heroSection?.description || heroImage?.description || pageData?.seoDescription || '';
+
+  const contentSubTitle =
+    contentSection?.subTitle || (contentSection as any)?.sub_title || contentImage?.altText || '';
+  const contentHeading = contentSection?.title || contentImage?.title || '';
+  const contentIntro = contentSection?.description || contentImage?.description || '';
+  const contentHtml = contentSection?.content || pageData?.content || '';
+
   // Parse sections for features/stats
   const featuresSection = pageData?.sections?.find((s: any) => s.type === 'features');
-  const formSection = pageData?.sections?.find((s: any) => s.type === 'form');
 
   return (
     <div className="boxed_wrapper software-page">
@@ -180,15 +206,17 @@ export default function SoftwarePage() {
                   ) : (
                     <>
                       <div className="sec-title mb_30">
-                        <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>Software Solutions</span>
+                        {heroSubTitle && (
+                          <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>
+                            {heroSubTitle}
+                          </span>
+                        )}
                         <h1 style={{ fontSize: '48px', lineHeight: '58px', fontWeight: '700', marginBottom: '20px' }}>
-                          {pageData?.title || 'Software'}
+                          {heroHeading}
                         </h1>
-                        {heroImage?.description ? (
-                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{heroImage.description}</p>
-                        ) : pageData?.seoDescription ? (
-                          <p></p>
-                          ) : null}
+                        {heroText && (
+                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{heroText}</p>
+                        )}
                       </div>
                     </>
                   )}
@@ -240,9 +268,28 @@ export default function SoftwarePage() {
                       </div>
                     ) : (
                       <>
-                        {pageData?.content && (
+                        {(contentSubTitle || contentHeading || contentIntro) && (
+                          <div className="sec-title mb_30">
+                            {contentSubTitle && (
+                              <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>
+                                {contentSubTitle}
+                              </span>
+                            )}
+                            {contentHeading && (
+                              <h2 style={{ fontSize: '36px', lineHeight: '46px', fontWeight: '700', marginBottom: '16px' }}>
+                                {contentHeading}
+                              </h2>
+                            )}
+                            {contentIntro && (
+                              <p style={{ fontSize: '16px', lineHeight: '28px', color: 'var(--title-color)', marginBottom: '20px' }}>
+                                {contentIntro}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                        {contentHtml && (
                           <div className="text-box mb_30 pb_30">
-                            <div dangerouslySetInnerHTML={{ __html: pageData.content }}></div>
+                            <div dangerouslySetInnerHTML={{ __html: contentHtml }}></div>
                           </div>
                         )}
                       </>
@@ -304,11 +351,15 @@ export default function SoftwarePage() {
           <section className="funfact-section p_relative pt_90 pb_90" style={{ background: '#f5f8fa' }}>
             <div className="auto-container">
               <div className="sec-title mb_50 centred">
-                <span className="sub-title mb_5">Our Software Solutions</span>
-                <h2>EHR / Practice Management Software</h2>
-                <p style={{ maxWidth: '600px', margin: '15px auto 0', color: '#000' }}>
-                  Comprehensive software solutions designed to streamline and optimize your revenue cycle management
-                </p>
+                {(ehrSection?.subTitle || (ehrSection as any)?.sub_title) && (
+                  <span className="sub-title mb_5">{ehrSection.subTitle || (ehrSection as any).sub_title}</span>
+                )}
+                <h2>{ehrSection?.title || 'EHR / Practice Management Software'}</h2>
+                {ehrSection?.description && (
+                  <p style={{ maxWidth: '600px', margin: '15px auto 0', color: 'var(--title-color)' }}>
+                    {ehrSection.description}
+                  </p>
+                )}
               </div>
               {ehrLoading ? (
                 <div className="row clearfix justify-content-center">
@@ -365,7 +416,11 @@ export default function SoftwarePage() {
               ) : (
                 <>
                   <div className="sec-title mb_40 centred">
-                    <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>Get in Touch</span>
+                    {(formSection?.subTitle || (formSection as any)?.sub_title) && (
+                      <span className="sub-title mb_5" style={{ color: 'var(--theme-color)', fontSize: '16px', fontWeight: '600' }}>
+                        {formSection.subTitle || (formSection as any).sub_title}
+                      </span>
+                    )}
                     <h2 style={{ fontSize: '36px', marginBottom: '15px' }}>
                       {formSection?.title || 'Request a Demo'}
                     </h2>
