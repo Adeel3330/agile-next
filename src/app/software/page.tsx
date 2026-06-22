@@ -287,11 +287,7 @@ export default function SoftwarePage() {
                             )}
                           </div>
                         )}
-                        {contentHtml && (
-                          <div className="text-box mb_30 pb_30">
-                            <div dangerouslySetInnerHTML={{ __html: contentHtml }}></div>
-                          </div>
-                        )}
+                     
                       </>
                     )}
                   </div>
