@@ -1,5 +1,6 @@
 export const TEXT_ONLY_MEDIA_POSITIONS = [
   'about-us-sections',
+  'resources',
   'compliance-gallery-heading',
   'software-ehr-heading',
   'software-carousel-heading',
@@ -46,6 +47,7 @@ export const SUGGESTED_MEDIA_POSITIONS = [
   'software-ehr',
   'software-ehr-heading',
   'testimonials',
+  'resources',
   'other',
 ];
 
