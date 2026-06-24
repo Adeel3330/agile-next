@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import WhyAgileSolutionsCards from './WhyAgileSolutionsCards';
 
 interface PageData {
   id: string;
@@ -220,6 +221,8 @@ export default function WhyAgileSolutions() {
           <span className="sub-title mb_5">Why Choose Us</span>
           <h2>{heading}</h2>
         </div>
+
+        <WhyAgileSolutionsCards instanceId="home-why-agile-cards" hideIntro />
 
         <div
           style={{

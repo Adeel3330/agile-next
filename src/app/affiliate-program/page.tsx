@@ -340,8 +340,8 @@ export default function AffiliateProgramPage() {
                           <Image
                             src={getCloudinaryImageUrl(item.fileUrl)}
                             alt={item.altText || item.title || 'Feature'}
-                            width={64}
-                            height={64}
+                            width={350}
+                            height={150}
                             style={{ objectFit: 'contain' }}
                           />
                         </div>
@@ -411,8 +411,8 @@ export default function AffiliateProgramPage() {
                           <Image
                             src={getCloudinaryImageUrl(step.fileUrl)}
                             alt={step.altText || step.title || 'Step'}
-                            width={72}
-                            height={72}
+                            width={350}
+                            height={150}
                             style={{ objectFit: 'contain' }}
                           />
                         </div>
@@ -600,8 +600,8 @@ export default function AffiliateProgramPage() {
             margin: 0;
           }
           .affiliate-feature-icon-img {
-            width: 72px;
-            height: 72px;
+            width: 350px;
+            height: 150px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -642,8 +642,8 @@ export default function AffiliateProgramPage() {
             height: 100%;
           }
           .affiliate-step-icon-img {
-            width: 72px;
-            height: 72px;
+            width: 350px;
+            height: 150px;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;

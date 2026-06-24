@@ -111,24 +111,74 @@ async function seedMedia() {
   console.log('🌱 Seeding media for Why Agile Solutions & Effortless Onboarding...');
 
   const now = new Date().toISOString();
+  const TEXT_ONLY = '/assets/images/resource/about-1.jpg';
 
-  const mediaItems = [
+  const whyAgileMedia = [
     {
-      title: 'Why Agile Solutions',
-      description: 'Why Agile Nexus Solutions – 24/7, quick turnaround, cost effective, advanced technology.',
+      title: 'heading',
+      description:
+        'We deliver what we promise. Agile Nexus Solutions offers revenue cycle management services to Healthcare Providers and Medical Billing Companies across the USA.',
+      file_url: TEXT_ONLY,
+      file_name: 'text-placeholder.jpg',
+      file_type: 'image/jpeg',
+      position: 'why-agile-solutions',
+      status: 'active',
+      display_order: 0,
+      alt_text: 'Our Advantages',
+      link_url: null as string | null,
+    },
+    {
+      title: '24/7 Services',
+      description: 'Round-the-clock support for all your medical billing needs.',
       file_url: getPlaceholderImage(),
-      file_name: 'why-agile-solutions.jpg',
-      file_size: 0,
+      file_name: 'why-agile-24-7.jpg',
       file_type: 'image/jpeg',
       position: 'why-agile-solutions',
       status: 'active',
       display_order: 1,
-      alt_text: 'Why Agile Solutions – RCM and medical billing',
+      alt_text: '24/7 Services',
       link_url: null as string | null,
-      created_at: now,
-      updated_at: now,
-      deleted_at: null as string | null,
     },
+    {
+      title: 'Quick Turnaround Time',
+      description: 'Faster claims processing and follow-ups to maximize your revenue.',
+      file_url: getPlaceholderImage(),
+      file_name: 'why-agile-turnaround.jpg',
+      file_type: 'image/jpeg',
+      position: 'why-agile-solutions',
+      status: 'active',
+      display_order: 2,
+      alt_text: 'Quick Turnaround Time',
+      link_url: null as string | null,
+    },
+    {
+      title: 'Cost Effective',
+      description: 'Affordable solutions that do not compromise on quality or compliance.',
+      file_url: getPlaceholderImage(),
+      file_name: 'why-agile-cost.jpg',
+      file_type: 'image/jpeg',
+      position: 'why-agile-solutions',
+      status: 'active',
+      display_order: 3,
+      alt_text: 'Cost Effective',
+      link_url: null as string | null,
+    },
+    {
+      title: 'Advanced Technology',
+      description: 'Modern tools and workflows for accuracy, transparency, and efficiency.',
+      file_url: getPlaceholderImage(),
+      file_name: 'why-agile-technology.jpg',
+      file_type: 'image/jpeg',
+      position: 'why-agile-solutions',
+      status: 'active',
+      display_order: 4,
+      alt_text: 'Advanced Technology',
+      link_url: null as string | null,
+    },
+  ];
+
+  const mediaItems = [
+    ...whyAgileMedia,
     {
       title: 'Effortless Onboarding',
       description: 'Effortless onboarding and seamless transition for your practice.',
@@ -148,26 +198,51 @@ async function seedMedia() {
   ];
 
   try {
+    for (const item of whyAgileMedia) {
+      const { data: existing } = await supabaseAdmin
+        .from('media')
+        .select('id')
+        .eq('position', item.position)
+        .eq('title', item.title)
+        .is('deleted_at', null)
+        .maybeSingle();
+
+      const payload = {
+        description: item.description,
+        file_url: item.file_url,
+        file_name: item.file_name,
+        file_type: item.file_type,
+        status: item.status,
+        display_order: item.display_order,
+        alt_text: item.alt_text,
+        link_url: item.link_url,
+        updated_at: now,
+      };
+
+      if (existing) {
+        await supabaseAdmin.from('media').update(payload).eq('id', existing.id);
+        console.log(`   ✓ Updated why-agile media: ${item.title}`);
+      } else {
+        await supabaseAdmin.from('media').insert({ ...item, created_at: now, updated_at: now, deleted_at: null });
+        console.log(`   ✓ Created why-agile media: ${item.title}`);
+      }
+    }
+
     const { data: existing } = await supabaseAdmin
       .from('media')
       .select('position, title')
-      .in('position', mediaItems.map((m) => m.position))
+      .eq('position', 'one-effortless-onboarding')
       .is('deleted_at', null);
 
     const existingKeys = new Set((existing || []).map((m: any) => `${m.position}:${m.title}`));
-    const toInsert = mediaItems.filter((m) => !existingKeys.has(`${m.position}:${m.title}`));
-
-    if (toInsert.length === 0) {
-      console.log('   ✓ Media for Why Agile & Onboarding already exist, skipping.');
-      return;
+    const onboardingItem = mediaItems.find((m) => m.position === 'one-effortless-onboarding')!;
+    if (!existingKeys.has(`${onboardingItem.position}:${onboardingItem.title}`)) {
+      const { error } = await supabaseAdmin.from('media').insert(onboardingItem);
+      if (error) console.error('   ❌ Error seeding onboarding media:', error);
+      else console.log('   ✓ Inserted Effortless Onboarding media');
+    } else {
+      console.log('   ✓ Effortless Onboarding media already exists, skipping.');
     }
-
-    const { data, error } = await supabaseAdmin.from('media').insert(toInsert).select();
-    if (error) {
-      console.error('   ❌ Error seeding media:', error);
-      return;
-    }
-    console.log(`   ✓ Inserted ${data?.length || 0} media item(s)`);
   } catch (e) {
     console.error('   ❌ Unexpected error seeding media:', e);
   }

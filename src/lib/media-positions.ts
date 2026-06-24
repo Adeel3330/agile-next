@@ -48,6 +48,7 @@ export const SUGGESTED_MEDIA_POSITIONS = [
   'software-ehr-heading',
   'testimonials',
   'resources',
+  'why-agile-solutions',
   'other',
 ];
 

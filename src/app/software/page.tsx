@@ -226,7 +226,7 @@ export default function SoftwarePage() {
                           {heroHeading}
                         </h1>
                         {heroText && (
-                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{heroText}</p>
+                          <p style={{ fontSize: '16px', lineHeight: '28px', color: 'var(--title-color)' }}>{heroText}</p>
                         )}
                       </div>
                     </>

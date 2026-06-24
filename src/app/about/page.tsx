@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Layout from '../../../components/layout/Layout';
 import Cta from '../../../components/sections/home2/Cta';
+import WhyAgileSolutionsCards from '../../../components/sections/home1/WhyAgileSolutionsCards';
 import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
 import { TEXT_ONLY_MEDIA_PLACEHOLDER_URL } from '@/lib/media-positions';
 
@@ -39,6 +40,13 @@ function isDisplayableImage(url?: string) {
   const trimmed = url?.trim();
   if (!trimmed || trimmed === TEXT_ONLY_MEDIA_PLACEHOLDER_URL) return false;
   return true;
+}
+
+function extractFirstParagraph(html?: string): string | null {
+  if (!html?.trim()) return null;
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const firstP = doc.querySelector('p');
+  return firstP?.textContent?.trim() || null;
 }
 
 interface PageData {
@@ -165,9 +173,11 @@ export default function AboutPage() {
       .filter(Boolean);
   }, [aboutSections]);
 
-  const overviewText =
-    pageData?.description ||
-    'Agile Nexus Solutions delivers secure, cost-effective medical billing, coding, and revenue cycle management solutions that help healthcare providers optimize reimbursements and streamline operations.';
+  const overviewText = useMemo(() => {
+    const fromContent = extractFirstParagraph(pageData?.content);
+    if (fromContent) return fromContent;
+    return 'Agile Nexus Solutions delivers secure, cost-effective medical billing, coding, and revenue cycle management solutions that help healthcare providers optimize reimbursements and streamline operations.';
+  }, [pageData?.content]);
 
   const renderSectionImage = (section: MediaItem) => {
     if (!isDisplayableImage(section.fileUrl)) return null;
@@ -265,6 +275,14 @@ export default function AboutPage() {
                   ))}
                 </div>
               )}
+
+              <div className="mb_70">
+                <div className="sec-title centred mb_40">
+                  <span className="sub-title mb_5">Why Choose Us</span>
+                  <h2>Why Agile Nexus Solutions?</h2>
+                </div>
+                <WhyAgileSolutionsCards instanceId="about-why-agile-cards" hideIntro />
+              </div>
 
               {/* <div className="row clearfix">
                 <div className="col-lg-12 col-md-12 col-sm-12">
