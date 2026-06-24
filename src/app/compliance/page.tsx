@@ -198,7 +198,7 @@ export default function CompliancePage() {
                           {heroHeading}
                         </h1>
                         {heroText && (
-                          <p style={{ fontSize: '18px', lineHeight: '28px', color: 'var(--title-color)' }}>{heroText}</p>
+                          <p style={{ fontSize: '16px', lineHeight: '28px', color: 'var(--title-color)' }}>{heroText}</p>
                         )}
                       </div>
                     </>
@@ -277,12 +277,12 @@ export default function CompliancePage() {
                 </div>
               </div>
               <div className="col-lg-6 col-md-12 col-sm-12 image-column">
-                <div className="image-block-one">
-                    <div className="image-box" style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden',paddingLeft: '0px', boxShadow: '0 10px 10px rgba(0,0,0,0.1)', }}>
+                <div className="image-block-one" style={{ height: '100%' }}>
+                    <div className="image-box" style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden',paddingLeft: '0px',height:'100%', boxShadow: '0 10px 10px rgba(0,0,0,0.1)', }}>
                     {mediaLoading ? (
                       <div className="skeleton-image" style={{ width: '100%', height: '500px', background: '#e0e0e0', borderRadius: '10px' }}></div>
                     ) : contentImage ? (
-                      <figure className="image">
+                      <figure className="image" style={{ height: '100%' }}>
                         <Image 
                           src={getCloudinaryImageUrl(contentImage.fileUrl)} 
                           alt={contentImage.altText || contentImage.title || 'Compliance'} 
