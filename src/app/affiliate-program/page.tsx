@@ -342,7 +342,7 @@ export default function AffiliateProgramPage() {
                             alt={item.altText || item.title || 'Feature'}
                             width={350}
                             height={150}
-                            style={{ objectFit: 'contain' }}
+                            style={{ objectFit: 'contain',height:'100%' }}
                           />
                         </div>
                       )}
@@ -413,7 +413,7 @@ export default function AffiliateProgramPage() {
                             alt={step.altText || step.title || 'Step'}
                             width={350}
                             height={150}
-                            style={{ objectFit: 'contain' }}
+                            style={{ objectFit: 'contain',height:'100%' }}
                           />
                         </div>
                       ) : (
