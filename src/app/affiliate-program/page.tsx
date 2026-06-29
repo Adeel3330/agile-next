@@ -342,7 +342,7 @@ export default function AffiliateProgramPage() {
                             alt={item.altText || item.title || 'Feature'}
                             width={350}
                             height={150}
-                            style={{ objectFit: 'contain',height:'100%' }}
+                            style={{ height:'100%' }}
                           />
                         </div>
                       )}
@@ -413,7 +413,7 @@ export default function AffiliateProgramPage() {
                             alt={step.altText || step.title || 'Step'}
                             width={350}
                             height={150}
-                            style={{ objectFit: 'contain',height:'100%' }}
+                            style={{ height:'100%' }}
                           />
                         </div>
                       ) : (
@@ -793,13 +793,23 @@ export default function AffiliateProgramPage() {
           @media only screen and (max-width: 479px) {
             .affiliate-feature-icon-img,
             .affiliate-step-icon-img {
-              height: 110px;
+              height: 250px;
+            }
+            .affiliate-feature-icon-img img,.affiliate-step-icon-img img {
+             
+              width: 100% !important;
+
             }
             .affiliate-image-box {
               max-height: 220px;
             }
           }
+            .affiliate-feature-icon-img img,.affiliate-step-icon-img img {
+             object-fit: contain !important;
+
+            }
         `,
+
           }}
         />
       </Layout>
