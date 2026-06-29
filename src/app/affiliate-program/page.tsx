@@ -371,7 +371,7 @@ export default function AffiliateProgramPage() {
               {programs.map((item, index) => {
                 const imageFirst = index % 2 === 1;
                 return (
-                  <div key={item.id} className="row clearfix align-items-center affiliate-program-row mb_60">
+                  <div key={item.id} className="row clearfix align-items-center affiliate-program-row mb_60 row-wise">
                     {imageFirst ? (
                       <>
                         {renderProgramImage(item)}
@@ -795,13 +795,16 @@ export default function AffiliateProgramPage() {
             .affiliate-step-icon-img {
               height: 250px;
             }
+            .about-section .auto-container > .row-wise:nth-child(odd) {
+              flex-direction: column-reverse;
+            }
             .affiliate-feature-icon-img img,.affiliate-step-icon-img img {
              
               width: 100% !important;
 
             }
             .affiliate-image-box {
-              max-height: 220px;
+              max-height: 350px;
             }
           }
             .affiliate-feature-icon-img img,.affiliate-step-icon-img img {
