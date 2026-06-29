@@ -101,7 +101,7 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
               style={{ background: 'white' }}
                 src={settings?.logoUrl || "/assets/images/logo-2.png"}
                 alt="Logo Image"
-                width={250}
+                width={350}
                   height={40}
                   priority
                 onError={(e) => {
