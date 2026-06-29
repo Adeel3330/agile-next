@@ -600,12 +600,17 @@ export default function AffiliateProgramPage() {
             margin: 0;
           }
           .affiliate-feature-icon-img {
-            width: 350px;
+            width: 100%;
+            max-width: 350px;
             height: 150px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+          }
+          .affiliate-feature-icon-img img {
+            max-width: 100%;
+            height: 100%;
           }
           .affiliate-program-row:last-child {
             margin-bottom: 0 !important;
@@ -642,12 +647,17 @@ export default function AffiliateProgramPage() {
             height: 100%;
           }
           .affiliate-step-icon-img {
-            width: 350px;
+            width: 100%;
+            max-width: 350px;
             height: 150px;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+          }
+          .affiliate-step-icon-img img {
+            max-width: 100%;
+            height: 100%;
           }
           .affiliate-step-number {
             width: 60px;
@@ -678,6 +688,11 @@ export default function AffiliateProgramPage() {
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+          }
+          .affiliate-image-box img {
+            display: block;
+            width: 100%;
+            height: 100%;
           }
           .affiliate-commission-card {
             background: #fff;
@@ -727,6 +742,62 @@ export default function AffiliateProgramPage() {
           .affiliate-faq-answer p {
             line-height: 26px;
             margin: 0;
+          }
+
+          /* Tablet */
+          @media only screen and (max-width: 991px) {
+            .affiliate-hero {
+              padding: 90px 0 70px !important;
+            }
+            .affiliate-program-row .image-column {
+              margin-bottom: 30px;
+            }
+            .affiliate-image-box {
+              max-height: 360px;
+            }
+          }
+
+          /* Mobile */
+          @media only screen and (max-width: 767px) {
+            .affiliate-hero {
+              padding: 70px 0 50px !important;
+            }
+            .affiliate-feature-card,
+            .affiliate-step-card {
+              padding: 28px 20px;
+            }
+            .affiliate-program-block {
+              padding: 30px 24px;
+            }
+            .affiliate-commission-card {
+              padding: 32px 24px;
+            }
+            .affiliate-form-card {
+              padding: 36px 20px;
+            }
+            .affiliate-feature-icon-img,
+            .affiliate-step-icon-img {
+              max-width: 100%;
+              height: 130px;
+            }
+            .affiliate-image-box {
+              max-height: 280px;
+            }
+            .affiliate-faq-btn {
+              font-size: 16px;
+              padding: 16px 18px;
+            }
+          }
+
+          /* Small mobile */
+          @media only screen and (max-width: 479px) {
+            .affiliate-feature-icon-img,
+            .affiliate-step-icon-img {
+              height: 110px;
+            }
+            .affiliate-image-box {
+              max-height: 220px;
+            }
           }
         `,
           }}
