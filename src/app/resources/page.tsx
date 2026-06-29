@@ -135,7 +135,7 @@ export default function ResourcesPage() {
                 alt={card.altText || card.title || 'Resource'}
                 width={560}
                 height={220}
-                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                style={{  width: '100%', height: '100%' }}
               />
             </figure>
           ) : (
@@ -238,6 +238,9 @@ export default function ResourcesPage() {
                   height: 320px;
                   overflow: hidden;
                 }
+                  .resource-card-image img{
+                    object-fit: cover !important;
+                  }
                 .resource-card-icon {
                   display: flex;
                   align-items: center;
@@ -287,6 +290,16 @@ export default function ResourcesPage() {
                 @keyframes resourceShimmer {
                   0% { background-position: 200% 0; }
                   100% { background-position: -200% 0; }
+                }
+
+                @media (max-width: 479px) {
+                  .resource-card-image {
+                    height: 250px;
+                    background: #f5f8fa;
+                  }
+                  .resource-card-image img{
+                    object-fit: contain !important;
+                  }
                 }
               `,
             }}
