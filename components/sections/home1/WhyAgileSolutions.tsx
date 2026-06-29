@@ -52,7 +52,7 @@ export default function WhyAgileSolutions() {
   const [settingsData, setSettingsData] = useState<SettingsData | null>(null);
   const [isInView, setIsInView] = useState(false);
   const [animatedCounts, setAnimatedCounts] = useState<number[]>([]);
-  const sectionRef = useRef<HTMLElement | null>(null);
+  const kpiBlockRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -60,7 +60,7 @@ export default function WhyAgileSolutions() {
   }, []);
 
   useEffect(() => {
-    if (!mounted || !sectionRef.current || isInView) return;
+    if (!mounted || !kpiBlockRef.current || isInView) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -69,10 +69,10 @@ export default function WhyAgileSolutions() {
           observer.disconnect();
         }
       },
-      { threshold: 0.35 }
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
     );
 
-    observer.observe(sectionRef.current);
+    observer.observe(kpiBlockRef.current);
 
     return () => observer.disconnect();
   }, [mounted, isInView]);
@@ -212,7 +212,6 @@ export default function WhyAgileSolutions() {
 
   return (
     <section
-      ref={sectionRef}
       className={`chooseus-section p_relative pt_120 pb_90 ${isInView ? 'kpi-animate-in' : ''}`}
       style={{ background: '#f5f8fa' }}
     >
@@ -225,6 +224,7 @@ export default function WhyAgileSolutions() {
         <WhyAgileSolutionsCards instanceId="home-why-agile-cards" hideIntro />
 
         <div
+          ref={kpiBlockRef}
           style={{
             background: '#ffffff',
             borderRadius: '16px',
