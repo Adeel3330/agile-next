@@ -294,7 +294,7 @@ export default function ResourcesPage() {
 
                 @media (max-width: 479px) {
                   .resource-card-image {
-                    height: 250px;
+                    height: 200px;
                     background: #f5f8fa;
                   }
                   .resource-card-image img{
