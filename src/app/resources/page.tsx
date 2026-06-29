@@ -235,7 +235,7 @@ export default function ResourcesPage() {
                 }
                 .resource-card-image {
                   margin: 0;
-                  height: 200px;
+                  height: 320px;
                   overflow: hidden;
                 }
                 .resource-card-icon {

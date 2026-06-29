@@ -260,11 +260,11 @@ export default function WhyAgileSolutionsCards({
             .why-agile-card-media {
               position: relative;
               width: 100%;
-              height: 220px;
+              height: 300px;
               flex-shrink: 0;
               border-radius: 20px 20px 0 0;
               overflow: hidden;
-              background: linear-gradient(135deg, #fff5eb 0%, #ffe8d4 100%);
+              background:white;
             }
             .why-agile-card-img {
               object-fit: cover;
@@ -349,6 +349,9 @@ export default function WhyAgileSolutionsCards({
               }
             }
             @media (max-width: 575px) {
+              .why-agile-card-img{
+                object-fit: contain !important;
+              }
               .why-agile-skeleton-row {
                 grid-template-columns: 1fr;
               }
