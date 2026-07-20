@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Roboto, Caveat } from "next/font/google";
+import { Roboto, Caveat, Source_Sans_3 } from "next/font/google";
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import ClientLayoutWrapper from "./ClientLayoutWrapper";
 import { getSettingsForServer } from "@/lib/get-settings-server";
