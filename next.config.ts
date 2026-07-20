@@ -2,13 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   eslint: {
-    // Disable ESLint during builds
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Disable TypeScript errors during builds (optional)
     ignoreBuildErrors: false,
   },
+  poweredByHeader: false,
+  compress: true,
   images: {
     remotePatterns: [
       {
@@ -27,21 +27,47 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-    // Configure image optimization
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    minimumCacheTTL: 60,
-    // Use modern image formats
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
-  // Increase timeout for image optimization and server actions
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
     },
+    optimizePackageImports: [
+      'react-icons',
+      'swiper',
+      'swiper/modules',
+      'swiper/react',
+    ],
   },
-  // Configure webpack to handle image loading better
+  async headers() {
+    return [
+      {
+        source: '/assets/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {

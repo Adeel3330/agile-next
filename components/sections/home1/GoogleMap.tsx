@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from "next/link";
 
 interface Settings {
@@ -36,6 +36,8 @@ export default function GoogleMapSection({ settings: propSettings, loading: prop
   const [mapUrl, setMapUrl] = useState<string>('https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2643.6895046810805!2d-122.52642526124438!3d38.00014098339506!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085976736097a2f%3A0xbe014d20e6e22654!2sSan Rafael%2C California%2C Hoa Kỳ!5e0!3m2!1svi!2s!4v1678975266976!5m2!1svi!2s');
   const [apiSettings, setApiSettings] = useState<Settings | null>(null);
   const [apiLoading, setApiLoading] = useState(true);
+  const [shouldLoadMap, setShouldLoadMap] = useState(false);
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (propSettings !== undefined) {
@@ -76,7 +78,7 @@ export default function GoogleMapSection({ settings: propSettings, loading: prop
         const lat = settings.additionalSettings.mapLatitude;
         const lng = settings.additionalSettings.mapLongitude;
         const zoom = settings.additionalSettings.mapZoom || '15';
-        setMapUrl(`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.184133894887!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f${zoom}!3m3!1m2!1s0x0%3A0x0!2z${lat}!5e0!3m2!1sen!2sus!4v${Date.now()}!5m2!1sen!2sus`);
+        setMapUrl(`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.184133894887!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f${zoom}!3m3!1m2!1s0x0%3A0x0!2z${lat}!5e0!3m2!1sen!2sus!4v1600000000000!5m2!1sen!2sus`);
       }
       // Build from address if available
       else if (settings.contactAddress || settings.contactCity) {
@@ -90,11 +92,29 @@ export default function GoogleMapSection({ settings: propSettings, loading: prop
 
         if (address) {
           const encodedAddress = encodeURIComponent(address);
-          setMapUrl(`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.184133894887!2d-122.52642526124438!3d38.00014098339506!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzjCsDAwJzAwLjQiTiAxMjLCsDMxJzM1LjEiVw!5e0!3m2!1sen!2sus!4v${Date.now()}!5m2!1sen!2sus&q=${encodedAddress}`);
+          setMapUrl(`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.184133894887!2d-122.52642526124438!3d38.00014098339506!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzjCsDAwJzAwLjQiTiAxMjLCsDMxJzM1LjEiVw!5e0!3m2!1sen!2sus!4v1600000000000!5m2!1sen!2sus&q=${encodedAddress}`);
         }
       }
     }
   }, [settings]);
+
+  useEffect(() => {
+    if (shouldLoadMap || !mapContainerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setShouldLoadMap(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px 0px' }
+    );
+
+    observer.observe(mapContainerRef.current);
+    return () => observer.disconnect();
+  }, [shouldLoadMap, loading]);
+
   const formatTime = (time: string | null) => {
     if (!time) return null;
 
@@ -191,8 +211,8 @@ export default function GoogleMapSection({ settings: propSettings, loading: prop
 
   return (
     <section className="google-map-section">
-      <div className="map-inner">
-        {loading ? (
+      <div className="map-inner" ref={mapContainerRef}>
+        {loading || !shouldLoadMap ? (
           <div style={{
             width: '100%',
             height: '570px',
@@ -200,9 +220,9 @@ export default function GoogleMapSection({ settings: propSettings, loading: prop
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            animation: 'pulse 1.5s ease-in-out infinite'
+            animation: loading ? 'pulse 1.5s ease-in-out infinite' : undefined
           }}>
-            <span style={{ color: '#999' }}>Loading map...</span>
+            <span style={{ color: '#999' }}>{loading ? 'Loading map...' : 'Map will load when visible'}</span>
           </div>
         ) : (
           <iframe
@@ -212,6 +232,7 @@ export default function GoogleMapSection({ settings: propSettings, loading: prop
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
+            title="Office location map"
           />
         )}
       </div>

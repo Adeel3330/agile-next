@@ -43,40 +43,7 @@
 
 
 
- @import url('animate.css');
- @import url('color/theme-color.css');
- @import url('color.css');
- @import url('elpath.css');
- @import url('flaticon.css');
- @import url('font-awesome-all.css');
- @import url('switcher-style.css');
- @import url('module-css/about.css');
- @import url('module-css/appointment.css');
- @import url('module-css/banner.css');
- @import url('module-css/blog-details.css');
- @import url('module-css/blog.css');
- @import url('module-css/chooseus.css');
- @import url('module-css/clients.css');
- @import url('module-css/contact-info.css');
- @import url('module-css/contact.css');
- @import url('module-css/cta.css');
- @import url('module-css/download.css');
- @import url('module-css/error.css');
- @import url('module-css/faq.css');
- @import url('module-css/funfact.css');
- @import url('module-css/news.css');
- @import url('module-css/page-title.css');
- @import url('module-css/portfolio.css');
- @import url('module-css/pricing.css');
- @import url('module-css/service-details.css');
- @import url('module-css/service.css');
- @import url('module-css/sidebar.css');
- @import url('module-css/subscribe.css');
- @import url('module-css/team-details.css');
- @import url('module-css/team.css');
- @import url('module-css/testimonial.css');
- @import url('module-css/video.css');
- @import url('module-css/working.css');
+ /* CSS modules are imported directly from src/app/layout.tsx for parallel bundling */
 
 
 
@@ -115,9 +82,9 @@
    --orange-color: #00FF00;
    --text-color: #000;
    --title-color: #111111;
-   --text-font: 'Roboto', sans-serif;
-   --title-font: 'Source Sans Pro', sans-serif;
-   --secondary-font: 'Caveat', cursive;
+   --text-font: var(--roboto), 'Roboto', sans-serif;
+   --title-font: var(--font-source-sans), 'Source Sans 3', 'Source Sans Pro', sans-serif;
+   --secondary-font: var(--font-caveat), 'Caveat', cursive;
  }
 
 

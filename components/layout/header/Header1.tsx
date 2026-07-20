@@ -209,7 +209,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                 <li>
                   <div className="d-flex justify-center align-items-center">
                     <div className="icon-box">
-                      <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={15} height={15} priority />
+                      <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={15} height={15} />
                     </div>
                     {loading ? (
                       <span style={{ display: 'inline-block', width: '150px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
@@ -410,7 +410,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
               <div className="menu-right-content">
                 {/* <div className="support-box">
                   <div className="icon-box">
-                    <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={25} height={25} priority />
+                    <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={25} height={25} />
                   </div>
                   <span>Call Us</span>
                   <h6>
@@ -554,7 +554,7 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
               <div className="menu-right-content">
                 {/* <div className="support-box">
                   <div className="icon-box">
-                    <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={25} height={25} priority />
+                    <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={25} height={25} />
                   </div>
                   <span>Call Us</span>
                   <h6>
