@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto, Caveat, Source_Sans_3 } from "next/font/google";
 import ClientLayoutWrapper from "./ClientLayoutWrapper";
 import { getSettingsForServer } from "@/lib/get-settings-server";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import "../../public/assets/css/bootstrap.css";
 import "../../public/assets/css/rtl.css";
@@ -117,6 +118,7 @@ export default function RootLayout({
       >
         {children}
         <ClientLayoutWrapper />
+        <SpeedInsights />
       </body>
     </html>
   );
