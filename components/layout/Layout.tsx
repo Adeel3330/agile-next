@@ -1,14 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import BackToTop from "../elements/BackToTop";
 import DataBg from "../elements/DataBg";
 import Breadcrumb from "./Breadcrumb";
-import SearchPopup from "./SearchPopup";
-import SidebarPopup from "./SidebarPopup";
 import Header1 from "./header/Header1";
 import Header2 from "./header/Header2";
 import Header3 from "./header/Header3";
 import Footer1 from "./footer/Footer1";
+
+const SearchPopup = dynamic(() => import("./SearchPopup"), { ssr: false });
+const SidebarPopup = dynamic(() => import("./SidebarPopup"), { ssr: false });
 
 type LayoutProps = {
   headerStyle?: 1 | 2 | 3;
@@ -48,17 +50,38 @@ export default function Layout({
   const handleSidebar = () => setSidebar((s) => !s);
 
   useEffect(() => {
-    (async () => {
-      // @ts-expect-error: WOW types not provided
-      const { WOW } = await import("wowjs");
-      const wow = new WOW({ live: false });
-      wow.init();
-    })();
+    let cancelled = false;
+    let idleId: number | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const initWow = () => {
+      if (cancelled) return;
+      void (async () => {
+        // @ts-expect-error: WOW types not provided
+        const { WOW } = await import("wowjs");
+        if (cancelled) return;
+        const wow = new WOW({ live: false });
+        wow.init();
+      })();
+    };
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(initWow, { timeout: 2500 });
+    } else {
+      timeoutId = setTimeout(initWow, 1200);
+    }
 
     const onScroll = () => setIsScrolled(window.scrollY > 100);
-    document.addEventListener("scroll", onScroll);
+    document.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
+      cancelled = true;
+      if (idleId !== null && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
       document.removeEventListener("scroll", onScroll);
       document.body.classList.remove("mobile-menu-visible");
     };

@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 
-import 'swiper/css';
 
 import { getCloudinaryImageUrl } from '@/lib/cloudinary-utils';
 import { TEXT_ONLY_MEDIA_PLACEHOLDER_URL } from '@/lib/media-positions';

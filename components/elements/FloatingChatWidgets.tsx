@@ -92,13 +92,40 @@ export default function FloatingChatWidgets() {
       return;
     }
 
-    const script = document.createElement('script');
-    script.id = 'talkto-widget-script';
-    script.async = true;
-    script.src = chatbotConfig.embedSrc;
-    script.charset = 'UTF-8';
-    script.setAttribute('crossorigin', '*');
-    document.body.appendChild(script);
+    let loaded = false;
+    const loadScript = () => {
+      if (loaded || document.getElementById('talkto-widget-script')) return;
+      loaded = true;
+      const script = document.createElement('script');
+      script.id = 'talkto-widget-script';
+      script.async = true;
+      script.defer = true;
+      script.src = chatbotConfig.embedSrc;
+      script.charset = 'UTF-8';
+      script.setAttribute('crossorigin', '*');
+      document.body.appendChild(script);
+    };
+
+    // Defer third-party chat until idle / interaction so it does not hurt PageSpeed.
+    const idleId =
+      typeof window !== 'undefined' && 'requestIdleCallback' in window
+        ? window.requestIdleCallback(loadScript, { timeout: 6000 })
+        : null;
+    const timeoutId = window.setTimeout(loadScript, 5000);
+    const onInteract = () => loadScript();
+    window.addEventListener('scroll', onInteract, { once: true, passive: true });
+    window.addEventListener('pointerdown', onInteract, { once: true });
+    window.addEventListener('keydown', onInteract, { once: true });
+
+    return () => {
+      if (idleId !== null && 'cancelIdleCallback' in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      window.clearTimeout(timeoutId);
+      window.removeEventListener('scroll', onInteract);
+      window.removeEventListener('pointerdown', onInteract);
+      window.removeEventListener('keydown', onInteract);
+    };
   }, [chatbotConfig]);
 
   const handleTalkToClick = () => {
