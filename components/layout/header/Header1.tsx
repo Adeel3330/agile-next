@@ -42,7 +42,6 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
   const pathname = usePathname();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Helper function to check if a path is active
@@ -72,7 +71,6 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
   };
 
   useEffect(() => {
-    setMounted(true);
     // Fetch settings from API
     fetch('/api/settings')
       .then(res => res.json())
@@ -182,21 +180,27 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
     return 'Mon - Fri: 9:00am to 6:00pm';
   };
 
-  if (!mounted) {
-    return null;
-  }
+  // Always render header on first paint (no mounted gate) to avoid CLS.
+  const logoSrc = settings?.logoUrl || '/assets/images/logo.png';
 
   return (
     <>
       <style dangerouslySetInnerHTML={{
         __html: `
           @keyframes pulse {
-            0%, 100% {
-              opacity: 1;
-            }
-            50% {
-              opacity: 0.5;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+          }
+          .main-header .logo-box .logo,
+          .main-header .logo-box .logo a {
+            display: block;
+            width: 203px;
+            height: 66px;
+          }
+          .main-header .logo-box .logo img {
+            width: 203px !important;
+            height: 66px !important;
+            object-fit: contain;
           }
         `
       }} />
@@ -281,28 +285,15 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
               <div className="logo-box">
                 <figure className="logo">
                   <Link href="/">
-                    {loading ? (
-                      <div
-                        style={{
-                          width: '203px',
-                          height: '40px',
-                          background: '#e0e0e0',
-                          borderRadius: '4px',
-                          animation: 'pulse 1.5s ease-in-out infinite',
-                        }}
-                      ></div>
-                    ) : (
-                      <Image
-                        src={settings?.logoUrl || '/assets/images/logo.png'}
-                        alt="Logo Image"
-                        width={203}
-                        height={40}
-                        priority
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/assets/images/logo.png';
-                        }}
-                      />
-                    )}
+                    <Image
+                      src={logoSrc}
+                      alt="Agile Nexus Solutions"
+                      width={203}
+                      height={66}
+                      priority
+                      sizes="203px"
+                      style={{ width: 203, height: 66, objectFit: 'contain' }}
+                    />
                   </Link>
                 </figure>
               </div>
@@ -440,20 +431,14 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
               <div className="logo-box">
                 <figure className="logo">
                   <Link href="/">
-                    {loading ? (
-                      <div style={{ width: '203px', height: '40px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></div>
-                    ) : (
-                      <Image
-                        src={settings?.logoUrl || '/assets/images/logo.png'}
-                        alt="Logo Image"
-                        width={203}
-                        height={40}
-                        priority
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/assets/images/logo.png';
-                        }}
-                      />
-                    )}
+                    <Image
+                      src={logoSrc}
+                      alt="Agile Nexus Solutions"
+                      width={203}
+                      height={66}
+                      sizes="203px"
+                      style={{ width: 203, height: 66, objectFit: 'contain' }}
+                    />
                   </Link>
                 </figure>
               </div>
