@@ -41,6 +41,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       sliders: mappedSliders,
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
     });
   } catch (error) {
     console.error('Public sliders error:', error);

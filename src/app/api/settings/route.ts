@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getCachedSettings, setCachedSettings } from '@/lib/settings-cache';
 
+const SETTINGS_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+};
+
 // GET /api/settings
 // Public API - Get settings with caching (no authentication required)
 export async function GET(req: NextRequest) {
@@ -13,7 +17,7 @@ export async function GET(req: NextRequest) {
         success: true,
         settings: cached,
         cached: true
-      });
+      }, { headers: SETTINGS_CACHE_HEADERS });
     }
 
     // Fetch from database
@@ -62,7 +66,7 @@ export async function GET(req: NextRequest) {
           success: true,
           settings: defaultSettings,
           cached: false
-        });
+        }, { headers: SETTINGS_CACHE_HEADERS });
       }
 
       console.error('Supabase error:', error);
@@ -117,7 +121,7 @@ export async function GET(req: NextRequest) {
       success: true,
       settings: mappedSettings,
       cached: false
-    });
+    }, { headers: SETTINGS_CACHE_HEADERS });
   } catch (error) {
     console.error('Get settings error:', error);
     return NextResponse.json(

@@ -5,9 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+// Swiper CSS is loaded globally from src/app/layout.tsx
 
 type Slider = {
   id: string;
@@ -150,7 +148,7 @@ export default function Banner() {
         </div>
       ) : (
         <Swiper {...swiperOptions} className="swiper-container banner-carousel">
-          {(hasSliders ? sliders : []).map((slider) => (
+          {(hasSliders ? sliders : []).map((slider, index) => (
             <SwiperSlide key={slider.id}>
               <div className="slide-item p_relative">
                 {/* Pattern Layer */}
@@ -229,6 +227,7 @@ export default function Banner() {
                         src={slider.file}
                         className="w-100 rounded-3 border"
                         controls
+                        preload={index === 0 ? 'metadata' : 'none'}
                         style={{ maxHeight: 700, objectFit: 'cover' }}
                       />
                     ) : (
@@ -238,6 +237,10 @@ export default function Banner() {
                         width={711}
                         height={700}
                         className="rounded-3"
+                        priority={index === 0}
+                        fetchPriority={index === 0 ? 'high' : 'auto'}
+                        sizes="(max-width: 767px) 90vw, (max-width: 1199px) 50vw, 711px"
+                        quality={75}
                       />
                     )}
                   </figure>
