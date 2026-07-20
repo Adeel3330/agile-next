@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto, Caveat } from "next/font/google";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import ClientLayoutWrapper from "./ClientLayoutWrapper";
 import { getSettingsForServer } from "@/lib/get-settings-server";
 
@@ -72,6 +73,7 @@ export default function RootLayout({
       >
         {children}
         <ClientLayoutWrapper />
+        <SpeedInsights />
       </body>
     </html>
   );
