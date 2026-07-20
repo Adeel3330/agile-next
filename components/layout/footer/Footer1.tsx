@@ -32,11 +32,9 @@ interface CertificationMedia {
 export default function Footer1() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [certifications, setCertifications] = useState<CertificationMedia[]>([]);
-  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
     // Fetch settings from API
     fetch('/api/settings')
       .then(res => res.json())
@@ -75,31 +73,47 @@ export default function Footer1() {
     return parts.join(', ') || '7901 4th St N, St. Petersburg, FL 33702, USA';
   };
 
-  if (!mounted) {
-    return null;
-  }
+  // Always render footer on first paint (no mounted gate) to avoid CLS from
+  // late-appearing pattern-layer / widget section.
+  const logoSrc = settings?.logoUrl || '/assets/images/logo.png';
 
   return (
     <>
       <style dangerouslySetInnerHTML={{
         __html: `
           @keyframes pulse {
-            0%, 100% {
-              opacity: 1;
-            }
-            50% {
-              opacity: 0.5;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+          }
+          .main-footer .footer-menu .logo-box,
+          .main-footer .footer-menu .logo-box a {
+            display: block;
+            width: 203px;
+            height: 66px;
+          }
+          .main-footer .footer-menu .logo-box img {
+            width: 203px !important;
+            height: 66px !important;
+            object-fit: contain;
+          }
+          .main-footer .widget-section {
+            min-height: 420px;
+          }
+          .main-footer .pattern-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
           }
         `
       }} />
       <footer className="main-footer">
         <div className="widget-section p_relative">
-          <div className="pattern-layer">
-            <div className="pattern-1" style={{ backgroundImage: "url(assets/images/shape/shape-21.png)" }}></div>
-            <div className="pattern-2" style={{ backgroundImage: "url(assets/images/shape/shape-22.png)" }}></div>
-            <div className="pattern-3" style={{ backgroundImage: "url(assets/images/shape/shape-23.png)" }}></div>
-            <div className="pattern-4" style={{ backgroundImage: "url(assets/images/shape/shape-24.png)" }}></div>
+          <div className="pattern-layer" aria-hidden="true">
+            <div className="pattern-1" style={{ backgroundImage: "url(/assets/images/shape/shape-21.png)" }}></div>
+            <div className="pattern-2" style={{ backgroundImage: "url(/assets/images/shape/shape-22.png)" }}></div>
+            <div className="pattern-3" style={{ backgroundImage: "url(/assets/images/shape/shape-23.png)" }}></div>
+            <div className="pattern-4" style={{ backgroundImage: "url(/assets/images/shape/shape-24.png)" }}></div>
           </div>
           <div className="auto-container">
             <div className="row clearfix">
@@ -188,7 +202,7 @@ export default function Footer1() {
                   <div className="widget-content">
                     <ul className="info-list clearfix">
                       <li>
-                        <Image src="/assets/images/icons/icon-5.svg" alt="Icon" width={20} height={15} priority />
+                        <Image src="/assets/images/icons/icon-5.svg" alt="" width={20} height={15} />
                         Email: {loading ? (
                           <span style={{ display: 'inline-block', width: '180px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
                         ) : (
@@ -198,7 +212,7 @@ export default function Footer1() {
                         )}
                       </li>
                       <li>
-                        <Image src="/assets/images/icons/icon-6.svg" alt="Icon" width={20} height={21} priority />
+                        <Image src="/assets/images/icons/icon-6.svg" alt="" width={20} height={21} />
                         Call: {loading ? (
                           <span style={{ display: 'inline-block', width: '140px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
                         ) : (
@@ -208,7 +222,7 @@ export default function Footer1() {
                         )}
                       </li>
                       <li>
-                        <Image src="/assets/images/icons/icon-7.svg" alt="Icon" width={20} height={20} priority />
+                        <Image src="/assets/images/icons/icon-7.svg" alt="" width={20} height={20} />
                         {loading ? (
                           <span style={{ display: 'inline-block', width: '250px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
                         ) : (
@@ -223,20 +237,14 @@ export default function Footer1() {
             <div className="footer-menu mt_60">
               <figure className="logo-box">
                 <Link href="/">
-                  {loading ? (
-                    <div style={{ width: '203px', height: '40px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></div>
-                  ) : (
-                    <Image
-                      src={settings?.logoUrl || '/assets/images/logo.png'}
-                      alt="Footer Logo"
-                      width={203}
-                      height={40}
-                      priority
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/assets/images/logo.png';
-                      }}
-                    />
-                  )}
+                  <Image
+                    src={logoSrc}
+                    alt="Agile Nexus Solutions"
+                    width={203}
+                    height={66}
+                    sizes="203px"
+                    style={{ width: 203, height: 66, objectFit: 'contain' }}
+                  />
                 </Link>
               </figure>
               <ul className="menu-list clearfix">
