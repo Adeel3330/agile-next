@@ -32,8 +32,27 @@ interface GoogleMapSectionProps {
   loading?: boolean;
 }
 
+const DEFAULT_OFFICE_ADDRESS = '7901 4th St N, St. Petersburg, FL 33702, USA';
+
+function buildMapEmbedUrl(address: string) {
+  const query = encodeURIComponent(address.trim());
+  return `https://maps.google.com/maps?q=${query}&z=15&output=embed`;
+}
+
+function buildAddressFromSettings(settings: Settings) {
+  return [
+    settings.contactAddress,
+    settings.contactCity,
+    settings.contactState,
+    settings.contactZip,
+    settings.contactCountry,
+  ]
+    .filter(Boolean)
+    .join(', ');
+}
+
 export default function GoogleMapSection({ settings: propSettings, loading: propLoading }: GoogleMapSectionProps) {
-  const [mapUrl, setMapUrl] = useState<string>('https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2643.6895046810805!2d-122.52642526124438!3d38.00014098339506!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085976736097a2f%3A0xbe014d20e6e22654!2sSan Rafael%2C California%2C Hoa Kỳ!5e0!3m2!1svi!2s!4v1678975266976!5m2!1svi!2s');
+  const [mapUrl, setMapUrl] = useState<string>(buildMapEmbedUrl(DEFAULT_OFFICE_ADDRESS));
   const [apiSettings, setApiSettings] = useState<Settings | null>(null);
   const [apiLoading, setApiLoading] = useState(true);
   const [shouldLoadMap, setShouldLoadMap] = useState(false);
@@ -68,34 +87,33 @@ export default function GoogleMapSection({ settings: propSettings, loading: prop
   const loading = propSettings !== undefined ? propLoading : apiLoading;
 
   useEffect(() => {
-    if (settings) {
-      // If map embed URL is provided in settings, use it
-      if (settings.mapEmbedUrl) {
-        setMapUrl(settings.mapEmbedUrl);
-      }
-      // Otherwise, try to build from address or coordinates
-      else if (settings.additionalSettings?.mapLatitude && settings.additionalSettings?.mapLongitude) {
-        const lat = settings.additionalSettings.mapLatitude;
-        const lng = settings.additionalSettings.mapLongitude;
-        const zoom = settings.additionalSettings.mapZoom || '15';
-        setMapUrl(`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.184133894887!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f${zoom}!3m3!1m2!1s0x0%3A0x0!2z${lat}!5e0!3m2!1sen!2sus!4v1600000000000!5m2!1sen!2sus`);
-      }
-      // Build from address if available
-      else if (settings.contactAddress || settings.contactCity) {
-        const address = [
-          settings.contactAddress,
-          settings.contactCity,
-          settings.contactState,
-          settings.contactZip,
-          settings.contactCountry
-        ].filter(Boolean).join(', ');
-
-        if (address) {
-          const encodedAddress = encodeURIComponent(address);
-          setMapUrl(`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.184133894887!2d-122.52642526124438!3d38.00014098339506!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzjCsDAwJzAwLjQiTiAxMjLCsDMxJzM1LjEiVw!5e0!3m2!1sen!2sus!4v1600000000000!5m2!1sen!2sus&q=${encodedAddress}`);
-        }
-      }
+    if (!settings) {
+      setMapUrl(buildMapEmbedUrl(DEFAULT_OFFICE_ADDRESS));
+      return;
     }
+
+    // Prefer an explicit embed URL from CMS when provided.
+    if (settings.mapEmbedUrl?.trim()) {
+      setMapUrl(settings.mapEmbedUrl.trim());
+      return;
+    }
+
+    // Coordinates from settings (if configured).
+    if (settings.additionalSettings?.mapLatitude && settings.additionalSettings?.mapLongitude) {
+      const lat = settings.additionalSettings.mapLatitude;
+      const lng = settings.additionalSettings.mapLongitude;
+      const zoom = settings.additionalSettings.mapZoom || '15';
+      setMapUrl(`https://maps.google.com/maps?q=${encodeURIComponent(`${lat},${lng}`)}&z=${zoom}&output=embed`);
+      return;
+    }
+
+    // Fall back to contact address / mapLocation text.
+    const address =
+      settings.mapLocation?.trim() ||
+      buildAddressFromSettings(settings) ||
+      DEFAULT_OFFICE_ADDRESS;
+
+    setMapUrl(buildMapEmbedUrl(address));
   }, [settings]);
 
   useEffect(() => {
