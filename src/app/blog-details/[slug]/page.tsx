@@ -345,6 +345,14 @@ export default function BlogDetailsPage() {
           </section>
           <Cta/>
         </Layout>
+
+        <style dangerouslySetInnerHTML={{ __html: `
+          p{
+            margin-bottom: 0px !important;
+          }
+        
+        
+      `}} />
       </div>
   );
 }
