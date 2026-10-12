@@ -247,8 +247,8 @@ export default function MobileMenu({ isSidebar, handleMobileMenu, handleSidebar 
             <h4>Contact Info</h4>
             <ul>
               <li>{formatAddress()}</li>
-              <li><Link href={settings?.contactPhone ? `tel:${settings.contactPhone}` : "tel:+8801682648101"}>{settings?.contactPhone || '+88 01682648101'}</Link></li>
-              <li><Link href={settings?.contactEmail ? `mailto:${settings.contactEmail}` : "mailto:info@example.com"}>{settings?.contactEmail || 'info@example.com'}</Link></li>
+              <li><Link href={settings?.contactPhone ? `tel:${settings.contactPhone}` : "tel:+17274054050"}>{settings?.contactPhone || '+1 (727) 405-4050'}</Link></li>
+              <li><Link href={settings?.contactEmail ? `mailto:${settings.contactEmail}` : "mailto:info@agilenexussolutions.com"}>{settings?.contactEmail || 'info@agilenexussolutions.com'}</Link></li>
             </ul>
           </div>
 

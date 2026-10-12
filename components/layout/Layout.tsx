@@ -10,7 +10,6 @@ import Header3 from "./header/Header3";
 import Footer1 from "./footer/Footer1";
 
 const SearchPopup = dynamic(() => import("./SearchPopup"), { ssr: false });
-const SidebarPopup = dynamic(() => import("./SidebarPopup"), { ssr: false });
 
 type LayoutProps = {
   headerStyle?: 1 | 2 | 3;
@@ -44,10 +43,6 @@ export default function Layout({
   // Search Popup
   const [isPopup, setPopup] = useState(false);
   const handlePopup = () => setPopup((p) => !p);
-
-  // Sidebar Popup
-  const [isSidebar, setSidebar] = useState(false);
-  const handleSidebar = () => setSidebar((s) => !s);
 
   useEffect(() => {
     let cancelled = false;
@@ -93,8 +88,6 @@ export default function Layout({
       isMobileMenu,
       handleMobileMenu,
       handlePopup,
-      isSidebar,
-      handleSidebar,
     };
     switch (headerStyle) {
       case 1:
@@ -125,7 +118,6 @@ export default function Layout({
 
         {/* Popups */}
         <SearchPopup isPopup={isPopup} handlePopup={handlePopup} />
-        <SidebarPopup isOpen={isSidebar} onClose={handleSidebar} />
 
         {/* Breadcrumb */}
         {breadcrumbTitle && <Breadcrumb breadcrumbTitle={breadcrumbTitle} />}

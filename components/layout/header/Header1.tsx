@@ -218,8 +218,8 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                     {loading ? (
                       <span style={{ display: 'inline-block', width: '150px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
                     ) : (
-                      <a className="ms-2" href={settings?.contactPhone ? `tel:${settings.contactPhone}` : 'tel:17276354993'}>
-                        {settings?.contactPhone || '1-727-635-4993'}
+                      <a className="ms-2" href={settings?.contactPhone ? `tel:${settings.contactPhone}` : 'tel:+17274054050'}>
+                        {settings?.contactPhone || '+1 (727) 405-4050'}
                       </a>
                     )}
                   </div>
@@ -229,8 +229,8 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
                   {loading ? (
                     <span style={{ display: 'inline-block', width: '150px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
                   ) : (
-                    <a href={settings?.contactEmail ? `mailto:${settings.contactEmail}` : 'mailto:info@agilenexussolution.com'}>
-                      {settings?.contactEmail || 'info@agilenexussolution.com'}
+                    <a href={settings?.contactEmail ? `mailto:${settings.contactEmail}` : 'mailto:info@agilenexussolutions.com'}>
+                      {settings?.contactEmail || 'info@agilenexussolutions.com'}
                     </a>
                   )}
                 </li>
@@ -399,21 +399,6 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
               </div>
 
               <div className="menu-right-content">
-                {/* <div className="support-box">
-                  <div className="icon-box">
-                    <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={25} height={25} />
-                  </div>
-                  <span>Call Us</span>
-                  <h6>
-                    {loading ? (
-                      <span style={{ display: 'inline-block', width: '120px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
-                    ) : (
-                      <Link href={settings?.contactPhone ? `tel:${settings.contactPhone.replace(/\s/g, '')}` : 'tel:17276354993'}>
-                        {settings?.contactPhone || '1-727-635-4993'}
-                      </Link>
-                    )}
-                  </h6>
-                </div> */}
                 <div className="btn-box">
                   <Link href="/contact" className="theme-btn btn-one">
                     <span>Get Started</span>
@@ -537,21 +522,6 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
               </div>
 
               <div className="menu-right-content">
-                {/* <div className="support-box">
-                  <div className="icon-box">
-                    <Image src="/assets/images/icons/icon-1.svg" alt="Icon Image" width={25} height={25} />
-                  </div>
-                  <span>Call Us</span>
-                  <h6>
-                    {loading ? (
-                      <span style={{ display: 'inline-block', width: '120px', height: '16px', background: '#e0e0e0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }}></span>
-                    ) : (
-                      <Link href={settings?.contactPhone ? `tel:${settings.contactPhone.replace(/\s/g, '')}` : 'tel:17276354993'}>
-                        {settings?.contactPhone || '1-727-635-4993'}
-                      </Link>
-                    )}
-                  </h6>
-                </div> */}
                 <div className="btn-box">
                   <Link href="/contact" className="theme-btn btn-one">
                     <span>Get Started</span>
@@ -562,7 +532,6 @@ export default function Header1({ scroll, handleMobileMenu }: Header1Props) {
           </div>
         </div>
 
-        {/* ✅ Fixed MobileMenu props */}
         <MobileMenu
           isSidebar={false}
           handleMobileMenu={handleMobileMenu}

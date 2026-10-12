@@ -60,11 +60,10 @@ export default function Cta() {
     return null;
   }
 
-  const title = ctaMedia?.title || 'Need a Doctor for Check-up? Call for an Emergency Service!';
-  const imageUrl = ctaMedia?.fileUrl || '/assets/images/resource/ambulance-1.png';
-  const phoneNumber = settings?.contactPhone || '+1 (123)-456-155-23';
+  const title = ctaMedia?.title || 'Ready to streamline your revenue cycle? Talk to Agile Nexus Solutions today.';
+  const imageUrl = ctaMedia?.fileUrl || '';
+  const phoneNumber = settings?.contactPhone || '+1 (727) 405-4050';
   const emergencyNumber = settings?.emergencyNo || phoneNumber;
-  const phoneLink = phoneNumber.replace(/\s/g, '');
   const emergencyPhoneLink = emergencyNumber.replace(/\s/g, '');
 
   return (
@@ -100,31 +99,31 @@ export default function Cta() {
                 }}></span>
               ) : (
                 <span>
-                  
-                  Emergency Call: <Link href={`tel:${emergencyPhoneLink}`}>{emergencyNumber}</Link>
+                  Call Us: <Link href={`tel:${emergencyPhoneLink}`}>{emergencyNumber}</Link>
                 </span>
               )}
             </div>
           </div>
-          <figure className="image-layer">
-            {loading ? (
-              <div style={{ 
-                width: '576px', 
-                height: '303px', 
-                background: '#e0e0e0', 
-                borderRadius: '8px',
-                animation: 'pulse 1.5s ease-in-out infinite'
-              }}></div>
-            ) : (
-              <Image 
-                src={imageUrl} 
-                alt={ctaMedia?.altText || 'CTA Image'} 
-                width={576} 
-                height={303} 
-                priority 
-              />
-            )}
-          </figure>
+          {imageUrl ? (
+            <figure className="image-layer">
+              {loading ? (
+                <div style={{
+                  width: '576px',
+                  height: '303px',
+                  background: '#e0e0e0',
+                  borderRadius: '8px',
+                  animation: 'pulse 1.5s ease-in-out infinite'
+                }}></div>
+              ) : (
+                <Image
+                  src={imageUrl}
+                  alt={ctaMedia?.altText || 'Agile Nexus Solutions'}
+                  width={576}
+                  height={303}
+                />
+              )}
+            </figure>
+          ) : null}
         </div>
       </div>
       <style dangerouslySetInnerHTML={{ __html: `

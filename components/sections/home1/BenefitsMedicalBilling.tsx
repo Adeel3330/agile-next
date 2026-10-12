@@ -69,7 +69,7 @@ export default function BenefitsMedicalBilling() {
 
   const heading = pageData?.title || 'Benefits of Medical Billing Outsourcing';
 
-  const contentHtml =
+  const rawContentHtml =
     pageData?.content ||
     `
     <p>Outsourcing your medical billing gives your practice access to specialized revenue cycle expertise without the overhead of building a large in-house team.</p>
@@ -78,8 +78,10 @@ export default function BenefitsMedicalBilling() {
       <li>End-to-end HIPAA-compliant workflows that keep patient data secure and audit-ready at all times.</li>
       <li>Up to 70% reduction in operational and administrative costs, freeing cash flow to reinvest in patient care and growth.</li>
     </ul>
-    <p>With Medivantek managing your billing, your team can refocus on delivering quality care instead of chasing claims and paperwork.</p>
+    <p>With Agile Nexus Solutions managing your billing, your team can refocus on delivering quality care instead of chasing claims and paperwork.</p>
   `;
+
+  const contentHtml = rawContentHtml.replace(/Medivantek/gi, 'Agile Nexus Solutions');
 
   const heroImage = mediaItems[0]?.fileUrl || (pageData as any)?.fileUrl || '';
   const heroAlt =
