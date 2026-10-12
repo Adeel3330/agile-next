@@ -58,7 +58,7 @@ export default function Testimonial() {
             Agile Nexus Solutions
           </h2>
           <p>
-            Agile Nexus Solutions is a leading medical billing company in the USA. We provide comprehensive medical billing and revenue cycle management services for healthcare providers and medical billing companies across the USA.
+            Healthcare providers and billing companies across the USA trust Agile Nexus Solutions to keep their revenue cycle running smoothly. Here’s what some of them have to say about working with us.
           </p>
           <Link href="/testimonials/submit" className="theme-btn btn-one mt-3" style={{ marginTop: '12px' }}>
             <span>Share your experience</span>

@@ -1,7 +1,6 @@
 import dynamic from "next/dynamic";
 import Layout from "../../components/layout/Layout";
 import Banner from "../../components/sections/home1/Banner";
-import Contact_Info from "../../components/sections/home1/Contact_Info";
 import Certifications from "../../components/sections/home1/Certifications";
 import About from "../../components/sections/home1/About";
 
@@ -22,7 +21,6 @@ export default function Home() {
     <div className="boxed_wrapper">
       <Layout headerStyle={1} footerStyle={1}>
         <Banner />
-        <Contact_Info />
         <Certifications />
         <About />
         <WhyAgileSolutions />

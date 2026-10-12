@@ -276,8 +276,8 @@ export default function GoogleMapSection({ settings: propSettings, loading: prop
                     verticalAlign: 'middle'
                   }}></span>
                 ) : (
-                  <Link href={settings?.contactEmail ? `mailto:${settings.contactEmail}` : 'mailto:info@agilenexussolution.com'}>
-                    {settings?.contactEmail || 'info@agilenexussolution.com'}
+                  <Link href={settings?.contactEmail ? `mailto:${settings.contactEmail}` : 'mailto:info@agilenexussolutions.com'}>
+                    {settings?.contactEmail || 'info@agilenexussolutions.com'}
                   </Link>
                 )}
               </li>
@@ -294,8 +294,8 @@ export default function GoogleMapSection({ settings: propSettings, loading: prop
                     verticalAlign: 'middle'
                   }}></span>
                 ) : (
-                  <Link href={settings?.contactPhone ? `tel:${settings.contactPhone.replace(/\s/g, '')}` : 'tel:+17276354993'}>
-                    {settings?.contactPhone || '+1(727) 635 4993'}
+                  <Link href={settings?.contactPhone ? `tel:${settings.contactPhone.replace(/\s/g, '')}` : 'tel:+17274054050'}>
+                    {settings?.contactPhone || '+1 (727) 405-4050'}
                   </Link>
                 )}
               </li>

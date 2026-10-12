@@ -46,6 +46,30 @@ const nextConfig: NextConfig = {
       'swiper/react',
     ],
   },
+  async redirects() {
+    const demoPaths = [
+      '/doctors',
+      '/doctor-details',
+      '/departments',
+      '/department-details',
+      '/department-details-2',
+      '/department-details-3',
+      '/department-details-4',
+      '/department-details-5',
+      '/department-details-6',
+      '/pricing',
+      '/portfolio',
+      '/portfolio-2',
+      '/index-2',
+      '/index-3',
+    ];
+
+    return demoPaths.map((source) => ({
+      source,
+      destination: '/',
+      permanent: true,
+    }));
+  },
   async headers() {
     return [
       {

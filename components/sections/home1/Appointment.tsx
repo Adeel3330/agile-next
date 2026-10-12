@@ -9,8 +9,8 @@ export default function Appointment() {
                     <div className="bg-layer" style={{ backgroundImage: "url(assets/images/background/appointment-bg.jpg)" }}></div>
                     <div className="content-box">
                         <div className="icon-box"><Image src="/assets/images/icons/icon-4.svg" alt="Icon" width={88} height={88} priority /></div>
-                        <h3>Need a Doctor for Check-up? Call for an Emergency Service!</h3>
-                        <span><a href="tel:112345615523">Call: +1 (123)-456-155-23</a></span>
+                        <h3>Ready to streamline your revenue cycle? Talk to Agile Nexus Solutions today.</h3>
+                        <span><a href="tel:+17274054050">Call: +1 (727) 405-4050</a></span>
                     </div>
                 </div>
                 <div className="right-column">
